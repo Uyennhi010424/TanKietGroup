@@ -1,0 +1,2 @@
+<?php
+// Common helper functions
