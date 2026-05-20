@@ -11,10 +11,10 @@
 
 <section class="section section-muted">
 	<div class="container grid grid-4">
-		<article class="card stats reveal"><strong>500+</strong><span class="muted">Dự án hoàn thành</span></article>
-		<article class="card stats reveal"><strong>150+</strong><span class="muted">Doanh nghiệp đối tác</span></article>
-		<article class="card stats reveal"><strong>10k+</strong><span class="muted">Học viên đào tạo</span></article>
-		<article class="card stats reveal"><strong>95%</strong><span class="muted">Mức độ hài lòng</span></article>
+		<article class="card stats reveal"><strong class="count" data-target="50" data-suffix="+">0</strong><span class="muted">Dự án hoàn thành</span></article>
+		<article class="card stats reveal"><strong class="count" data-target="15" data-suffix="+">0</strong><span class="muted">Doanh nghiệp đối tác</span></article>
+		<article class="card stats reveal"><strong class="count" data-target="100" data-suffix="+">0</strong><span class="muted">Học viên đào tạo</span></article>
+		<article class="card stats reveal"><strong class="count" data-target="95" data-suffix="%">0</strong><span class="muted">Mức độ hài lòng</span></article>
 	</div>
 </section>
 
@@ -22,17 +22,32 @@
 	<div class="container">
 		<h2 class="reveal">Dịch vụ nổi bật</h2>
 		<div class="grid grid-3" style="margin-top:24px;">
-			<article class="card reveal">
-				<h3>Sản xuất </h3>
-				<p class="muted">Xây dựng giao diện chuẩn UX, tốc độ cao, tối ưu SEO và tối đa hóa chuyển đổi.</p>
+			<article class="card service-card reveal">
+				<div class="card-media">
+					<img src="/img/du_an.jpg" alt="Sản xuất">
+				</div>
+				<div class="card-content">
+					<h3>Sản xuất</h3>
+					<p class="muted">Xây dựng giao diện chuẩn UX, tốc độ cao, tối ưu SEO và tối đa hóa chuyển đổi.</p>
+				</div>
 			</article>
-			<article class="card reveal">
-				<h3>Quản trị Fanpage</h3>
-				<p class="muted">Lên chiến lược nội dung, vận hành quảng cáo và gia tăng tương tác thương hiệu.</p>
+			<article class="card service-card reveal">
+				<div class="card-media">
+					<img src="/img/du_an1.jpg" alt="Quản trị Fanpage">
+				</div>
+				<div class="card-content">
+					<h3>Quản trị Fanpage</h3>
+					<p class="muted">Lên chiến lược nội dung, vận hành quảng cáo và gia tăng tương tác thương hiệu.</p>
+				</div>
 			</article>
-			<article class="card reveal">
-				<h3>Marketing tổng thể</h3>
-				<p class="muted">Đồng bộ tất cả kênh từ branding đến performance với KPI rõ ràng theo từng tháng.</p>
+			<article class="card service-card reveal">
+				<div class="card-media">
+					<img src="/img/du_an5.jpg" alt="Marketing tổng thể">
+				</div>
+				<div class="card-content">
+					<h3>Marketing tổng thể</h3>
+					<p class="muted">Đồng bộ tất cả kênh từ branding đến performance với KPI rõ ràng theo từng tháng.</p>
+				</div>
 			</article>
 		</div>
 	</div>
@@ -42,13 +57,23 @@
 	<div class="container">
 		<h2 class="reveal">Dự án tiêu biểu</h2>
 		<div class="grid grid-2" style="margin-top:24px;">
-			<article class="card reveal">
-				<h3>Hệ sinh thái bất động sản</h3>
-				<p class="muted">Tái cấu trúc bộ nhận diện, website và hệ thống lead-gen, tăng 2.7 lần tỷ lệ chốt.</p>
+			<article class="card project-card reveal">
+				<div class="card-media">
+					<img src="/img/du_an3.jpg" alt="Hệ sinh thái bất động sản">
+				</div>
+				<div class="card-content">
+					<h3>Hệ sinh thái bất động sản</h3>
+					<p class="muted">Tái cấu trúc bộ nhận diện, website và hệ thống lead-gen, tăng 2.7 lần tỷ lệ chốt.</p>
+				</div>
 			</article>
-			<article class="card reveal">
-				<h3>Chiến dịch F&B đa kênh</h3>
-				<p class="muted">Tối ưu creative theo data, giảm 35% chi phí/khách hàng tiềm năng trong 3 tháng.</p>
+			<article class="card project-card reveal">
+				<div class="card-media">
+					<img src="/img/du_an4.jpg" alt="Chiến dịch F&B đa kênh">
+				</div>
+				<div class="card-content">
+					<h3>Chiến dịch F&B đa kênh</h3>
+					<p class="muted">Tối ưu creative theo data, giảm 35% chi phí/khách hàng tiềm năng trong 3 tháng.</p>
+				</div>
 			</article>
 		</div>
 	</div>

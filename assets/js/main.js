@@ -141,3 +141,66 @@ document.addEventListener('click', (e) => {
 });
 
 // Make hotline clickable behavior for mobile: nothing extra needed, ensure tel: link exists
+
+// Count-up animation for stats
+function animateCount(el, target, duration = 1400, opts = {}) {
+  const start = 0;
+  const startTime = performance.now();
+
+  function easeOutQuad(t) { return t * (2 - t); }
+
+  function frame(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = easeOutQuad(progress);
+    const current = Math.floor(start + (target - start) * eased);
+    render(current);
+    if (progress < 1) {
+      requestAnimationFrame(frame);
+    } else {
+      render(target);
+    }
+  }
+
+  function render(value) {
+    if (opts.abbrev === 'k') {
+      const k = Math.floor(value / 1000);
+      el.textContent = k + (opts.suffix || '');
+    } else if (opts.percent) {
+      el.textContent = value + (opts.suffix || '');
+    } else {
+      el.textContent = value + (opts.suffix || '');
+    }
+  }
+
+  requestAnimationFrame(frame);
+}
+
+function initCounters() {
+  const counters = document.querySelectorAll('.count');
+  if (!counters.length) return;
+
+  const obs = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const el = entry.target;
+      if (el.dataset.counted) return;
+      const target = parseInt(el.getAttribute('data-target') || '0', 10);
+      const suffix = el.getAttribute('data-suffix') || '';
+      const abbrev = el.getAttribute('data-abbrev') || '';
+      const isPercent = suffix === '%';
+      animateCount(el, target, 1400, { abbrev: abbrev, suffix: suffix, percent: isPercent });
+      el.dataset.counted = '1';
+      observer.unobserve(el);
+    });
+  }, { threshold: 0.2 });
+
+  counters.forEach(c => obs.observe(c));
+}
+
+// Initialize counters after DOM ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initCounters);
+} else {
+  initCounters();
+}
