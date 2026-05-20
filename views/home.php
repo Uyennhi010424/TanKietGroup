@@ -23,7 +23,7 @@
 		<h2 class="reveal">Dịch vụ nổi bật</h2>
 		<div class="grid grid-3" style="margin-top:24px;">
 			<article class="card reveal">
-				<h3>Thiết kế Website</h3>
+				<h3>Sản xuất </h3>
 				<p class="muted">Xây dựng giao diện chuẩn UX, tốc độ cao, tối ưu SEO và tối đa hóa chuyển đổi.</p>
 			</article>
 			<article class="card reveal">
