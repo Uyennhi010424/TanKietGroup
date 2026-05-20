@@ -61,7 +61,6 @@
 
                 <li><a href="/?page=services">Khóa học</a></li>
                 <li><a href="/?page=services">Dự án</a></li>
-                <li><a href="/?page=services">Hỗ trợ Khách hàng</a></li>
                 <li><a href="/?page=services">Tuyển dụng</a></li>
                 <li><a href="/?page=services">Blog</a></li>
                 <li><a class="<?php echo ($currentPage ?? '') === 'contact' ? 'active' : ''; ?>" href="/?page=contact">Liên hệ</a></li>
