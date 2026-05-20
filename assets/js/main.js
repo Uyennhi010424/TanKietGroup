@@ -204,3 +204,51 @@ if (document.readyState === 'loading') {
 } else {
   initCounters();
 }
+
+// Initialize Swiper sliders (services + projects) with accessibility and keyboard support
+(function(){
+  function initSwipers(){
+    if (typeof Swiper !== 'function') return;
+
+    const servicesEl = document.querySelector('.services-swiper');
+    if (servicesEl && !servicesEl.dataset.swiperInit) {
+      new Swiper(servicesEl, {
+        loop: true,
+        slidesPerView: 'auto',
+        spaceBetween: 24,
+        autoplay: { delay: 2800, disableOnInteraction: false },
+        keyboard: { enabled: true },
+        a11y: { enabled: true, prevSlideMessage: 'Slide trước', nextSlideMessage: 'Slide tiếp theo', slideLabelMessage: 'Slide {{index}} của {{slidesLength}}' },
+        pagination: { el: '.services-swiper .swiper-pagination', clickable: true },
+        navigation: { nextEl: '.services-swiper .swiper-button-next', prevEl: '.services-swiper .swiper-button-prev' }
+      });
+      servicesEl.dataset.swiperInit = '1';
+    }
+
+    const projectsEl = document.querySelector('.projects-swiper');
+    if (projectsEl && !projectsEl.dataset.swiperInit) {
+      new Swiper(projectsEl, {
+        loop: true,
+        slidesPerView: 2,
+        spaceBetween: 24,
+        autoplay: { delay: 3500, disableOnInteraction: false },
+        keyboard: { enabled: true },
+        a11y: { enabled: true },
+        navigation: { nextEl: '.projects-swiper .swiper-button-next', prevEl: '.projects-swiper .swiper-button-prev' },
+        pagination: { el: '.projects-swiper .swiper-pagination', clickable: true },
+        breakpoints: {
+          0: { slidesPerView: 1 },
+          700: { slidesPerView: 1.2 },
+          1000: { slidesPerView: 2 }
+        }
+      });
+      projectsEl.dataset.swiperInit = '1';
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSwipers);
+  } else {
+    initSwipers();
+  }
+})();
