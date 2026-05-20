@@ -2,5 +2,7 @@
 // Main layout wrapper
 ?>
 <?php include __DIR__ . '/header.php'; ?>
-<?php echo $content ?? ''; ?>
+<main id="main-content">
+	<?php echo $content ?? ''; ?>
+</main>
 <?php include __DIR__ . '/footer.php'; ?>

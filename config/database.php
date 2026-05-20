@@ -2,7 +2,7 @@
 // Database connection settings
 return [
     'host' => 'localhost',
-    'dbname' => 'tankiet',
+    'dbname' => 'tankietgroup',
     'user' => 'root',
     'pass' => ''
 ];
