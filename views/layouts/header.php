@@ -22,7 +22,9 @@
             <span class="sr-only">Mở menu</span>
         </button>
 
-        <a class="brand" href="/?page=home">TanKiet Group</a>
+        <a class="brand" href="/?page=home">
+            <img src="/img/logo.jpg" alt="TanKiet Group" class="site-logo">
+        </a>
 
         <nav id="main-nav" class="site-nav" data-main-nav>
             <ul>

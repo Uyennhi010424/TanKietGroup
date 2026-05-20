@@ -1,7 +1,9 @@
 <footer class="site-footer">
     <div class="container footer-grid">
         <div>
-            <h4 class="footer-title">TanKiet Group</h4>
+            <a class="brand" href="/?page=home">
+            <img src="/img/logo1.jpg" alt="TanKiet Group" class="site-logo">
+        </a>
             <p class="muted">Giải pháp Marketing tăng trưởng toàn diện và bền vững cho doanh nghiệp Việt.</p>
         </div>
         <div>

@@ -1,6 +1,5 @@
-<section class="hero">
+<section class="hero" style="--hero-banner: url('/img/hero.jpg');">
 	<div class="container reveal">
-		<span class="tag">Giải pháp tăng trưởng</span>
 		<h1>Chiến lược Marketing toàn diện cho doanh nghiệp hiện đại</h1>
 		<p class="lead">TanKiet Group kết hợp dữ liệu, sáng tạo và công nghệ để giúp doanh nghiệp gia tăng doanh thu bền vững trên đa kênh.</p>
 		<div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:24px;">
