@@ -123,6 +123,8 @@ if ($db && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $industryId = ($_POST['industry_id'] ?? '') === '' ? null : (int)$_POST['industry_id'];
             $serviceId = ($_POST['service_id'] ?? '') === '' ? null : (int)$_POST['service_id'];
             $shortDesc = trim($_POST['short_desc'] ?? '');
+            $content = trim($_POST['content'] ?? '');
+            $resultMetrics = trim($_POST['result_metrics'] ?? '');
             $thumbnail = trim($_POST['current_thumbnail'] ?? '');
             $status = (int)($_POST['status'] ?? 1);
 
@@ -148,7 +150,7 @@ if ($db && $_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             if ($id > 0) {
-                $stmt = $db->prepare('UPDATE projects SET title = :title, slug = :slug, client_name = :client_name, industry_id = :industry_id, service_id = :service_id, short_desc = :short_desc, thumbnail = :thumbnail, status = :status WHERE id = :id');
+                $stmt = $db->prepare('UPDATE projects SET title = :title, slug = :slug, client_name = :client_name, industry_id = :industry_id, service_id = :service_id, short_desc = :short_desc, content = :content, result_metrics = :result_metrics, thumbnail = :thumbnail, status = :status WHERE id = :id');
                 $stmt->execute([
                     'id' => $id,
                     'title' => $title,
@@ -157,14 +159,15 @@ if ($db && $_SERVER['REQUEST_METHOD'] === 'POST') {
                     'industry_id' => $industryId,
                     'service_id' => $serviceId,
                     'short_desc' => $shortDesc,
+                    'content' => $content,
+                    'result_metrics' => $resultMetrics,
                     'thumbnail' => $thumbnail,
                     'status' => $status,
                 ]);
                 header('Location: ' . with_query($adminRoutes['projects'], ['msg' => 'Đã cập nhật dự án']));
                 exit;
             }
-
-            $stmt = $db->prepare('INSERT INTO projects (title, slug, client_name, industry_id, service_id, short_desc, thumbnail, status) VALUES (:title, :slug, :client_name, :industry_id, :service_id, :short_desc, :thumbnail, :status)');
+            $stmt = $db->prepare('INSERT INTO projects (title, slug, client_name, industry_id, service_id, short_desc, content, result_metrics, thumbnail, status) VALUES (:title, :slug, :client_name, :industry_id, :service_id, :short_desc, :content, :result_metrics, :thumbnail, :status)');
             $stmt->execute([
                 'title' => $title,
                 'slug' => $slug,
@@ -172,6 +175,8 @@ if ($db && $_SERVER['REQUEST_METHOD'] === 'POST') {
                 'industry_id' => $industryId,
                 'service_id' => $serviceId,
                 'short_desc' => $shortDesc,
+                'content' => $content,
+                'result_metrics' => $resultMetrics,
                 'thumbnail' => $thumbnail,
                 'status' => $status,
             ]);
@@ -191,6 +196,8 @@ $editing = [
     'industry_id' => null,
     'service_id' => null,
     'short_desc' => '',
+    'content' => '',
+    'result_metrics' => '',
     'thumbnail' => '',
     'status' => 1,
 ];
@@ -198,7 +205,7 @@ $editing = [
 if ($db && isset($_GET['edit'])) {
     $editId = (int)$_GET['edit'];
     if ($editId > 0) {
-        $stmt = $db->prepare('SELECT id, title, slug, client_name, industry_id, service_id, short_desc, thumbnail, status FROM projects WHERE id = :id LIMIT 1');
+        $stmt = $db->prepare('SELECT id, title, slug, client_name, industry_id, service_id, short_desc, content, result_metrics, thumbnail, status FROM projects WHERE id = :id LIMIT 1');
         $stmt->execute(['id' => $editId]);
         $row = $stmt->fetch();
         if ($row) {
@@ -335,6 +342,16 @@ if ($db) {
                         <div style="grid-column:1 / -1;">
                             <label class="small">Mô tả ngắn</label>
                             <textarea class="form-control" name="short_desc" rows="3"><?php echo h($editing['short_desc']); ?></textarea>
+                        </div>
+
+                        <div style="grid-column:1 / -1;">
+                            <label class="small">Nội dung dự án</label>
+                            <textarea class="form-control" name="content" rows="6"><?php echo h($editing['content'] ?? ''); ?></textarea>
+                        </div>
+
+                        <div style="grid-column:1 / -1;">
+                            <label class="small">Kết quả đạt được (result_metrics)</label>
+                            <textarea class="form-control" name="result_metrics" rows="4" placeholder='Bạn có thể nhập JSON hoặc mô tả ngắn'><?php echo h($editing['result_metrics'] ?? ''); ?></textarea>
                         </div>
 
                         <div style="grid-column:1 / -1;">

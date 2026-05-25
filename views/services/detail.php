@@ -1,74 +1,58 @@
-<?php 
-// services/detail.php
-include '../header.php'; 
+<?php
+require_once __DIR__ . '/../../includes/site.php';
 
-$slug = $_GET['slug'] ?? '';
+$slug = trim((string)($_GET['slug'] ?? ''));
+$service = null;
 
-// Dữ liệu dịch vụ (bạn có thể mở rộng sau)
-$services = [
-    'marketing-tong-the' => [
-        'title' => 'Marketing Tổng Thể',
-        'short_desc' => 'Đồng bộ tất cả kênh từ branding đến performance',
-        'image' => '../assets/images/services/marketing.jpg',
-        'description' => 'Chúng tôi cung cấp giải pháp marketing tổng thể giúp doanh nghiệp xây dựng thương hiệu và tăng doanh thu bền vững.'
-    ],
-    'san-xuat' => [
-        'title' => 'Sản Xuất',
-        'short_desc' => 'Xây dựng giao diện tối ưu SEO và tối đa chuyển đổi',
-        'image' => '../assets/images/services/sanxuat.jpg',
-        'description' => 'Dịch vụ sản xuất nội dung, video, website chất lượng cao.'
-    ]
-    // Thêm dịch vụ khác ở đây...
-];
+if ($slug !== '') {
+    $service = site_fetch_one(
+        'SELECT s.*, i.name AS industry_name
+         FROM services s
+         LEFT JOIN industries i ON i.id = s.industry_id
+         WHERE s.slug = :slug AND s.status = 1
+         LIMIT 1',
+        ['slug' => $slug]
+    );
+}
 
-$service = $services[$slug] ?? $services['marketing-tong-the'];
+if (!$service) {
+    $service = site_fetch_one(
+        'SELECT s.*, i.name AS industry_name
+         FROM services s
+         LEFT JOIN industries i ON i.id = s.industry_id
+         WHERE s.status = 1
+         ORDER BY s.sort_order ASC, s.id DESC
+         LIMIT 1'
+    );
+}
+
+if (!$service) {
+    echo '<section class="section"><div class="container"><div class="card"><h3>Chưa có dịch vụ</h3><p class="muted">Thêm dịch vụ trong admin để trang này hiển thị.</p></div></div></section>';
+    return;
+}
 ?>
-
-<!-- Hero Section -->
-<section class="service-hero py-5 text-white" style="background: linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.75)), url('<?= $service['image'] ?>') center/cover no-repeat;">
-    <div class="container">
-        <h1 class="display-4 fw-bold text-center"><?= $service['title'] ?></h1>
-        <p class="lead text-center"><?= $service['short_desc'] ?></p>
-    </div>
+<section class="hero" style="--hero-banner: url('<?php echo htmlspecialchars(site_image_url($service['image'] ?? '', '/img/hero.jpg'), ENT_QUOTES, 'UTF-8'); ?>');">
+	<div class="container reveal">
+		<span class="tag"><?php echo htmlspecialchars($service['industry_name'] ?? 'Dịch vụ', ENT_QUOTES, 'UTF-8'); ?></span>
+		<h1><?php echo htmlspecialchars($service['title'], ENT_QUOTES, 'UTF-8'); ?></h1>
+		<p class="lead"><?php echo htmlspecialchars($service['short_desc'] ?: 'Dịch vụ được quản lý từ admin và hiển thị trực tiếp cho người dùng.', ENT_QUOTES, 'UTF-8'); ?></p>
+	</div>
 </section>
 
-<section class="py-5">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-8">
-                <h2>Về dịch vụ</h2>
-                <p><?= $service['description'] ?></p>
-
-                <h3 class="mt-5">Dịch vụ bao gồm</h3>
-                <ul class="list-unstyled">
-                    <li><i class="fas fa-check text-success me-2"></i> Giao diện chuẩn thương hiệu</li>
-                    <li><i class="fas fa-check text-success me-2"></i> Responsive mobile</li>
-                    <li><i class="fas fa-check text-success me-2"></i> Tối ưu tốc độ & SEO</li>
-                    <li><i class="fas fa-check text-success me-2"></i> Tích hợp chat, form liên hệ</li>
-                </ul>
-
-                <h3 class="mt-5">Quy trình thực hiện</h3>
-                <div class="row text-center">
-                    <div class="col-md-3"><div class="step">01</div><p>Tư vấn</p></div>
-                    <div class="col-md-3"><div class="step">02</div><p>Thiết kế</p></div>
-                    <div class="col-md-3"><div class="step">03</div><p>Triển khai</p></div>
-                    <div class="col-md-3"><div class="step">04</div><p>Bàn giao</p></div>
-                </div>
-            </div>
-
-            <!-- Sidebar -->
-            <div class="col-lg-4">
-                <div class="card sticky-top" style="top: 100px;">
-                    <div class="card-body">
-                        <h4>Thông tin dịch vụ</h4>
-                        <p><strong>Thời gian:</strong> 15 - 45 ngày</p>
-                        <p><strong>Giá:</strong> <span class="text-primary">Liên hệ báo giá</span></p>
-                        <a href="../lien-he.php" class="btn btn-primary w-100">Nhận tư vấn ngay</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+<section class="section">
+	<div class="container grid grid-2">
+		<article class="card reveal">
+			<h2>Về dịch vụ</h2>
+			<?php echo nl2br(htmlspecialchars((string)($service['content'] ?: 'Nội dung chi tiết chưa được cập nhật.'), ENT_QUOTES, 'UTF-8')); ?>
+		</article>
+		<article class="card reveal">
+			<h2>Thông tin nhanh</h2>
+			<ul class="contact-list">
+				<li><strong>Ngành:</strong> <?php echo htmlspecialchars($service['industry_name'] ?? 'Chưa phân loại', ENT_QUOTES, 'UTF-8'); ?></li>
+				<li><strong>Trạng thái:</strong> Đang hiển thị</li>
+				<li><strong>Liên hệ:</strong> <?php echo htmlspecialchars((site_settings()['hotline'] ?? '') ?: 'Liên hệ qua trang tư vấn', ENT_QUOTES, 'UTF-8'); ?></li>
+			</ul>
+			<p style="margin-top:16px;"><a class="btn btn-primary" href="/?page=consultations">Nhận tư vấn ngay</a></p>
+		</article>
+	</div>
 </section>
-
-<?php include '../footer.php'; ?>

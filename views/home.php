@@ -1,7 +1,42 @@
-<section class="hero" style="--hero-banner: url('/img/hero.jpg');">
+<?php
+require_once __DIR__ . '/../includes/site.php';
+
+$site = site_settings();
+$heroBanner = site_image_url($site['banner'] ?? '', '/img/hero.jpg');
+$services = site_fetch_all(
+    'SELECT s.id, s.title, s.slug, s.short_desc, s.image, i.name AS industry_name
+     FROM services s
+     LEFT JOIN industries i ON i.id = s.industry_id
+     WHERE s.status = 1
+     ORDER BY s.sort_order ASC, s.id DESC
+     LIMIT 6'
+);
+$projects = site_fetch_all(
+    'SELECT id, title, slug, short_desc, thumbnail
+     FROM projects
+     WHERE status = 1
+     ORDER BY created_at DESC
+     LIMIT 4'
+);
+$courses = site_fetch_all(
+    'SELECT id, title, slug, short_desc, thumbnail, price, discount_price
+     FROM courses
+     WHERE status = 1
+     ORDER BY sort_order ASC, created_at DESC
+     LIMIT 4'
+);
+$posts = site_fetch_all(
+    'SELECT id, title, slug, thumbnail, meta_title, created_at
+     FROM blog_posts
+     WHERE status = "published"
+     ORDER BY is_featured DESC, published_at DESC, created_at DESC
+     LIMIT 4'
+);
+?>
+<section class="hero" style="--hero-banner: url('<?php echo htmlspecialchars($heroBanner, ENT_QUOTES, 'UTF-8'); ?>');">
 	<div class="container reveal">
-		<h1>Chiến lược Marketing toàn diện cho doanh nghiệp hiện đại</h1>
-		<p class="lead">TanKiet Group kết hợp dữ liệu, sáng tạo và công nghệ để giúp doanh nghiệp gia tăng doanh thu bền vững trên đa kênh.</p>
+		<h1><?php echo htmlspecialchars($site['meta_title'] ?: 'Chiến lược Marketing toàn diện cho doanh nghiệp hiện đại', ENT_QUOTES, 'UTF-8'); ?></h1>
+		<p class="lead"><?php echo htmlspecialchars($site['meta_description'] ?: 'TanKiet Group kết hợp dữ liệu, sáng tạo và công nghệ để giúp doanh nghiệp gia tăng doanh thu bền vững trên đa kênh.', ENT_QUOTES, 'UTF-8'); ?></p>
 		<div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:24px;">
 			<a class="btn btn-primary" href="/?page=services">Khám phá dịch vụ</a>
 			<a class="btn btn-outline" href="/?page=about">Tìm hiểu chúng tôi</a>
@@ -11,163 +46,40 @@
 
 <section class="section section-muted">
 	<div class="container grid grid-4">
-		<article class="card stats reveal"><strong class="count" data-target="50" data-suffix="+">0</strong><span class="muted">Dự án hoàn thành</span></article>
-		<article class="card stats reveal"><strong class="count" data-target="35" data-suffix="+">0</strong><span class="muted">Doanh nghiệp đối tác</span></article>
-		<article class="card stats reveal"><strong class="count" data-target="99" data-suffix="+">0</strong><span class="muted">Học viên đào tạo</span></article>
-		<article class="card stats reveal"><strong class="count" data-target="97" data-suffix="%">0</strong><span class="muted">Mức độ hài lòng</span></article>
+		<article class="card stats reveal"><strong class="count" data-target="<?php echo count($projects); ?>">0</strong><span class="muted">Dự án đang hiển thị</span></article>
+		<article class="card stats reveal"><strong class="count" data-target="<?php echo count($services); ?>">0</strong><span class="muted">Dịch vụ đang hiển thị</span></article>
+		<article class="card stats reveal"><strong class="count" data-target="<?php echo count($courses); ?>">0</strong><span class="muted">Khóa học đang hiển thị</span></article>
+		<article class="card stats reveal"><strong class="count" data-target="<?php echo count($posts); ?>">0</strong><span class="muted">Bài viết đang hiển thị</span></article>
 	</div>
 </section>
 
 <section class="section">
 	<div class="container">
 		<h2 class="reveal">Dịch vụ nổi bật</h2>
-
 		<div class="swiper services-swiper" style="margin-top:24px;">
 			<div class="swiper-wrapper">
-
-				<!-- SERVICE 1 -->
-				<div class="swiper-slide">
-					<article class="card service-card reveal">
-
-						<div class="card-media service-overlay-wrap">
-							<img src="/img/du_an.jpg" alt="Sản xuất">
-
-							<a href="/services/detail.php?id=san-xuat" class="service-overlay">
-								Xem chi tiết
-							</a>
+				<?php if (!$services): ?>
+					<div class="swiper-slide"><article class="card reveal"><h3>Chưa có dữ liệu dịch vụ</h3><p class="muted">Hãy thêm dịch vụ trong trang quản trị.</p></article></div>
+				<?php else: ?>
+					<?php foreach ($services as $service): ?>
+						<div class="swiper-slide">
+							<article class="card service-card reveal">
+								<div class="card-media service-overlay-wrap">
+									<img src="<?php echo htmlspecialchars(site_image_url($service['image'] ?? '', '/img/du_an.jpg'), ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($service['title'], ENT_QUOTES, 'UTF-8'); ?>">
+									<a href="/?page=service_detail&amp;slug=<?php echo rawurlencode($service['slug']); ?>" class="service-overlay">Xem chi tiết</a>
+								</div>
+								<div class="card-content">
+									<h3><?php echo htmlspecialchars($service['title'], ENT_QUOTES, 'UTF-8'); ?></h3>
+									<p class="muted"><?php echo htmlspecialchars($service['short_desc'] ?: ($service['industry_name'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></p>
+								</div>
+							</article>
 						</div>
-
-						<div class="card-content">
-							<h3>Sản xuất</h3>
-							<p class="muted">
-								Xây dựng giao diện chuẩn UX, tốc độ cao,
-								tối ưu SEO và tối đa hóa chuyển đổi.
-							</p>
-						</div>
-
-					</article>
-				</div>
-
-				<!-- SERVICE 2 -->
-				<div class="swiper-slide">
-					<article class="card service-card reveal">
-
-						<div class="card-media service-overlay-wrap">
-							<img src="/img/du_an1.jpg" alt="Quản trị Fanpage">
-
-							<a href="/services/detail.php?id=fanpage" class="service-overlay">
-								Xem chi tiết
-							</a>
-						</div>
-
-						<div class="card-content">
-							<h3>Quản trị Fanpage</h3>
-							<p class="muted">
-								Lên chiến lược nội dung, vận hành quảng cáo
-								và gia tăng tương tác thương hiệu.
-							</p>
-						</div>
-
-					</article>
-				</div>
-
-				<!-- SERVICE 3 -->
-				<div class="swiper-slide">
-					<article class="card service-card reveal">
-
-						<div class="card-media service-overlay-wrap">
-							<img src="/img/du_an5.jpg" alt="Marketing tổng thể">
-
-							<a href="/services/detail.php?id=marketing" class="service-overlay">
-								Xem chi tiết
-							</a>
-						</div>
-
-						<div class="card-content">
-							<h3>Marketing tổng thể</h3>
-							<p class="muted">
-								Đồng bộ tất cả kênh từ branding đến performance
-								với KPI rõ ràng theo từng tháng.
-							</p>
-						</div>
-
-					</article>
-				</div>
-				<div class="swiper-slide">
-					<article class="card service-card reveal">
-
-						<div class="card-media service-overlay-wrap">
-							<img src="/img/du_an.jpg" alt="Sản xuất">
-
-							<a href="/services/detail.php?id=san-xuat" class="service-overlay">
-								Xem chi tiết
-							</a>
-						</div>
-
-						<div class="card-content">
-							<h3>Sản xuất</h3>
-							<p class="muted">
-								Xây dựng giao diện chuẩn UX, tốc độ cao,
-								tối ưu SEO và tối đa hóa chuyển đổi.
-							</p>
-						</div>
-
-					</article>
-				</div>
-
-				<!-- SERVICE 2 -->
-				<div class="swiper-slide">
-					<article class="card service-card reveal">
-
-						<div class="card-media service-overlay-wrap">
-							<img src="/img/du_an1.jpg" alt="Quản trị Fanpage">
-
-							<a href="/services/detail.php?id=fanpage" class="service-overlay">
-								Xem chi tiết
-							</a>
-						</div>
-
-						<div class="card-content">
-							<h3>Quản trị Fanpage</h3>
-							<p class="muted">
-								Lên chiến lược nội dung, vận hành quảng cáo
-								và gia tăng tương tác thương hiệu.
-							</p>
-						</div>
-
-					</article>
-				</div>
-
-				<!-- SERVICE 3 -->
-				<div class="swiper-slide">
-					<article class="card service-card reveal">
-
-						<div class="card-media service-overlay-wrap">
-							<img src="/img/du_an5.jpg" alt="Marketing tổng thể">
-
-							<a href="/services/detail.php?id=marketing" class="service-overlay">
-								Xem chi tiết
-							</a>
-						</div>
-
-						<div class="card-content">
-							<h3>Marketing tổng thể</h3>
-							<p class="muted">
-								Đồng bộ tất cả kênh từ branding đến performance
-								với KPI rõ ràng theo từng tháng.
-							</p>
-						</div>
-
-					</article>
-				</div>
-
+					<?php endforeach; ?>
+				<?php endif; ?>
 			</div>
-			
-
 			<div class="swiper-button-prev"></div>
 			<div class="swiper-button-next"></div>
 			<div class="swiper-pagination"></div>
-
 		</div>
 	</div>
 </section>
@@ -177,30 +89,24 @@
 		<h2 class="reveal">Dự án tiêu biểu</h2>
 		<div class="swiper projects-swiper" style="margin-top:24px;">
 			<div class="swiper-wrapper">
-				<div class="swiper-slide">
-					<article class="card project-card reveal">
-						<div class="card-media">
-							<img src="/img/du_an3.jpg" alt="Hệ sinh thái bất động sản">
-							<a class="project-overlay" href="/?page=projects&amp;id=du_an3" aria-label="Xem chi tiết dự án Hệ sinh thái bất động sản">Xem chi tiết</a>
+				<?php if (!$projects): ?>
+					<div class="swiper-slide"><article class="card reveal"><h3>Chưa có dữ liệu dự án</h3><p class="muted">Hãy thêm dự án trong trang quản trị.</p></article></div>
+				<?php else: ?>
+					<?php foreach ($projects as $project): ?>
+						<div class="swiper-slide">
+							<article class="card project-card reveal">
+								<div class="card-media">
+									<img src="<?php echo htmlspecialchars(site_image_url($project['thumbnail'] ?? '', '/img/du_an3.jpg'), ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($project['title'], ENT_QUOTES, 'UTF-8'); ?>">
+									<a class="project-overlay" href="/?page=project_detail&amp;slug=<?php echo rawurlencode($project['slug']); ?>" aria-label="Xem chi tiết dự án <?php echo htmlspecialchars($project['title'], ENT_QUOTES, 'UTF-8'); ?>">Xem chi tiết</a>
+								</div>
+								<div class="card-content">
+									<h3><?php echo htmlspecialchars($project['title'], ENT_QUOTES, 'UTF-8'); ?></h3>
+									<p class="muted"><?php echo htmlspecialchars($project['short_desc'] ?? '', ENT_QUOTES, 'UTF-8'); ?></p>
+								</div>
+							</article>
 						</div>
-						<div class="card-content">
-							<h3>Hệ sinh thái bất động sản</h3>
-							<p class="muted">Tái cấu trúc bộ nhận diện, website và hệ thống lead-gen, tăng 2.7 lần tỷ lệ chốt.</p>
-						</div>
-					</article>
-				</div>
-				<div class="swiper-slide">
-					<article class="card project-card reveal">
-						<div class="card-media">
-							<img src="/img/du_an4.jpg" alt="Chiến dịch F&B đa kênh">
-							<a class="project-overlay" href="/?page=projects&amp;id=du_an4" aria-label="Xem chi tiết dự án Chiến dịch F&B đa kênh">Xem chi tiết</a>
-						</div>
-						<div class="card-content">
-							<h3>Chiến dịch F&B đa kênh</h3>
-							<p class="muted">Tối ưu creative theo data, giảm 35% chi phí/khách hàng tiềm năng trong 3 tháng.</p>
-						</div>
-					</article>
-				</div>
+					<?php endforeach; ?>
+				<?php endif; ?>
 			</div>
 			<div class="swiper-button-prev" aria-label="Previous slide"></div>
 			<div class="swiper-button-next" aria-label="Next slide"></div>
@@ -210,8 +116,47 @@
 </section>
 
 <section class="section">
+	<div class="container">
+		<h2 class="reveal">Khóa học mới</h2>
+		<div class="grid grid-4" style="margin-top:24px;">
+			<?php if (!$courses): ?>
+				<article class="card reveal"><h3>Chưa có khóa học</h3><p class="muted">Thêm khóa học trong admin để hiển thị tại đây.</p></article>
+			<?php else: ?>
+				<?php foreach ($courses as $course): ?>
+					<article class="card reveal">
+						<img src="<?php echo htmlspecialchars(site_image_url($course['thumbnail'] ?? '', '/img/du_an.jpg'), ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($course['title'], ENT_QUOTES, 'UTF-8'); ?>" style="width:100%;height:180px;object-fit:cover;border-radius:12px;">
+						<h3 style="margin-top:14px;"><?php echo htmlspecialchars($course['title'], ENT_QUOTES, 'UTF-8'); ?></h3>
+						<p class="muted"><?php echo htmlspecialchars($course['short_desc'] ?? '', ENT_QUOTES, 'UTF-8'); ?></p>
+						<p><a href="/?page=course_detail&amp;slug=<?php echo rawurlencode($course['slug']); ?>">Xem chi tiết</a></p>
+					</article>
+				<?php endforeach; ?>
+			<?php endif; ?>
+		</div>
+	</div>
+</section>
+
+<section class="section section-muted">
+	<div class="container">
+		<h2 class="reveal">Tin mới từ blog</h2>
+		<div class="grid grid-4" style="margin-top:24px;">
+			<?php if (!$posts): ?>
+				<article class="card reveal"><h3>Chưa có bài viết</h3><p class="muted">Thêm blog post trong admin để hiển thị tại đây.</p></article>
+			<?php else: ?>
+				<?php foreach ($posts as $post): ?>
+					<article class="card reveal">
+						<img src="<?php echo htmlspecialchars(site_image_url($post['thumbnail'] ?? '', '/img/du_an4.jpg'), ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($post['title'], ENT_QUOTES, 'UTF-8'); ?>" style="width:100%;height:180px;object-fit:cover;border-radius:12px;">
+						<h3 style="margin-top:14px;"><?php echo htmlspecialchars($post['title'], ENT_QUOTES, 'UTF-8'); ?></h3>
+						<p><a href="/?page=blog_detail&amp;slug=<?php echo rawurlencode($post['slug']); ?>">Đọc bài viết</a></p>
+					</article>
+				<?php endforeach; ?>
+			<?php endif; ?>
+		</div>
+	</div>
+</section>
+
+<section class="section">
 	<div class="container card reveal" style="text-align:center;">
-		<h2>Sẵn sàng bứt phá cùng TanKiet Group?</h2>
+		<h2>Sẵn sàng bứt phá cùng <?php echo htmlspecialchars($site['site_name'] ?: APP_NAME, ENT_QUOTES, 'UTF-8'); ?>?</h2>
 		<p class="lead" style="margin-inline:auto;">Nhận tư vấn 1:1 và lộ trình tăng trưởng phù hợp với mục tiêu doanh nghiệp của bạn.</p>
 		<a class="btn btn-primary" href="/?page=contact">Đăng ký tư vấn miễn phí</a>
 	</div>

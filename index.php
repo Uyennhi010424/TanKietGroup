@@ -16,9 +16,41 @@ $viewMap = [
 		'view' => __DIR__ . '/views/services/index.php',
 		'title' => 'Dịch vụ',
 	],
+	'service_detail' => [
+		'view' => __DIR__ . '/views/services/detail.php',
+		'title' => 'Chi tiết dịch vụ',
+	],
+	'courses' => [
+		'view' => __DIR__ . '/views/courses/index.php',
+		'title' => 'Khóa học',
+	],
+	'course_detail' => [
+		'view' => __DIR__ . '/views/courses/detail.php',
+		'title' => 'Chi tiết khóa học',
+	],
+	'projects' => [
+		'view' => __DIR__ . '/views/projects/index.php',
+		'title' => 'Dự án',
+	],
+	'project_detail' => [
+		'view' => __DIR__ . '/views/projects/detail.php',
+		'title' => 'Chi tiết dự án',
+	],
+	'blog' => [
+		'view' => __DIR__ . '/views/blog/index.php',
+		'title' => 'Blog',
+	],
+	'blog_detail' => [
+		'view' => __DIR__ . '/views/blog/detail.php',
+		'title' => 'Chi tiết bài viết',
+	],
 	'contact' => [
 		'view' => __DIR__ . '/views/contact.php',
 		'title' => 'Liên hệ',
+	],
+	'recruitments' => [
+		'view' => __DIR__ . '/views/recruitments.php',
+		'title' => 'Tuyển dụng',
 	],
 	'consultations' => [
 		'view' => __DIR__ . '/views/consultations.php',
@@ -84,17 +116,23 @@ $viewMap = [
 		'title' => 'Đăng nhập quản trị',
 		'layout' => 'none',
 	],
-	'projects' => [
-		'view' => __DIR__ . '/views/projects/index.php',
-		'title' => 'Dự án',
-	],
 ];
 
+// Backward-compatible aliases for older query params.
+if ($page === 'services' && !empty($_GET['slug'])) {
+	$page = 'service_detail';
+}
 
-// Special handling: if requesting a specific project detail via ?page=projects&id=slug
+if ($page === 'courses' && !empty($_GET['slug'])) {
+	$page = 'course_detail';
+}
+
 if ($page === 'projects' && !empty($_GET['id'])) {
-    $viewMap['projects']['view'] = __DIR__ . '/views/projects/detail.php';
-    $viewMap['projects']['title'] = 'Chi tiết dự án';
+	$page = 'project_detail';
+}
+
+if ($page === 'blog' && !empty($_GET['slug'])) {
+	$page = 'blog_detail';
 }
 
 if (!isset($viewMap[$page])) {

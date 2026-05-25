@@ -1,7 +1,12 @@
+<?php
+require_once __DIR__ . '/../includes/site.php';
+
+$site = site_settings();
+?>
 <section class="hero">
 	<div class="container reveal">
 		<span class="tag">Liên hệ</span>
-		<h1>Kết nối với TanKiet Group</h1>
+		<h1>Kết nối với <?php echo htmlspecialchars($site['site_name'] ?: APP_NAME, ENT_QUOTES, 'UTF-8'); ?></h1>
 		<p class="lead">Gửi thông tin nhu cầu, đội ngũ của chúng tôi sẽ liên hệ và tư vấn lộ trình phù hợp trong vòng 24 giờ.</p>
 	</div>
 </section>
@@ -11,12 +16,10 @@
 		<article class="card reveal">
 			<h2>Thông tin kết nối</h2>
 			<ul class="contact-list">
-				<li><strong>Hotline:</strong> 0901 234 567</li>
-				<li><strong>Email:</strong> contact@tankiet.group</li>
-				<li><strong>Địa chỉ:</strong> Quận 1, TP. Hồ Chí Minh</li>
-				<li><strong>Giờ làm việc:</strong> 08:30 - 18:00 (Thứ Hai - Thứ Bảy)</li>
+				<li><strong>Hotline:</strong> <?php echo htmlspecialchars($site['hotline'] ?: '0901 234 567', ENT_QUOTES, 'UTF-8'); ?></li>
+				<li><strong>Email:</strong> <?php echo htmlspecialchars($site['email'] ?: 'contact@tankiet.group', ENT_QUOTES, 'UTF-8'); ?></li>
+				<li><strong>Địa chỉ:</strong> <?php echo htmlspecialchars($site['address'] ?: 'TP. Hồ Chí Minh', ENT_QUOTES, 'UTF-8'); ?></li>
 			</ul>
-			<p class="muted" style="margin-top:16px;">Bạn có thể đặt lịch hẹn trực tiếp để được phân tích nhanh tình hình marketing hiện tại của doanh nghiệp.</p>
 		</article>
 
 		<article class="card reveal">

@@ -1,10 +1,18 @@
 <!doctype html>
 <html lang="vi">
 <head>
+<?php
+require_once __DIR__ . '/../../includes/site.php';
+$site = site_settings();
+$logoUrl = site_image_url($site['logo'] ?? '', '/img/logo.jpg');
+$metaTitle = trim((string)($site['meta_title'] ?? ''));
+$metaDescription = trim((string)($site['meta_description'] ?? ''));
+$resolvedTitle = $pageTitle ?? ($metaTitle !== '' ? $metaTitle : APP_NAME);
+?>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title><?php echo ($pageTitle ?? APP_NAME) . ' | ' . APP_NAME; ?></title>
-    <meta name="description" content="TanKiet Group - Giải pháp Marketing tăng trưởng toàn diện cho doanh nghiệp hiện đại.">
+    <title><?php echo htmlspecialchars($resolvedTitle . ' | ' . ($site['site_name'] ?? APP_NAME), ENT_QUOTES, 'UTF-8'); ?></title>
+    <meta name="description" content="<?php echo htmlspecialchars($metaDescription !== '' ? $metaDescription : 'TanKiet Group - Giải pháp Marketing tăng trưởng toàn diện cho doanh nghiệp hiện đại.', ENT_QUOTES, 'UTF-8'); ?>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -24,7 +32,7 @@
         </button>
 
         <a class="brand" href="/?page=home">
-            <img src="/img/logo.jpg" alt="TanKiet Group" class="site-logo">
+            <img src="<?php echo htmlspecialchars($logoUrl, ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($site['site_name'] ?? APP_NAME, ENT_QUOTES, 'UTF-8'); ?>" class="site-logo">
         </a>
 
         <nav id="main-nav" class="site-nav" data-main-nav>
@@ -39,40 +47,29 @@
                             <div class="dropdown-column">
                                 <h4>Dịch vụ chính</h4>
                                 <ul>
-                                    <li><a href="/?page=services#marketing-tron-goi">Marketing Trọn gói</a></li>
-                                    <li><a href="/?page=services#cham-soc-fanpage">Chăm sóc Fanpage</a></li>
-                                    <li><a href="/?page=services#san-xuat-video">Sản xuất Video</a></li>
-                                    <li><a href="/?page=services#to-chuc-su-kien">Tổ chức Sự kiện</a></li>
-                                    <li><a href="/?page=services#thiet-ke-website">Thiết kế Website chuẩn SEO</a></li>
+                                    <li><a href="/?page=services">Tất cả dịch vụ</a></li>
                                 </ul>
                             </div>
                             <div class="dropdown-column">
                                 <h4>Marketing theo ngành</h4>
                                 <ul>
-                                    <li><a class="highlight" href="/?page=services#xd">Marketing cho Xây dựng</a></li>
-                                    <li><a href="/?page=services#bds">Marketing cho Bất động sản</a></li>
-                                    <li><a href="/?page=services#fb">Marketing cho F&B</a></li>
-                                    <li><a href="/?page=services#beauty">Marketing cho Beauty</a></li>
-                                    <li><a href="/?page=services#ban-le">Marketing cho Bán lẻ</a></li>
-                                    <li><a href="/?page=services#nong-nghiep">Marketing cho Nông nghiệp</a></li>
-                                    <li><a href="/?page=services#du-lich">Marketing cho Du lịch</a></li>
+                                    <li><a class="highlight" href="/?page=services">Giải pháp theo ngành</a></li>
                                 </ul>
                             </div>
                         </div>
                     </div>
                 </li>
 
-                <li><a href="/?page=services">Khóa học</a></li>
-                <li><a href="/?page=services">Dự án</a></li>
-                <li><a href="/?page=services">Tuyển dụng</a></li>
-                <li><a href="/?page=services">Blog</a></li>
-                <li><a class="<?php echo ($currentPage ?? '') === 'consultations' ? 'active' : ''; ?>" href="/?page=consultations">Tư vấn</a></li>
+                <li><a class="<?php echo ($currentPage ?? '') === 'courses' ? 'active' : ''; ?>" href="/?page=courses">Khóa học</a></li>
+                <li><a class="<?php echo in_array($currentPage ?? '', ['projects', 'project_detail'], true) ? 'active' : ''; ?>" href="/?page=projects">Dự án</a></li>
+                <li><a class="<?php echo in_array($currentPage ?? '', ['blog', 'blog_detail'], true) ? 'active' : ''; ?>" href="/?page=blog">Blog</a></li>
+                <li><a class="<?php echo ($currentPage ?? '') === 'recruitments' ? 'active' : ''; ?>" href="/?page=recruitments">Tuyển dụng</a></li>
                 <li><a class="<?php echo ($currentPage ?? '') === 'contact' ? 'active' : ''; ?>" href="/?page=contact">Liên hệ</a></li>
             </ul>
         </nav>
 
         <div class="header-cta">
-            <a class="btn btn-primary" href="/?page=consultations">Tư vấn ngay</a>
+            <a class="btn btn-primary" href="/?page=contact"><?php echo htmlspecialchars($site['hotline'] ? ('Gọi ' . $site['hotline']) : 'Liên hệ', ENT_QUOTES, 'UTF-8'); ?></a>
         </div>
     </div>
 </header>

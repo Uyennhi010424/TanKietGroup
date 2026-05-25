@@ -18,6 +18,7 @@ $adminRoutes = [
 
 require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/security.php';
+require_once __DIR__ . '/../includes/functions.php';
 
 $loginRoute = $isAdminRoot ? '/login.php' : '/?page=admin_login';
 $logoutRoute = $isAdminRoot ? '/login.php?logout=1' : '/?page=admin_login&logout=1';
@@ -55,6 +56,14 @@ function with_query($route, $params)
     return $route . $sep . http_build_query($params);
 }
 
+$servicePresets = [
+    'Marketing trọn gói (Chiến lược xây kênh)',
+    'Chăm sóc fanpage (Đăng bài, Quản lý trang, Viết content)',
+    'Sản xuất video',
+    'Tổ chức sự kiện',
+    'Thiết kế Website chuẩn SEO',
+];
+
 $db = null;
 $dbError = '';
 $flash = $_GET['msg'] ?? '';
@@ -83,12 +92,14 @@ if ($db && $_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
 
-        if ($action === 'save') {
+            if ($action === 'save') {
             $id = (int)($_POST['id'] ?? 0);
             $title = trim($_POST['title'] ?? '');
             $slug = trim($_POST['slug'] ?? '');
             $industryId = ($_POST['industry_id'] ?? '') === '' ? null : (int)$_POST['industry_id'];
             $shortDesc = trim($_POST['short_desc'] ?? '');
+                $content = trim($_POST['content'] ?? '');
+                $image = trim($_POST['current_image'] ?? '');
             $status = (int)($_POST['status'] ?? 1);
 
             if ($title === '') {
@@ -107,26 +118,36 @@ if ($db && $_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw new RuntimeException('Slug dịch vụ đã tồn tại, vui lòng chọn slug khác');
             }
 
+            // handle uploaded image
+            $uploaded = store_uploaded_image('image_file', 'uploads/services');
+            if ($uploaded !== null) {
+                $image = $uploaded;
+            }
+
             if ($id > 0) {
-                $stmt = $db->prepare('UPDATE services SET title = :title, slug = :slug, industry_id = :industry_id, short_desc = :short_desc, status = :status WHERE id = :id');
+                $stmt = $db->prepare('UPDATE services SET title = :title, slug = :slug, industry_id = :industry_id, short_desc = :short_desc, content = :content, image = :image, status = :status WHERE id = :id');
                 $stmt->execute([
                     'id' => $id,
                     'title' => $title,
                     'slug' => $slug,
                     'industry_id' => $industryId,
                     'short_desc' => $shortDesc,
+                    'content' => $content,
+                    'image' => $image,
                     'status' => $status,
                 ]);
                 header('Location: ' . with_query($adminRoutes['services'], ['msg' => 'Đã cập nhật dịch vụ']));
                 exit;
             }
 
-            $stmt = $db->prepare('INSERT INTO services (title, slug, industry_id, short_desc, status) VALUES (:title, :slug, :industry_id, :short_desc, :status)');
+            $stmt = $db->prepare('INSERT INTO services (title, slug, industry_id, short_desc, content, image, status) VALUES (:title, :slug, :industry_id, :short_desc, :content, :image, :status)');
             $stmt->execute([
                 'title' => $title,
                 'slug' => $slug,
                 'industry_id' => $industryId,
                 'short_desc' => $shortDesc,
+                'content' => $content,
+                'image' => $image,
                 'status' => $status,
             ]);
 
@@ -144,13 +165,15 @@ $editing = [
     'slug' => '',
     'industry_id' => null,
     'short_desc' => '',
+    'content' => '',
+    'image' => '',
     'status' => 1,
 ];
 
 if ($db && isset($_GET['edit'])) {
     $editId = (int)$_GET['edit'];
     if ($editId > 0) {
-        $stmt = $db->prepare('SELECT id, title, slug, industry_id, short_desc, status FROM services WHERE id = :id LIMIT 1');
+        $stmt = $db->prepare('SELECT id, title, slug, industry_id, short_desc, content, image, status FROM services WHERE id = :id LIMIT 1');
         $stmt->execute(['id' => $editId]);
         $row = $stmt->fetch();
         if ($row) {
@@ -237,18 +260,24 @@ if ($db) {
 
                 <div class="card" style="padding:16px;margin-bottom:18px;">
                     <h3 style="margin:0 0 12px 0"><?php echo (int)$editing['id'] > 0 ? 'Sửa dịch vụ' : 'Thêm dịch vụ'; ?></h3>
-                    <form method="post" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;">
+                        <form method="post" enctype="multipart/form-data" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;">
                         <input type="hidden" name="action" value="save">
                         <input type="hidden" name="csrf_token" value="<?php echo h($csrfToken); ?>">
                         <input type="hidden" name="id" value="<?php echo (int)$editing['id']; ?>">
 
                         <div>
                             <label class="small">Tên dịch vụ</label>
-                            <input class="form-control" type="text" name="title" required value="<?php echo h($editing['title']); ?>">
+                            <input class="form-control" type="text" name="title" list="service-title-presets" id="serviceTitleInput" required value="<?php echo h($editing['title']); ?>" placeholder="Chọn hoặc nhập tên dịch vụ">
+                            <datalist id="service-title-presets">
+                                <?php foreach ($servicePresets as $preset): ?>
+                                    <option value="<?php echo h($preset); ?>"></option>
+                                <?php endforeach; ?>
+                            </datalist>
+                            <div class="small" style="margin-top:6px;color:var(--ak-muted);">Chọn nhanh tên có sẵn hoặc nhập tên riêng, slug sẽ tự sinh.</div>
                         </div>
                         <div>
                             <label class="small">Slug</label>
-                            <input class="form-control" type="text" name="slug" value="<?php echo h($editing['slug']); ?>">
+                            <input class="form-control" type="text" name="slug" id="serviceSlugInput" value="<?php echo h($editing['slug']); ?>" placeholder="Tự tạo từ tên dịch vụ">
                         </div>
                         <div>
                             <label class="small">Ngành</label>
@@ -269,6 +298,19 @@ if ($db) {
                         <div style="grid-column:1 / -1;">
                             <label class="small">Mô tả ngắn</label>
                             <textarea class="form-control" name="short_desc" rows="3"><?php echo h($editing['short_desc']); ?></textarea>
+                        </div>
+                        <div>
+                            <label class="small">Ảnh dịch vụ</label>
+                            <input class="form-control" type="file" name="image_file" accept="image/*">
+                            <input type="hidden" name="current_image" value="<?php echo h($editing['image'] ?? ''); ?>">
+                            <?php if (!empty($editing['image'])): ?>
+                                <div class="small" style="margin-top:8px">Ảnh hiện tại: <?php echo h($editing['image']); ?></div>
+                                <img src="<?php echo h('/?page=admin_media&path=' . rawurlencode($editing['image'])); ?>" alt="" style="max-height:80px;margin-top:8px;border-radius:8px;border:1px solid rgba(0,0,0,0.06);">
+                            <?php endif; ?>
+                        </div>
+                        <div style="grid-column:1 / -1;">
+                            <label class="small">Nội dung chi tiết</label>
+                            <textarea class="form-control" name="content" rows="6"><?php echo h($editing['content']); ?></textarea>
                         </div>
                         <div style="grid-column:1 / -1;display:flex;gap:10px;">
                             <button class="btn-admin" type="submit"><?php echo (int)$editing['id'] > 0 ? 'Cập nhật' : 'Thêm mới'; ?></button>
@@ -326,6 +368,42 @@ if ($db) {
 
         </main>
     </div>
+    <script>
+    (function () {
+        var titleInput = document.getElementById('serviceTitleInput');
+        var slugInput = document.getElementById('serviceSlugInput');
+        if (!titleInput || !slugInput) return;
+
+        var manualSlugEdit = false;
+        var lastTitle = titleInput.value || '';
+
+        function slugify(text) {
+            return String(text || '')
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/đ/g, 'd')
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-+|-+$/g, '') || 'service';
+        }
+
+        slugInput.addEventListener('input', function () {
+            manualSlugEdit = true;
+        });
+
+        titleInput.addEventListener('input', function () {
+            var currentTitle = titleInput.value.trim();
+            if (!manualSlugEdit || slugInput.value.trim() === '' || slugInput.value === slugify(lastTitle)) {
+                slugInput.value = slugify(currentTitle);
+            }
+            lastTitle = currentTitle;
+        });
+
+        if (!slugInput.value.trim() && titleInput.value.trim()) {
+            slugInput.value = slugify(titleInput.value);
+        }
+    })();
+    </script>
 </body>
 
 </html>
