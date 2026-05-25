@@ -198,6 +198,48 @@ function initCounters() {
   counters.forEach(c => obs.observe(c));
 }
 
+// Handle consultation form submission
+const consultationForm = document.getElementById('consultationForm');
+if (consultationForm) {
+  consultationForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const formData = new FormData(consultationForm);
+    const messageDiv = document.getElementById('formMessage');
+    
+    try {
+      const response = await fetch('/api/save_consultation.php', {
+        method: 'POST',
+        body: formData
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        messageDiv.style.display = 'block';
+        messageDiv.style.background = '#d4edda';
+        messageDiv.style.color = '#155724';
+        messageDiv.textContent = result.message;
+        consultationForm.reset();
+        
+        setTimeout(() => {
+          messageDiv.style.display = 'none';
+        }, 3000);
+      } else {
+        messageDiv.style.display = 'block';
+        messageDiv.style.background = '#f8d7da';
+        messageDiv.style.color = '#721c24';
+        messageDiv.textContent = result.message;
+      }
+    } catch (error) {
+      messageDiv.style.display = 'block';
+      messageDiv.style.background = '#f8d7da';
+      messageDiv.style.color = '#721c24';
+      messageDiv.textContent = 'Lỗi: ' + error.message;
+    }
+  });
+}
+
 // Initialize counters after DOM ready
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initCounters);

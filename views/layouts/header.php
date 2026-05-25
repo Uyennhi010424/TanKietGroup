@@ -65,12 +65,13 @@
                 <li><a href="/?page=services">Dự án</a></li>
                 <li><a href="/?page=services">Tuyển dụng</a></li>
                 <li><a href="/?page=services">Blog</a></li>
+                <li><a class="<?php echo ($currentPage ?? '') === 'consultations' ? 'active' : ''; ?>" href="/?page=consultations">Tư vấn</a></li>
                 <li><a class="<?php echo ($currentPage ?? '') === 'contact' ? 'active' : ''; ?>" href="/?page=contact">Liên hệ</a></li>
             </ul>
         </nav>
 
         <div class="header-cta">
-            <a class="btn btn-primary" href="/?page=contact">Tư vấn ngay</a>
+            <a class="btn btn-primary" href="/?page=consultations">Tư vấn ngay</a>
         </div>
     </div>
 </header>

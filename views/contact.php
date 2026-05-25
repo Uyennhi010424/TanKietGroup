@@ -21,7 +21,7 @@
 
 		<article class="card reveal">
 			<h2>Gửi yêu cầu tư vấn</h2>
-			<form data-demo-form>
+			<form id="consultationForm" method="POST" action="/api/save_consultation.php">
 				<div class="form-grid">
 					<input class="input" type="text" name="name" placeholder="Họ và tên" required>
 					<input class="input" type="tel" name="phone" placeholder="Số điện thoại" required>
@@ -39,6 +39,7 @@
 				<textarea class="textarea" name="message" placeholder="Chia sẻ ngắn gọn về doanh nghiệp và nhu cầu"></textarea>
 				<p></p>
 				<button class="btn btn-primary" type="submit">Đăng ký tư vấn miễn phí</button>
+				<div id="formMessage" style="margin-top:12px;display:none;padding:12px;border-radius:8px;"></div>
 			</form>
 		</article>
 	</div>
