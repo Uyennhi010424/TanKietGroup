@@ -361,14 +361,17 @@ h2 {
   align-items: stretch;
 }
 
-.services-swiper .swiper-slide {
-  width: 320px;
-  flex-shrink: 0;
-}
+.services-swiper .swiper-slide{
+	width: 420px !important;
 
-.projects-swiper .swiper-slide {
-  width: 520px;
-  flex-shrink: 0;
+	display: flex;
+	height: auto;
+
+	transition: all 0.6s ease;
+	transform: scale(0.78);
+
+	opacity: 0.35;
+	filter: blur(2px);
 }
 
 .swiper-slide .card {
@@ -950,4 +953,265 @@ h2 {
   .header-cta .btn {
     display: none;
   }
+}
+
+.service-overlay-wrap {
+  position: relative;
+  overflow: hidden;
+  border-radius: 18px 18px 0 0;
+}
+
+.service-overlay-wrap img {
+  width: 100%;
+  display: block;
+  transition: 0.4s;
+}
+
+.service-overlay {
+  position: absolute;
+  inset: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(0, 0, 0, 0.55);
+
+  color: #fff;
+  font-size: 20px;
+  font-weight: 700;
+  text-decoration: none;
+
+  opacity: 0;
+  transition: 0.4s;
+}
+
+.service-overlay-wrap:hover .service-overlay {
+  opacity: 1;
+}
+
+.service-overlay-wrap:hover img {
+  transform: scale(1.05);
+}
+
+/* =========================
+   SERVICES PREMIUM SLIDER
+========================= */
+
+.services-swiper {
+  padding: 80px 0 100px;
+  overflow: visible;
+  position: relative;
+}
+
+/* fade 2 bên */
+.services-swiper::before,
+.services-swiper::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 180px;
+  height: 100%;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.services-swiper::before {
+  left: 0;
+  background: linear-gradient(to right, #021114, transparent);
+}
+
+.services-swiper::after {
+  right: 0;
+  background: linear-gradient(to left, #021114, transparent);
+}
+
+.services-swiper .swiper-wrapper {
+  align-items: center;
+}
+
+.services-swiper .swiper-slide {
+  width: 420px;
+  transition: all 0.6s ease;
+  transform: scale(0.78);
+  opacity: 0.35;
+  filter: blur(2px);
+}
+
+/* CARD CHÍNH GIỮA */
+.services-swiper .swiper-slide-active {
+  transform: scale(1.12);
+  opacity: 1;
+  filter: blur(0);
+  z-index: 30;
+}
+
+/* 2 CARD HAI BÊN */
+.services-swiper .swiper-slide-prev,
+.services-swiper .swiper-slide-next {
+  transform: scale(0.92);
+  opacity: 0.7;
+  filter: blur(0);
+}
+
+/* CARD */
+.service-card {
+  position: relative;
+  border-radius: 32px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  transition: all 0.5s ease;
+}
+
+/* CARD ACTIVE PHÁT SÁNG */
+.services-swiper .swiper-slide-active .service-card {
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.45),
+    0 0 40px rgba(0, 255, 200, 0.12);
+
+  border: 1px solid rgba(0, 255, 200, 0.18);
+}
+
+/* IMAGE */
+.service-card img {
+  width: 100%;
+  height: 460px;
+  object-fit: cover;
+  transition: 0.6s;
+}
+
+/* IMAGE ACTIVE */
+.services-swiper .swiper-slide-active img {
+  transform: scale(1.08);
+}
+
+/* CONTENT */
+.service-card {
+  position: relative;
+
+  height: 100%;
+  min-height: 420px;
+
+  display: flex;
+  flex-direction: column;
+
+  border-radius: 32px;
+  overflow: hidden;
+
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(10px);
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  transition: all 0.5s ease;
+}
+
+/* OVERLAY */
+.service-overlay {
+  position: absolute;
+  inset: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(0, 0, 0, 0.45);
+
+  font-size: 24px;
+  font-weight: 700;
+  color: white;
+
+  opacity: 0;
+  transition: 0.4s;
+  text-decoration: none;
+  letter-spacing: 1px;
+}
+
+.service-overlay:hover {
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.service-overlay-wrap:hover .service-overlay {
+  opacity: 1;
+}
+
+/* PAGINATION */
+.services-swiper .swiper-pagination {
+  bottom: 10px !important;
+}
+
+.services-swiper .swiper-pagination-bullet {
+  width: 12px;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.3);
+  opacity: 1;
+  transition: 0.3s;
+}
+
+.services-swiper .swiper-pagination-bullet-active {
+  width: 40px;
+  border-radius: 20px;
+  background: #00ffd0;
+}
+
+/* NÚT */
+.services-swiper .swiper-button-prev,
+.services-swiper .swiper-button-next {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+
+  color: #00ffd0;
+  transition: 0.4s;
+}
+
+.services-swiper .swiper-button-prev:hover,
+.services-swiper .swiper-button-next:hover {
+  transform: scale(1.12);
+  background: rgba(0, 255, 200, 0.18);
+}
+
+.services-swiper .swiper-button-prev::after,
+.services-swiper .swiper-button-next::after {
+  font-size: 22px;
+  font-weight: bold;
+}
+/* IMAGE */
+.service-card img{
+	width: 100%;
+	height: 260px;
+	object-fit: cover;
+	display: block;
+}
+
+/* CONTENT */
+.service-card .card-content{
+	padding: 20px 24px;
+}
+
+/* TITLE */
+.service-card h3{
+	font-size: 32px;
+	font-weight: 800;
+
+	min-height: 80px;
+	margin-bottom: 18px;
+
+	display: flex;
+	align-items: center;
+}
+
+/* DESCRIPTION */
+.service-card p{
+	font-size: 18px;
+	line-height: 1.7;
+
+	color: rgba(255,255,255,0.72);
+
+	min-height: 130px;
 }

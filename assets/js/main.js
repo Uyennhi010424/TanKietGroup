@@ -206,21 +206,40 @@ if (document.readyState === 'loading') {
 }
 
 // Initialize Swiper sliders (services + projects) with accessibility and keyboard support
-(function(){
-  function initSwipers(){
+(function () {
+  function initSwipers() {
     if (typeof Swiper !== 'function') return;
 
     const servicesEl = document.querySelector('.services-swiper');
     if (servicesEl && !servicesEl.dataset.swiperInit) {
       new Swiper(servicesEl, {
+
         loop: true,
+        centeredSlides: true,
+        speed: 1200,
+
         slidesPerView: 'auto',
-        spaceBetween: 24,
-        autoplay: { delay: 2800, disableOnInteraction: false },
-        keyboard: { enabled: true },
-        a11y: { enabled: true, prevSlideMessage: 'Slide trước', nextSlideMessage: 'Slide tiếp theo', slideLabelMessage: 'Slide {{index}} của {{slidesLength}}' },
-        pagination: { el: '.services-swiper .swiper-pagination', clickable: true },
-        navigation: { nextEl: '.services-swiper .swiper-button-next', prevEl: '.services-swiper .swiper-button-prev' }
+        spaceBetween: 30,
+
+        autoplay: {
+          delay: 2500,
+          disableOnInteraction: false
+        },
+
+        keyboard: {
+          enabled: true
+        },
+
+        pagination: {
+          el: '.services-swiper .swiper-pagination',
+          clickable: true
+        },
+
+        navigation: {
+          nextEl: '.services-swiper .swiper-button-next',
+          prevEl: '.services-swiper .swiper-button-prev'
+        }
+
       });
       servicesEl.dataset.swiperInit = '1';
     }

@@ -12,57 +12,162 @@
 <section class="section section-muted">
 	<div class="container grid grid-4">
 		<article class="card stats reveal"><strong class="count" data-target="50" data-suffix="+">0</strong><span class="muted">Dự án hoàn thành</span></article>
-		<article class="card stats reveal"><strong class="count" data-target="15" data-suffix="+">0</strong><span class="muted">Doanh nghiệp đối tác</span></article>
-		<article class="card stats reveal"><strong class="count" data-target="100" data-suffix="+">0</strong><span class="muted">Học viên đào tạo</span></article>
-		<article class="card stats reveal"><strong class="count" data-target="95" data-suffix="%">0</strong><span class="muted">Mức độ hài lòng</span></article>
+		<article class="card stats reveal"><strong class="count" data-target="35" data-suffix="+">0</strong><span class="muted">Doanh nghiệp đối tác</span></article>
+		<article class="card stats reveal"><strong class="count" data-target="99" data-suffix="+">0</strong><span class="muted">Học viên đào tạo</span></article>
+		<article class="card stats reveal"><strong class="count" data-target="97" data-suffix="%">0</strong><span class="muted">Mức độ hài lòng</span></article>
 	</div>
 </section>
 
 <section class="section">
 	<div class="container">
 		<h2 class="reveal">Dịch vụ nổi bật</h2>
+
 		<div class="swiper services-swiper" style="margin-top:24px;">
 			<div class="swiper-wrapper">
+
+				<!-- SERVICE 1 -->
 				<div class="swiper-slide">
 					<article class="card service-card reveal">
-						<div class="card-media"><img src="/img/du_an.jpg" alt="Sản xuất"></div>
-						<div class="card-content"><h3>Sản xuất</h3><p class="muted">Xây dựng giao diện chuẩn UX, tốc độ cao, tối ưu SEO và tối đa hóa chuyển đổi.</p></div>
+
+						<div class="card-media service-overlay-wrap">
+							<img src="/img/du_an.jpg" alt="Sản xuất">
+
+							<a href="/services/detail.php?id=san-xuat" class="service-overlay">
+								Xem chi tiết
+							</a>
+						</div>
+
+						<div class="card-content">
+							<h3>Sản xuất</h3>
+							<p class="muted">
+								Xây dựng giao diện chuẩn UX, tốc độ cao,
+								tối ưu SEO và tối đa hóa chuyển đổi.
+							</p>
+						</div>
+
+					</article>
+				</div>
+
+				<!-- SERVICE 2 -->
+				<div class="swiper-slide">
+					<article class="card service-card reveal">
+
+						<div class="card-media service-overlay-wrap">
+							<img src="/img/du_an1.jpg" alt="Quản trị Fanpage">
+
+							<a href="/services/detail.php?id=fanpage" class="service-overlay">
+								Xem chi tiết
+							</a>
+						</div>
+
+						<div class="card-content">
+							<h3>Quản trị Fanpage</h3>
+							<p class="muted">
+								Lên chiến lược nội dung, vận hành quảng cáo
+								và gia tăng tương tác thương hiệu.
+							</p>
+						</div>
+
+					</article>
+				</div>
+
+				<!-- SERVICE 3 -->
+				<div class="swiper-slide">
+					<article class="card service-card reveal">
+
+						<div class="card-media service-overlay-wrap">
+							<img src="/img/du_an5.jpg" alt="Marketing tổng thể">
+
+							<a href="/services/detail.php?id=marketing" class="service-overlay">
+								Xem chi tiết
+							</a>
+						</div>
+
+						<div class="card-content">
+							<h3>Marketing tổng thể</h3>
+							<p class="muted">
+								Đồng bộ tất cả kênh từ branding đến performance
+								với KPI rõ ràng theo từng tháng.
+							</p>
+						</div>
+
 					</article>
 				</div>
 				<div class="swiper-slide">
 					<article class="card service-card reveal">
-						<div class="card-media"><img src="/img/du_an1.jpg" alt="Quản trị Fanpage"></div>
-						<div class="card-content"><h3>Quản trị Fanpage</h3><p class="muted">Lên chiến lược nội dung, vận hành quảng cáo và gia tăng tương tác thương hiệu.</p></div>
+
+						<div class="card-media service-overlay-wrap">
+							<img src="/img/du_an.jpg" alt="Sản xuất">
+
+							<a href="/services/detail.php?id=san-xuat" class="service-overlay">
+								Xem chi tiết
+							</a>
+						</div>
+
+						<div class="card-content">
+							<h3>Sản xuất</h3>
+							<p class="muted">
+								Xây dựng giao diện chuẩn UX, tốc độ cao,
+								tối ưu SEO và tối đa hóa chuyển đổi.
+							</p>
+						</div>
+
 					</article>
 				</div>
+
+				<!-- SERVICE 2 -->
 				<div class="swiper-slide">
 					<article class="card service-card reveal">
-						<div class="card-media"><img src="/img/du_an5.jpg" alt="Marketing tổng thể"></div>
-						<div class="card-content"><h3>Marketing tổng thể</h3><p class="muted">Đồng bộ tất cả kênh từ branding đến performance với KPI rõ ràng theo từng tháng.</p></div>
+
+						<div class="card-media service-overlay-wrap">
+							<img src="/img/du_an1.jpg" alt="Quản trị Fanpage">
+
+							<a href="/services/detail.php?id=fanpage" class="service-overlay">
+								Xem chi tiết
+							</a>
+						</div>
+
+						<div class="card-content">
+							<h3>Quản trị Fanpage</h3>
+							<p class="muted">
+								Lên chiến lược nội dung, vận hành quảng cáo
+								và gia tăng tương tác thương hiệu.
+							</p>
+						</div>
+
 					</article>
 				</div>
+
+				<!-- SERVICE 3 -->
 				<div class="swiper-slide">
 					<article class="card service-card reveal">
-						<div class="card-media"><img src="/img/du_an.jpg" alt="Sản xuất"></div>
-						<div class="card-content"><h3>Sản xuất</h3><p class="muted">Xây dựng giao diện chuẩn UX, tốc độ cao, tối ưu SEO và tối đa hóa chuyển đổi.</p></div>
+
+						<div class="card-media service-overlay-wrap">
+							<img src="/img/du_an5.jpg" alt="Marketing tổng thể">
+
+							<a href="/services/detail.php?id=marketing" class="service-overlay">
+								Xem chi tiết
+							</a>
+						</div>
+
+						<div class="card-content">
+							<h3>Marketing tổng thể</h3>
+							<p class="muted">
+								Đồng bộ tất cả kênh từ branding đến performance
+								với KPI rõ ràng theo từng tháng.
+							</p>
+						</div>
+
 					</article>
 				</div>
-				<div class="swiper-slide">
-					<article class="card service-card reveal">
-						<div class="card-media"><img src="/img/du_an1.jpg" alt="Quản trị Fanpage"></div>
-						<div class="card-content"><h3>Quản trị Fanpage</h3><p class="muted">Lên chiến lược nội dung, vận hành quảng cáo và gia tăng tương tác thương hiệu.</p></div>
-					</article>
-				</div>
-				<div class="swiper-slide">
-					<article class="card service-card reveal">
-						<div class="card-media"><img src="/img/du_an5.jpg" alt="Marketing tổng thể"></div>
-						<div class="card-content"><h3>Marketing tổng thể</h3><p class="muted">Đồng bộ tất cả kênh từ branding đến performance với KPI rõ ràng theo từng tháng.</p></div>
-					</article>
-				</div>
+
 			</div>
-			<div class="swiper-button-prev" aria-label="Previous service"></div>
-			<div class="swiper-button-next" aria-label="Next service"></div>
+			
+
+			<div class="swiper-button-prev"></div>
+			<div class="swiper-button-next"></div>
 			<div class="swiper-pagination"></div>
+
 		</div>
 	</div>
 </section>
