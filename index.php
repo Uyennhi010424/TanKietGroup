@@ -3,14 +3,15 @@ require_once __DIR__ . '/config/constants.php';
 
 $page = $_GET['page'] ?? 'home';
 
-// Quick asset router: serve /assets/* and /img/* directly from disk when requested.
-// This helps when the built-in PHP server or environment doesn't serve static files.
+// Quick asset router: serve static files directly from disk when requests are
+// rewritten to index.php by Apache/Nginx or the built-in PHP server.
 $reqPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
-if (preg_match('#^/(assets|img)/(.*)$#', $reqPath, $m)) {
-	$type = $m[1];
-	$sub = $m[2];
-	$file = realpath(__DIR__ . '/' . $type . '/' . $sub);
-	$baseDir = realpath(__DIR__ . '/' . $type);
+if (preg_match('#^/(admin/)?(assets|img)/(.*)$#', $reqPath, $m)) {
+	$prefix = !empty($m[1]) ? 'admin/' : '';
+	$type = $m[2];
+	$sub = $m[3];
+	$file = realpath(__DIR__ . '/' . $prefix . $type . '/' . $sub);
+	$baseDir = realpath(__DIR__ . '/' . $prefix . $type);
 	if ($file && $baseDir && str_starts_with($file, $baseDir) && is_file($file)) {
 		$ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
 		$mimes = [
