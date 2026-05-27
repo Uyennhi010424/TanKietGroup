@@ -1,26 +1,26 @@
 <?php
 // Admin - Blog Management
-$docRoot = rtrim(str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT'] ?? ''), '/');
-$isAdminRoot = substr($docRoot, -6) === '/admin';
-$assetBase = $isAdminRoot ? '' : '/admin';
-$adminRoutes = [
-    'dashboard' => $isAdminRoot ? '/index.php' : '/?page=admin_index',
-    'courses' => $isAdminRoot ? '/courses.php' : '/?page=admin_courses',
-    'projects' => $isAdminRoot ? '/projects.php' : '/?page=admin_projects',
-    'services' => $isAdminRoot ? '/services.php' : '/?page=admin_services',
-    'users' => $isAdminRoot ? '/users.php' : '/?page=admin_users',
-    'blog' => $isAdminRoot ? '/blog.php' : '/?page=admin_blog',
-    'recruitments' => $isAdminRoot ? '/recruitments.php' : '/?page=admin_recruitments',
-    'stats' => $isAdminRoot ? '/stats.php' : '/?page=admin_stats',
-    'settings' => $isAdminRoot ? '/settings.php' : '/?page=admin_settings',
-    'consultations' => $isAdminRoot ? '/consultations.php' : '/?page=admin_consultations',
-];
-
+require_once __DIR__ . '/../includes/site.php';
 require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/security.php';
 
-$loginRoute = $isAdminRoot ? '/login.php' : '/?page=admin_login';
-$logoutRoute = $isAdminRoot ? '/login.php?logout=1' : '/?page=admin_login&logout=1';
+$assetBase = site_admin_base_path();
+$logoUrl = site_logo_url('/img/logo.jpg');
+$adminRoutes = [
+    'dashboard' => site_page_url('admin_index'),
+    'courses' => site_page_url('admin_courses'),
+    'projects' => site_page_url('admin_projects'),
+    'services' => site_page_url('admin_services'),
+    'users' => site_page_url('admin_users'),
+    'blog' => site_page_url('admin_blog'),
+    'recruitments' => site_page_url('admin_recruitments'),
+    'stats' => site_page_url('admin_stats'),
+    'settings' => site_page_url('admin_settings'),
+    'consultations' => site_page_url('admin_consultations'),
+];
+
+$loginRoute = site_page_url('admin_login');
+$logoutRoute = site_page_url('admin_login', ['logout' => 1]);
 admin_require_login($loginRoute);
 $currentAdminUser = admin_current_user() ?? [];
 $adminRole = (string)($currentAdminUser['role'] ?? 'editor');
@@ -248,6 +248,7 @@ if ($db) {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Blog - Trang quản trị</title>
+    <link rel="icon" href="<?php echo htmlspecialchars(site_favicon_url(), ENT_QUOTES, 'UTF-8'); ?>">
     <link rel="stylesheet" href="<?php echo $assetBase; ?>/assets/css/admin.css">
     <script defer src="<?php echo $assetBase; ?>/assets/js/admin.js"></script>
 </head>
@@ -257,7 +258,7 @@ if ($db) {
     <div class="admin-wrap">
         <aside class="admin-sidebar" style="display:block">
             <div class="sidebar-header">
-                <div class="brand-admin"><img src="<?php echo $assetBase; ?>/logo.php" alt="TanKiet Group" class="site-logo"></div>
+                <div class="brand-admin"><img src="<?php echo htmlspecialchars($logoUrl, ENT_QUOTES, 'UTF-8'); ?>" alt="TanKiet Group" class="site-logo"></div>
             </div>
             <nav>
                 <ul class="nav-admin">

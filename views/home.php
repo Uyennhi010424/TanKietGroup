@@ -38,8 +38,8 @@ $posts = site_fetch_all(
 		<h1><?php echo htmlspecialchars($site['meta_title'] ?: 'Chiến lược Marketing toàn diện cho doanh nghiệp hiện đại', ENT_QUOTES, 'UTF-8'); ?></h1>
 		<p class="lead"><?php echo htmlspecialchars($site['meta_description'] ?: 'TanKiet Group kết hợp dữ liệu, sáng tạo và công nghệ để giúp doanh nghiệp gia tăng doanh thu bền vững trên đa kênh.', ENT_QUOTES, 'UTF-8'); ?></p>
 		<div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:24px;">
-			<a class="btn btn-primary" href="/?page=services">Khám phá dịch vụ</a>
-			<a class="btn btn-outline" href="/?page=about">Tìm hiểu chúng tôi</a>
+			<a class="btn btn-primary" href="<?php echo htmlspecialchars(site_page_url('services'), ENT_QUOTES, 'UTF-8'); ?>">Khám phá dịch vụ</a>
+			<a class="btn btn-outline" href="<?php echo htmlspecialchars(site_page_url('about'), ENT_QUOTES, 'UTF-8'); ?>">Tìm hiểu chúng tôi</a>
 		</div>
 	</div>
 </section>
@@ -66,7 +66,7 @@ $posts = site_fetch_all(
 							<article class="card service-card reveal">
 								<div class="card-media service-overlay-wrap">
 									<img src="<?php echo htmlspecialchars(site_image_url($service['image'] ?? '', '/img/du_an.jpg'), ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($service['title'], ENT_QUOTES, 'UTF-8'); ?>">
-									<a href="/?page=service_detail&amp;slug=<?php echo rawurlencode($service['slug']); ?>" class="service-overlay">Xem chi tiết</a>
+									<a href="<?php echo htmlspecialchars(site_page_url('service_detail', ['slug' => $service['slug']]), ENT_QUOTES, 'UTF-8'); ?>" class="service-overlay">Xem chi tiết</a>
 								</div>
 								<div class="card-content">
 									<h3><?php echo htmlspecialchars($service['title'], ENT_QUOTES, 'UTF-8'); ?></h3>
@@ -97,7 +97,7 @@ $posts = site_fetch_all(
 							<article class="card project-card reveal">
 								<div class="card-media">
 									<img src="<?php echo htmlspecialchars(site_image_url($project['thumbnail'] ?? '', '/img/du_an3.jpg'), ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($project['title'], ENT_QUOTES, 'UTF-8'); ?>">
-									<a class="project-overlay" href="/?page=project_detail&amp;slug=<?php echo rawurlencode($project['slug']); ?>" aria-label="Xem chi tiết dự án <?php echo htmlspecialchars($project['title'], ENT_QUOTES, 'UTF-8'); ?>">Xem chi tiết</a>
+									<a class="project-overlay" href="<?php echo htmlspecialchars(site_page_url('project_detail', ['slug' => $project['slug']]), ENT_QUOTES, 'UTF-8'); ?>" aria-label="Xem chi tiết dự án <?php echo htmlspecialchars($project['title'], ENT_QUOTES, 'UTF-8'); ?>">Xem chi tiết</a>
 								</div>
 								<div class="card-content">
 									<h3><?php echo htmlspecialchars($project['title'], ENT_QUOTES, 'UTF-8'); ?></h3>
@@ -127,7 +127,7 @@ $posts = site_fetch_all(
 						<img src="<?php echo htmlspecialchars(site_image_url($course['thumbnail'] ?? '', '/img/du_an.jpg'), ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($course['title'], ENT_QUOTES, 'UTF-8'); ?>" style="width:100%;height:180px;object-fit:cover;border-radius:12px;">
 						<h3 style="margin-top:14px;"><?php echo htmlspecialchars($course['title'], ENT_QUOTES, 'UTF-8'); ?></h3>
 						<p class="muted"><?php echo htmlspecialchars($course['short_desc'] ?? '', ENT_QUOTES, 'UTF-8'); ?></p>
-						<p><a href="/?page=course_detail&amp;slug=<?php echo rawurlencode($course['slug']); ?>">Xem chi tiết</a></p>
+						<p><a href="<?php echo htmlspecialchars(site_page_url('course_detail', ['slug' => $course['slug']]), ENT_QUOTES, 'UTF-8'); ?>">Xem chi tiết</a></p>
 					</article>
 				<?php endforeach; ?>
 			<?php endif; ?>
@@ -146,7 +146,7 @@ $posts = site_fetch_all(
 					<article class="card reveal">
 						<img src="<?php echo htmlspecialchars(site_image_url($post['thumbnail'] ?? '', '/img/du_an4.jpg'), ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($post['title'], ENT_QUOTES, 'UTF-8'); ?>" style="width:100%;height:180px;object-fit:cover;border-radius:12px;">
 						<h3 style="margin-top:14px;"><?php echo htmlspecialchars($post['title'], ENT_QUOTES, 'UTF-8'); ?></h3>
-						<p><a href="/?page=blog_detail&amp;slug=<?php echo rawurlencode($post['slug']); ?>">Đọc bài viết</a></p>
+						<p><a href="<?php echo htmlspecialchars(site_page_url('blog_detail', ['slug' => $post['slug']]), ENT_QUOTES, 'UTF-8'); ?>">Đọc bài viết</a></p>
 					</article>
 				<?php endforeach; ?>
 			<?php endif; ?>
@@ -158,6 +158,6 @@ $posts = site_fetch_all(
 	<div class="container card reveal" style="text-align:center;">
 		<h2>Sẵn sàng bứt phá cùng <?php echo htmlspecialchars($site['site_name'] ?: APP_NAME, ENT_QUOTES, 'UTF-8'); ?>?</h2>
 		<p class="lead" style="margin-inline:auto;">Nhận tư vấn 1:1 và lộ trình tăng trưởng phù hợp với mục tiêu doanh nghiệp của bạn.</p>
-		<a class="btn btn-primary" href="/?page=contact">Đăng ký tư vấn miễn phí</a>
+		<a class="btn btn-primary" href="<?php echo htmlspecialchars(site_page_url('contact'), ENT_QUOTES, 'UTF-8'); ?>">Đăng ký tư vấn miễn phí</a>
 	</div>
 </section>

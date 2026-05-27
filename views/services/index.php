@@ -54,11 +54,11 @@ $industries = site_fetch_all('SELECT id, name, slug, description FROM industries
 								<?php else: foreach ($services as $s): ?>
 									<tr>
 										<td>#SVC-<?php echo str_pad((string)$s['id'], 4, '0', STR_PAD_LEFT); ?></td>
-										<td><a href="/?page=service_detail&amp;slug=<?php echo rawurlencode($s['slug']); ?>"><?php echo htmlspecialchars($s['title'], ENT_QUOTES, 'UTF-8'); ?></a></td>
+										<td><a href="<?php echo htmlspecialchars(site_page_url('service_detail', ['slug' => $s['slug']]), ENT_QUOTES, 'UTF-8'); ?>"><?php echo htmlspecialchars($s['title'], ENT_QUOTES, 'UTF-8'); ?></a></td>
 										<td><?php echo htmlspecialchars($s['industry_name'] ?? '-', ENT_QUOTES, 'UTF-8'); ?></td>
 										<td style="max-width:360px"><?php echo htmlspecialchars($s['short_desc'] ?: '-', ENT_QUOTES, 'UTF-8'); ?></td>
 										<td><?php if (!empty($s['image'])): ?><img src="<?php echo htmlspecialchars(site_image_url($s['image']), ENT_QUOTES, 'UTF-8'); ?>" alt="" style="height:48px;object-fit:cover;border-radius:6px;"><?php else: ?>-<?php endif; ?></td>
-										<td style="text-align:right"><a class="btn" href="/?page=service_detail&amp;slug=<?php echo rawurlencode($s['slug']); ?>">Xem</a></td>
+										<td style="text-align:right"><a class="btn" href="<?php echo htmlspecialchars(site_page_url('service_detail', ['slug' => $s['slug']]), ENT_QUOTES, 'UTF-8'); ?>">Xem</a></td>
 									</tr>
 								<?php endforeach; endif; ?>
 							</tbody>
@@ -73,7 +73,7 @@ $industries = site_fetch_all('SELECT id, name, slug, description FROM industries
 								<img src="<?php echo htmlspecialchars(site_image_url($service['image'] ?? '', '/img/du_an.jpg'), ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($service['title'], ENT_QUOTES, 'UTF-8'); ?>" style="width:100%;height:200px;object-fit:cover;border-radius:12px;">
 								<h3 style="margin-top:14px;"><?php echo htmlspecialchars($service['title'], ENT_QUOTES, 'UTF-8'); ?></h3>
 								<p class="muted"><?php echo htmlspecialchars($service['short_desc'] ?: ($service['industry_name'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></p>
-								<p><a href="/?page=service_detail&amp;slug=<?php echo rawurlencode($service['slug']); ?>">Xem chi tiết</a></p>
+								<p><a href="<?php echo htmlspecialchars(site_page_url('service_detail', ['slug' => $service['slug']]), ENT_QUOTES, 'UTF-8'); ?>">Xem chi tiết</a></p>
 							</article>
 						<?php endforeach; endif; ?></div>
 				<?php endif; ?>
@@ -87,7 +87,7 @@ $industries = site_fetch_all('SELECT id, name, slug, description FROM industries
 							<li class="muted">Chưa có ngành nào</li>
 						<?php else: foreach ($industries as $ind): ?>
 							<li style="padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.03);">
-								<a href="/?page=services&amp;industry=<?php echo rawurlencode($ind['slug']); ?>"><?php echo htmlspecialchars($ind['name'], ENT_QUOTES, 'UTF-8'); ?></a>
+								<a href="<?php echo htmlspecialchars(site_page_url('services', ['industry' => $ind['slug']]), ENT_QUOTES, 'UTF-8'); ?>"><?php echo htmlspecialchars($ind['name'], ENT_QUOTES, 'UTF-8'); ?></a>
 								<div class="muted" style="font-size:0.92rem;margin-top:6px"><?php echo htmlspecialchars($ind['description'] ?: '', ENT_QUOTES, 'UTF-8'); ?></div>
 							</li>
 						<?php endforeach; endif; ?></ul>

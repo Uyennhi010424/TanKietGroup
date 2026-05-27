@@ -23,7 +23,7 @@ $resultMetrics = site_parse_json($project['result_metrics'] ?? '', []);
 <section class="section">
 	<div class="container project-detail">
 		<div class="project-back">
-			<a class="btn btn-outline" href="/?page=projects">← Quay lại</a>
+			<a class="btn btn-outline" href="<?php echo htmlspecialchars(site_page_url('projects'), ENT_QUOTES, 'UTF-8'); ?>">← Quay lại</a>
 		</div>
 		<div class="grid grid-2">
 			<div>

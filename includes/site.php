@@ -3,6 +3,24 @@ require_once __DIR__ . '/../config/constants.php';
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/functions.php';
 
+function site_app_config(): array
+{
+    static $config = null;
+    if (is_array($config)) {
+        return $config;
+    }
+
+    $configFile = __DIR__ . '/../config/config.php';
+    if (is_file($configFile)) {
+        $loaded = require $configFile;
+        $config = is_array($loaded) ? $loaded : [];
+    } else {
+        $config = [];
+    }
+
+    return $config;
+}
+
 function site_db(): PDO
 {
     static $db = null;
@@ -58,7 +76,7 @@ function site_public_media_url(string $path): string
         return $path;
     }
 
-    return '/?page=admin_media&path=' . rawurlencode($path);
+    return site_base_path() . '/?page=admin_media&path=' . rawurlencode($path);
 }
 
 function site_image_url(?string $path, string $fallback = ''): string
@@ -76,11 +94,67 @@ function site_image_url(?string $path, string $fallback = ''): string
         return $path;
     }
 
+    // If path starts with '/', treat it as site-root-relative and prefix base path
     if (str_starts_with($path, '/')) {
-        return $path;
+        return site_base_path() . $path;
     }
 
-    return '/' . ltrim($path, '/');
+    return site_base_path() . '/' . ltrim($path, '/');
+}
+
+function site_logo_url(string $fallback = '/img/logo.jpg'): string
+{
+    $site = site_settings();
+    $logoPath = trim((string)($site['logo'] ?? ''));
+
+    if ($logoPath === '') {
+        return site_image_url($fallback, $fallback);
+    }
+
+    return site_image_url($logoPath, $fallback);
+}
+
+function site_base_path(): string
+{
+    $scriptDir = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '')), '/');
+
+    // Normalize common values: when running under CLI or some servers dirname() may return '.' or '/'.
+    if ($scriptDir === '' || $scriptDir === '.' || $scriptDir === '/') {
+        return '';
+    }
+
+    return $scriptDir;
+}
+
+function site_page_url(string $page, array $params = []): string
+{
+    $url = site_base_path() . '/?page=' . rawurlencode($page);
+    if (!empty($params)) {
+        $url .= '&' . http_build_query($params);
+    }
+
+    return $url;
+}
+
+function site_admin_base_path(): string
+{
+    $scriptName = str_replace('\\', '/', (string)($_SERVER['SCRIPT_NAME'] ?? ''));
+    $scriptDir = rtrim(dirname($scriptName), '/');
+
+    if ($scriptDir !== '' && preg_match('#/admin$#', $scriptDir)) {
+        return $scriptDir;
+    }
+
+    $basePath = site_base_path();
+    return ($basePath !== '' ? $basePath : '') . '/admin';
+}
+
+function site_admin_url(string $path = ''): string
+{
+    $basePath = rtrim(site_admin_base_path(), '/');
+    $path = ltrim($path, '/');
+
+    return $path === '' ? $basePath : $basePath . '/' . $path;
 }
 
 function site_fetch_all(string $sql, array $params = []): array
@@ -124,4 +198,21 @@ function site_slugify(string $text): string
     $text = preg_replace('/[^a-z0-9]+/', '-', $text);
     $text = trim((string)$text, '-');
     return $text !== '' ? $text : 'item';
+}
+
+function site_favicon_url(string $fallback = '/img/favicon.ico'): string
+{
+    $site = site_settings();
+    $fav = trim((string)($site['favicon'] ?? ''));
+    if ($fav !== '') {
+        return site_image_url($fav, $fallback);
+    }
+
+    // If no explicit favicon, fall back to logo when available
+    $logo = trim((string)($site['logo'] ?? ''));
+    if ($logo !== '') {
+        return site_image_url($logo, $fallback);
+    }
+
+    return site_image_url($fallback, $fallback);
 }

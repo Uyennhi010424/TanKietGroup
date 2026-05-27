@@ -61,6 +61,14 @@ function admin_logout_user(): void
 function admin_require_login(string $loginUrl): void
 {
 	if (!admin_is_logged_in()) {
+		$current = (string)($_SERVER['REQUEST_URI'] ?? '');
+		$query = (string)($_SERVER['QUERY_STRING'] ?? '');
+
+		// If the current request already targets the login page, do not redirect (avoid loops).
+		if (stripos($query, 'page=admin_login') !== false) {
+			return;
+		}
+
 		header('Location: ' . $loginUrl);
 		exit;
 	}
@@ -71,6 +79,12 @@ function admin_require_roles(array $allowedRoles, string $fallbackUrl): void
 	$user = admin_current_user();
 	$role = (string)($user['role'] ?? '');
 	if (!in_array($role, $allowedRoles, true)) {
+		$query = (string)($_SERVER['QUERY_STRING'] ?? '');
+		if (stripos($query, 'page=') !== false && stripos($query, 'page=') === 0 && stripos($query, 'page=admin') !== false) {
+			// If already on an admin page, avoid redirecting repeatedly.
+			return;
+		}
+
 		header('Location: ' . $fallbackUrl);
 		exit;
 	}

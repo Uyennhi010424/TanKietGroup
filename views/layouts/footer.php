@@ -2,11 +2,11 @@
 <?php
 require_once __DIR__ . '/../../includes/site.php';
 $site = site_settings();
-$footerLogo = site_image_url($site['logo'] ?? '', '/img/logo1.jpg');
+$footerLogo = site_logo_url('/img/logo1.jpg');
 ?>
     <div class="container footer-grid">
         <div>
-            <a class="brand" href="/?page=home">
+            <a class="brand" href="<?php echo htmlspecialchars(site_page_url('home'), ENT_QUOTES, 'UTF-8'); ?>">
             <img src="<?php echo htmlspecialchars($footerLogo, ENT_QUOTES, 'UTF-8'); ?>" alt="TanKiet Group" class="site-logo">
         </a>
             <p class="muted"><?php echo htmlspecialchars($site['meta_description'] ?: 'Giải pháp Marketing tăng trưởng toàn diện và bền vững cho doanh nghiệp Việt.', ENT_QUOTES, 'UTF-8'); ?></p>
@@ -14,13 +14,13 @@ $footerLogo = site_image_url($site['logo'] ?? '', '/img/logo1.jpg');
         <div>
             <h4 class="footer-title">Khám phá</h4>
             <ul class="footer-links">
-                <li><a href="/?page=home">Trang chủ</a></li>
-                <li><a href="/?page=about">Giới thiệu</a></li>
-                <li><a href="/?page=services">Dịch vụ</a></li>
-                <li><a href="/?page=courses">Khóa học</a></li>
-                <li><a href="/?page=projects">Dự án</a></li>
-                <li><a href="/?page=blog">Blog</a></li>
-                <li><a href="/?page=contact">Liên hệ</a></li>
+                <li><a href="<?php echo htmlspecialchars(site_page_url('home'), ENT_QUOTES, 'UTF-8'); ?>">Trang chủ</a></li>
+                <li><a href="<?php echo htmlspecialchars(site_page_url('about'), ENT_QUOTES, 'UTF-8'); ?>">Giới thiệu</a></li>
+                <li><a href="<?php echo htmlspecialchars(site_page_url('services'), ENT_QUOTES, 'UTF-8'); ?>">Dịch vụ</a></li>
+                <li><a href="<?php echo htmlspecialchars(site_page_url('courses'), ENT_QUOTES, 'UTF-8'); ?>">Khóa học</a></li>
+                <li><a href="<?php echo htmlspecialchars(site_page_url('projects'), ENT_QUOTES, 'UTF-8'); ?>">Dự án</a></li>
+                <li><a href="<?php echo htmlspecialchars(site_page_url('blog'), ENT_QUOTES, 'UTF-8'); ?>">Blog</a></li>
+                <li><a href="<?php echo htmlspecialchars(site_page_url('contact'), ENT_QUOTES, 'UTF-8'); ?>">Liên hệ</a></li>
             </ul>
         </div>
         <div>
@@ -44,6 +44,6 @@ $footerLogo = site_image_url($site['logo'] ?? '', '/img/logo1.jpg');
     <div class="footer-bottom">&copy; <?php echo date('Y'); ?> TanKiet Group. All rights reserved.</div>
 </footer>
 <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
-<script src="/assets/js/main.js"></script>
+<script src="<?php echo site_base_path() . '/assets/js/main.js'; ?>"></script>
 </body>
 </html>

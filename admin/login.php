@@ -1,33 +1,24 @@
 <?php
 // Admin login form
-$scriptFile = str_replace('\\', '/', (string)($_SERVER['SCRIPT_FILENAME'] ?? ''));
-$isDirectAdmin = str_ends_with($scriptFile, '/admin/login.php');
-$assetBase = $isDirectAdmin ? '.' : 'admin';
-$adminCssHref = $assetBase . '/assets/css/admin.css';
+require_once __DIR__ . '/../includes/site.php';
+require_once __DIR__ . '/../includes/db.php';
+require_once __DIR__ . '/../includes/security.php';
+
+$adminCssHref = site_admin_url('assets/css/admin.css');
 $inlineAdminCss = '';
 $adminCssFile = __DIR__ . '/assets/css/admin.css';
 if (is_file($adminCssFile)) {
 	$inlineAdminCss = (string)file_get_contents($adminCssFile);
 }
 
-$logoSrc = $assetBase . '/logo.php';
-$logoFile = __DIR__ . '/../img/logo.jpg';
-if (is_file($logoFile)) {
-	$logoData = (string)file_get_contents($logoFile);
-	if ($logoData !== '') {
-		$logoSrc = 'data:image/jpeg;base64,' . base64_encode($logoData);
-	}
-}
+$logoSrc = site_logo_url('/img/logo.jpg');
 $host = strtolower((string)($_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? ''));
 $isLocalDebug = str_contains($host, 'localhost') || str_contains($host, '127.0.0.1');
 
-require_once __DIR__ . '/../includes/db.php';
-require_once __DIR__ . '/../includes/security.php';
-
-$loginRoute = $isDirectAdmin ? 'login.php' : '?page=admin_login';
-$adminHome = $isDirectAdmin ? 'index.php' : '?page=admin_index';
-$editorHome = $isDirectAdmin ? 'courses.php' : '?page=admin_courses';
-$siteHome = $isDirectAdmin ? '../index.php' : 'index.php';
+$loginRoute = site_page_url('admin_login');
+$adminHome = site_page_url('admin_index');
+$editorHome = site_page_url('admin_courses');
+$siteHome = site_page_url('home');
 
 if (isset($_GET['logout'])) {
 	admin_logout_user();
@@ -36,7 +27,7 @@ if (isset($_GET['logout'])) {
 }
 
 $error = '';
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
 	$userInput = trim($_POST['user'] ?? '');
 	$password = (string)($_POST['pass'] ?? '');
 
@@ -86,6 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width,initial-scale=1">
 	<title>Đăng nhập quản trị - TanKiet Group</title>
+	<?php require_once __DIR__ . '/../includes/favicon_links.php'; ?>
 	<?php if ($inlineAdminCss !== ''): ?>
 		<style><?php echo $inlineAdminCss; ?></style>
 	<?php else: ?>

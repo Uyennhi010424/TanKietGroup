@@ -52,7 +52,7 @@ if (!$service) {
 				<li><strong>Trạng thái:</strong> Đang hiển thị</li>
 				<li><strong>Liên hệ:</strong> <?php echo htmlspecialchars((site_settings()['hotline'] ?? '') ?: 'Liên hệ qua trang tư vấn', ENT_QUOTES, 'UTF-8'); ?></li>
 			</ul>
-			<p style="margin-top:16px;"><a class="btn btn-primary" href="/?page=consultations">Nhận tư vấn ngay</a></p>
+			<p style="margin-top:16px;"><a class="btn btn-primary" href="<?php echo htmlspecialchars(site_page_url('consultations'), ENT_QUOTES, 'UTF-8'); ?>">Nhận tư vấn ngay</a></p>
 		</article>
 	</div>
 </section>

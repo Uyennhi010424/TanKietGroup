@@ -1,8 +1,0 @@
-<?php
-// Copy this file to database.local.php and set your real MySQL credentials.
-return [
-    'host' => 'localhost',
-    'dbname' => 'tankietgroup',
-    'user' => 'root',
-    'pass' => 'your_mysql_password_here',
-];

@@ -39,7 +39,7 @@ if (!$course) {
 				<li><strong>Thời lượng:</strong> <?php echo htmlspecialchars($course['duration'] ?? '-', ENT_QUOTES, 'UTF-8'); ?></li>
 				<li><strong>Hình thức:</strong> <?php echo htmlspecialchars($course['form_type'] ?? '-', ENT_QUOTES, 'UTF-8'); ?></li>
 			</ul>
-			<p style="margin-top:16px;"><a class="btn btn-primary" href="/?page=consultations">Đăng ký tư vấn</a></p>
+			<p style="margin-top:16px;"><a class="btn btn-primary" href="<?php echo htmlspecialchars(site_page_url('consultations'), ENT_QUOTES, 'UTF-8'); ?>">Đăng ký tư vấn</a></p>
 		</article>
 	</div>
 </section>

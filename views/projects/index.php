@@ -28,7 +28,7 @@ $projects = site_fetch_all(
 						<h3 style="margin-top:14px;"><?php echo htmlspecialchars($project['title'], ENT_QUOTES, 'UTF-8'); ?></h3>
 						<p class="muted"><?php echo htmlspecialchars($project['short_desc'] ?? '', ENT_QUOTES, 'UTF-8'); ?></p>
 						<p class="muted"><?php echo htmlspecialchars($project['client_name'] ?: 'Khách hàng', ENT_QUOTES, 'UTF-8'); ?></p>
-						<p><a href="/?page=project_detail&amp;slug=<?php echo rawurlencode($project['slug']); ?>">Xem chi tiết</a></p>
+						<p><a href="<?php echo htmlspecialchars(site_page_url('project_detail', ['slug' => $project['slug']]), ENT_QUOTES, 'UTF-8'); ?>">Xem chi tiết</a></p>
 					</article>
 				<?php endforeach; ?>
 			<?php endif; ?>

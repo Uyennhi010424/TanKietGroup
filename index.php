@@ -3,6 +3,30 @@ require_once __DIR__ . '/config/constants.php';
 
 $page = $_GET['page'] ?? 'home';
 
+// Quick asset router: serve /assets/* and /img/* directly from disk when requested.
+// This helps when the built-in PHP server or environment doesn't serve static files.
+$reqPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+if (preg_match('#^/(assets|img)/(.*)$#', $reqPath, $m)) {
+	$type = $m[1];
+	$sub = $m[2];
+	$file = realpath(__DIR__ . '/' . $type . '/' . $sub);
+	$baseDir = realpath(__DIR__ . '/' . $type);
+	if ($file && $baseDir && str_starts_with($file, $baseDir) && is_file($file)) {
+		$ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+		$mimes = [
+			'css' => 'text/css', 'js' => 'application/javascript', 'jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg', 'png' => 'image/png', 'webp' => 'image/webp', 'svg' => 'image/svg+xml', 'gif' => 'image/gif', 'woff' => 'font/woff', 'woff2' => 'font/woff2'
+		];
+		header('X-Accel-Buffered-Response: no');
+		header('Content-Type: ' . ($mimes[$ext] ?? 'application/octet-stream'));
+		header('Content-Length: ' . filesize($file));
+		readfile($file);
+		exit;
+	}
+	http_response_code(404);
+	echo 'Not Found';
+	exit;
+}
+
 $viewMap = [
 	'home' => [
 		'view' => __DIR__ . '/views/home.php',
