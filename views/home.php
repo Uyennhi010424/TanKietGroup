@@ -4,7 +4,7 @@ require_once __DIR__ . '/../includes/site.php';
 $site = site_settings();
 $heroBanner = site_image_url($site['banner'] ?? '', '/img/hero.jpg');
 $services = site_fetch_all(
-    'SELECT s.id, s.title, s.slug, s.short_desc, s.image, i.name AS industry_name
+	'SELECT s.id, s.title, s.slug, s.short_desc, s.image, i.name AS industry_name
      FROM services s
      LEFT JOIN industries i ON i.id = s.industry_id
      WHERE s.status = 1
@@ -12,21 +12,21 @@ $services = site_fetch_all(
      LIMIT 6'
 );
 $projects = site_fetch_all(
-    'SELECT id, title, slug, short_desc, thumbnail
+	'SELECT id, title, slug, short_desc, thumbnail
      FROM projects
      WHERE status = 1
      ORDER BY created_at DESC
      LIMIT 4'
 );
 $courses = site_fetch_all(
-    'SELECT id, title, slug, short_desc, thumbnail, price, discount_price
+	'SELECT id, title, slug, short_desc, thumbnail, price, discount_price
      FROM courses
      WHERE status = 1
      ORDER BY sort_order ASC, created_at DESC
      LIMIT 4'
 );
 $posts = site_fetch_all(
-    'SELECT id, title, slug, thumbnail, meta_title, created_at
+	'SELECT id, title, slug, thumbnail, meta_title, created_at
      FROM blog_posts
      WHERE status = "published"
      ORDER BY is_featured DESC, published_at DESC, created_at DESC
@@ -59,14 +59,22 @@ $posts = site_fetch_all(
 		<div class="swiper services-swiper" style="margin-top:24px;">
 			<div class="swiper-wrapper">
 				<?php if (!$services): ?>
-					<div class="swiper-slide"><article class="card reveal"><h3>Chưa có dữ liệu dịch vụ</h3><p class="muted">Hãy thêm dịch vụ trong trang quản trị.</p></article></div>
+					<div class="swiper-slide">
+						<article class="card reveal">
+							<h3>Chưa có dữ liệu dịch vụ</h3>
+							<p class="muted">Hãy thêm dịch vụ trong trang quản trị.</p>
+						</article>
+					</div>
 				<?php else: ?>
 					<?php foreach ($services as $service): ?>
 						<div class="swiper-slide">
 							<article class="card service-card reveal">
 								<div class="card-media service-overlay-wrap">
 									<img src="<?php echo htmlspecialchars(site_image_url($service['image'] ?? '', '/img/du_an.jpg'), ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($service['title'], ENT_QUOTES, 'UTF-8'); ?>">
-									<a href="<?php echo htmlspecialchars(site_page_url('service_detail', ['slug' => $service['slug']]), ENT_QUOTES, 'UTF-8'); ?>" class="service-overlay">Xem chi tiết</a>
+									<a href="/<?php echo htmlspecialchars($service['slug']); ?>"
+										class="service-overlay">
+										Xem chi tiết
+									</a>
 								</div>
 								<div class="card-content">
 									<h3><?php echo htmlspecialchars($service['title'], ENT_QUOTES, 'UTF-8'); ?></h3>
@@ -90,14 +98,23 @@ $posts = site_fetch_all(
 		<div class="swiper projects-swiper" style="margin-top:24px;">
 			<div class="swiper-wrapper">
 				<?php if (!$projects): ?>
-					<div class="swiper-slide"><article class="card reveal"><h3>Chưa có dữ liệu dự án</h3><p class="muted">Hãy thêm dự án trong trang quản trị.</p></article></div>
+					<div class="swiper-slide">
+						<article class="card reveal">
+							<h3>Chưa có dữ liệu dự án</h3>
+							<p class="muted">Hãy thêm dự án trong trang quản trị.</p>
+						</article>
+					</div>
 				<?php else: ?>
 					<?php foreach ($projects as $project): ?>
 						<div class="swiper-slide">
 							<article class="card project-card reveal">
 								<div class="card-media">
 									<img src="<?php echo htmlspecialchars(site_image_url($project['thumbnail'] ?? '', '/img/du_an3.jpg'), ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($project['title'], ENT_QUOTES, 'UTF-8'); ?>">
-									<a class="project-overlay" href="<?php echo htmlspecialchars(site_page_url('project_detail', ['slug' => $project['slug']]), ENT_QUOTES, 'UTF-8'); ?>" aria-label="Xem chi tiết dự án <?php echo htmlspecialchars($project['title'], ENT_QUOTES, 'UTF-8'); ?>">Xem chi tiết</a>
+									<a class="project-overlay"
+										href="/<?php echo htmlspecialchars($project['slug'], ENT_QUOTES, 'UTF-8'); ?>"
+										aria-label="Xem chi tiết dự án <?php echo htmlspecialchars($project['title'], ENT_QUOTES, 'UTF-8'); ?>">
+										Xem chi tiết
+									</a>
 								</div>
 								<div class="card-content">
 									<h3><?php echo htmlspecialchars($project['title'], ENT_QUOTES, 'UTF-8'); ?></h3>
@@ -120,7 +137,10 @@ $posts = site_fetch_all(
 		<h2 class="reveal">Khóa học mới</h2>
 		<div class="grid grid-4" style="margin-top:24px;">
 			<?php if (!$courses): ?>
-				<article class="card reveal"><h3>Chưa có khóa học</h3><p class="muted">Thêm khóa học trong admin để hiển thị tại đây.</p></article>
+				<article class="card reveal">
+					<h3>Chưa có khóa học</h3>
+					<p class="muted">Thêm khóa học trong admin để hiển thị tại đây.</p>
+				</article>
 			<?php else: ?>
 				<?php foreach ($courses as $course): ?>
 					<article class="card reveal">
@@ -140,7 +160,10 @@ $posts = site_fetch_all(
 		<h2 class="reveal">Tin mới từ blog</h2>
 		<div class="grid grid-4" style="margin-top:24px;">
 			<?php if (!$posts): ?>
-				<article class="card reveal"><h3>Chưa có bài viết</h3><p class="muted">Thêm blog post trong admin để hiển thị tại đây.</p></article>
+				<article class="card reveal">
+					<h3>Chưa có bài viết</h3>
+					<p class="muted">Thêm blog post trong admin để hiển thị tại đây.</p>
+				</article>
 			<?php else: ?>
 				<?php foreach ($posts as $post): ?>
 					<article class="card reveal">
