@@ -1295,3 +1295,87 @@ h2 {
         0 25px 60px rgba(0, 0, 0, 0.45),
         0 0 40px rgba(134, 215, 223, 0.4);
 }
+/* ==================== STATS SECTION ==================== */
+
+.stats-section{
+    padding: 60px 0;
+
+    background:
+        radial-gradient(
+            circle at center,
+            rgba(18,54,60,.25) 0%,
+            rgba(15,23,24,1) 70%
+        );
+}
+
+/* GRID */
+.stats-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:30px;
+}
+
+/* CARD */
+.stat-card{
+    background: rgba(21,32,34,.35);
+
+    border:1px solid rgba(134,215,223,.12);
+    border-radius:20px;
+
+    height:180px;
+
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+
+    padding:20px;
+
+    backdrop-filter:blur(8px);
+
+    transition:.3s ease;
+}
+
+.stat-card{
+    height:160px;
+}
+
+/* Khối số */
+.stat-number-wrap{
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    gap:8px;
+
+    margin-bottom:12px;
+}
+
+/* Số */
+.stat-number{
+    font-size:4rem;
+    font-weight:800;
+    line-height:1;
+    color:var(--primary);
+}
+
+/* + và % */
+.plus,
+.percent{
+    font-size:4rem;
+    font-weight:800;
+    line-height:1;
+    color:var(--primary);
+
+    margin-top:0px;
+}
+
+/* Chữ */
+.stat-label{
+    font-size:1rem;
+    font-weight:500;
+
+    color:#dbe8ea;
+
+    text-align:center;
+    line-height:1.5;
+}
