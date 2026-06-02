@@ -1,72 +1,24 @@
 <?php
-$page = $_GET['page'] ?? 'home';
 
-$publicViewMap = [
-    'home' => [
-        'view' => __DIR__ . '/../views/home.php',
-        'title' => 'Trang chủ',
-    ],
-    'about' => [
-        'view' => __DIR__ . '/../views/about.php',
-        'title' => 'Giới thiệu',
-    ],
-    'services' => [
-        'view' => __DIR__ . '/../views/services/index.php',
-        'title' => 'Dịch vụ',
-    ],
-    'service_detail' => [
-        'view' => __DIR__ . '/../views/services/detail.php',
-        'title' => 'Chi tiết dịch vụ',
-    ],
-    'courses' => [
-        'view' => __DIR__ . '/../views/courses/index.php',
-        'title' => 'Khóa học',
-    ],
-    'course_detail' => [
-        'view' => __DIR__ . '/../views/courses/detail.php',
-        'title' => 'Chi tiết khóa học',
-    ],
-    'projects' => [
-        'view' => __DIR__ . '/../views/projects/index.php',
-        'title' => 'Dự án',
-    ],
-    'project_detail' => [
-        'view' => __DIR__ . '/../views/projects/detail.php',
-        'title' => 'Chi tiết dự án',
-    ],
-    'blog' => [
-        'view' => __DIR__ . '/../views/blog/index.php',
-        'title' => 'Blog',
-    ],
-    'blog_detail' => [
-        'view' => __DIR__ . '/../views/blog/detail.php',
-        'title' => 'Chi tiết bài viết',
-    ],
-    'contact' => [
-        'view' => __DIR__ . '/../views/contact.php',
-        'title' => 'Liên hệ',
-    ],
-    'consultations' => [
-        'view' => __DIR__ . '/../views/consultations.php',
-        'title' => 'Tư vấn',
-    ],
+$page = $_GET['page'] ?? 'admin_index';
+
+$adminViewMap = [
+    'admin_courses'      => __DIR__ . '/courses.php',
+    'admin_projects'     => __DIR__ . '/projects.php',
+    'admin_services'     => __DIR__ . '/services.php',
+    'admin_users'        => __DIR__ . '/users.php',
+    'admin_blog'         => __DIR__ . '/blog.php',
+    'admin_recruitments' => __DIR__ . '/recruitments.php',
+    'admin_stats'        => __DIR__ . '/stats.php',
+    'admin_settings'     => __DIR__ . '/settings.php',
+    'admin_consultations'=> __DIR__ . '/consultations.php',
+    'admin_login'        => __DIR__ . '/login.php',
+    'admin_media'        => __DIR__ . '/media.php',
 ];
 
-if (isset($publicViewMap[$page])) {
-    $currentPage = $page;
-    $pageTitle = $publicViewMap[$page]['title'];
-
-    if (($publicViewMap[$page]['layout'] ?? 'main') === 'none') {
-        include $publicViewMap[$page]['view'];
-        return;
-    }
-
-    ob_start();
-    include $publicViewMap[$page]['view'];
-    $content = ob_get_clean();
-
-    include __DIR__ . '/../views/layouts/main.php';
-    return;
+if (isset($adminViewMap[$page])) {
+    require $adminViewMap[$page];
+    exit;
 }
 
 require_once __DIR__ . '/../includes/db.php';
@@ -117,8 +69,8 @@ try {
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Trang quản trị - TanKiet Group</title>
     <link rel="icon" href="<?php echo htmlspecialchars(site_favicon_url(), ENT_QUOTES, 'UTF-8'); ?>">
-    <link rel="stylesheet" href="<?php echo $assetBase; ?>/assets/css/admin.css">
-    <script defer src="<?php echo $assetBase; ?>/assets/js/admin.js"></script>
+    <link rel="stylesheet" href="/assets/css/admin.css">
+    <script defer src="/assets/js/admin.js"></script>
 </head>
 
 <body class="role-<?php echo htmlspecialchars($adminRole, ENT_QUOTES, 'UTF-8'); ?>">

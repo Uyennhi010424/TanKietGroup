@@ -93,8 +93,8 @@ if ($db) {
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Tư vấn khách hàng - Trang quản trị</title>
     <link rel="icon" href="<?php echo htmlspecialchars(site_favicon_url(), ENT_QUOTES, 'UTF-8'); ?>">
-    <link rel="stylesheet" href="<?php echo $assetBase; ?>/assets/css/admin.css">
-    <script defer src="<?php echo $assetBase; ?>/assets/js/admin.js"></script>
+    <link rel="stylesheet" href="/assets/css/admin.css">
+    <script defer src="/assets/js/admin.js"></script>
 </head>
 
 <body class="role-<?php echo h($adminRole); ?>">

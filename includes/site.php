@@ -216,3 +216,19 @@ function site_favicon_url(string $fallback = '/img/favicon.ico'): string
 
     return site_image_url($fallback, $fallback);
 }
+
+function site_admin_asset_url(string $path): string
+{
+    $scriptName = str_replace('\\', '/', (string)($_SERVER['SCRIPT_NAME'] ?? ''));
+    $scriptDir = rtrim(dirname($scriptName), '/');
+
+    // Nếu đang chạy với -t admin thì scriptDir không có /admin
+    // Nếu chạy từ gốc project thì scriptDir có /admin
+    if (preg_match('#/admin$#', $scriptDir)) {
+        // Chạy từ gốc: /admin/assets/css/admin.css
+        return $scriptDir . '/assets/' . ltrim($path, '/');
+    }
+
+    // Chạy với -t admin: /assets/css/admin.css
+    return '/assets/' . ltrim($path, '/');
+}

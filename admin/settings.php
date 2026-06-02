@@ -223,8 +223,8 @@ if ($db) {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Cài đặt hệ thống - Trang quản trị</title>
-    <link rel="stylesheet" href="<?php echo $assetBase; ?>/assets/css/admin.css">
-    <script defer src="<?php echo $assetBase; ?>/assets/js/admin.js"></script>
+    <link rel="stylesheet" href="/assets/css/admin.css">
+    <script defer src="/assets/js/admin.js"></script>
 </head>
 <body class="role-<?php echo h($adminRole); ?>">
 <div class="admin-wrap">
