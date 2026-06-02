@@ -11,8 +11,7 @@ $courses = site_fetch_all(
 <section class="hero">
 	<div class="container reveal">
 		<span class="tag">Khóa học</span>
-		<h1>Khóa học đang được quản lý trong admin</h1>
-		<p class="lead">Mỗi khóa học hiển thị ở đây đều lấy từ bảng `courses`, nên admin thêm/sửa là frontend cập nhật ngay.</p>
+		<h1>Khóa học</h1>
 	</div>
 </section>
 
@@ -26,15 +25,14 @@ $courses = site_fetch_all(
 				</article>
 			<?php else: ?>
 				<?php foreach ($courses as $course): ?>
-					<article class="card reveal">
+					<article class="card reveal course-card">
 						<img src="<?php echo htmlspecialchars(site_image_url($course['thumbnail'] ?? '', '/img/du_an.jpg'), ENT_QUOTES, 'UTF-8'); ?>"
 							alt="<?php echo htmlspecialchars($course['title'], ENT_QUOTES, 'UTF-8'); ?>"
 							style="width:100%;height:200px;object-fit:cover;border-radius:12px;">
 
 						<h3 style="margin-top:14px;"><?php echo htmlspecialchars($course['title'], ENT_QUOTES, 'UTF-8'); ?></h3>
 
-						<!-- Ẩn short_desc theo yêu cầu của bạn -->
-						<!-- <p class="muted"><?php echo htmlspecialchars($course['short_desc'] ?? '', ENT_QUOTES, 'UTF-8'); ?></p> -->
+						<!-- <?php echo htmlspecialchars($course['short_desc'] ?? '', ENT_QUOTES, 'UTF-8'); ?></p>  --> 
 
 						<p class="muted"><?php echo htmlspecialchars(($course['duration'] ?? '') . ' · ' . ($course['form_type'] ?? 'online'), ENT_QUOTES, 'UTF-8'); ?></p>
 

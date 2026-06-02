@@ -290,7 +290,7 @@ if ($db) {
                             </select>
                         </div>
                         <div style="grid-column:1 / -1;">
-                            <label class="small">Mô tả ngắn</label>
+                            <label class="small">Nội dung khóa học</label>
                             <textarea class="form-control" name="short_desc" rows="3"><?php echo h($editing['short_desc']); ?></textarea>
                         </div>
                         <div style="grid-column:1 / -1;">

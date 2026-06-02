@@ -21,7 +21,6 @@ if (!$course) {
 	<div class="container reveal">
 		<span class="tag">Khóa học</span>
 		<h1><?php echo htmlspecialchars($course['title'], ENT_QUOTES, 'UTF-8'); ?></h1>
-		<p class="lead"><?php echo htmlspecialchars($course['short_desc'] ?: 'Khóa học được quản lý từ admin.', ENT_QUOTES, 'UTF-8'); ?></p>
 	</div>
 </section>
 
@@ -30,7 +29,7 @@ if (!$course) {
 		<article class="card reveal">
     <h2>Nội dung khóa học</h2>
     <?php 
-    $content = trim((string)($course['content'] ?? ''));
+    $content = trim((string)($course['short_desc'] ?? ''));
     
     if (!empty($content)): 
     ?>
@@ -46,10 +45,9 @@ if (!$course) {
 </article>
 </article>
 		<article class="card reveal">
-			<h2>Thông tin nhanh</h2>
+			<h2>Thông tin</h2>
 			<ul class="contact-list">
 				<li><strong>Giá:</strong> <?php echo htmlspecialchars(format_vnd($course['price'] ?? 0), ENT_QUOTES, 'UTF-8'); ?></li>
-				<li><strong>Giá ưu đãi:</strong> <?php echo htmlspecialchars(format_vnd($course['discount_price'] ?? 0), ENT_QUOTES, 'UTF-8'); ?></li>
 				<li><strong>Thời lượng:</strong> <?php echo htmlspecialchars($course['duration'] ?? '-', ENT_QUOTES, 'UTF-8'); ?></li>
 				<li><strong>Hình thức:</strong> <?php echo htmlspecialchars($course['form_type'] ?? '-', ENT_QUOTES, 'UTF-8'); ?></li>
 			</ul>
