@@ -30,3 +30,46 @@ $site = site_settings();
 		</div>
 	</div>
 </section>
+<!-- ==================== PHẦN THỐNG KÊ 4 CARD NGANG ==================== -->
+<section class="stats-section">
+	<div class="container">
+		<div class="stats-grid">
+
+			<div class="stat-card">
+				<div class="stat-number-wrap">
+					<div class="stat-number count" data-target="150">0</div>
+					<span class="plus">+</span>
+				</div>
+				<div class="stat-label">Dự án thực hiện</div>
+			</div>
+
+			<div class="stat-card">
+				<div class="stat-number-wrap">
+					<div class="stat-number count" data-target="50">0</div>
+					<span class="plus">+</span>
+				</div>
+
+				<div class="stat-label">Doanh nghiệp đối tác</div>
+			</div>
+
+			<div class="stat-card">
+				<div class="stat-number-wrap">
+					<div class="stat-number count" data-target="99">0</div>
+					<span class="plus">+</span>
+				</div>
+
+				<div class="stat-label">Học viên đào tạo</div>
+			</div>
+
+			<div class="stat-card">
+				<div class="stat-number-wrap">
+					<div class="stat-number count" data-target="98">0</div>
+					<span class="percent">%</span>
+				</div>
+
+				<div class="stat-label">Mức độ hài lòng</div>
+			</div>
+
+		</div>
+	</div>
+</section>
