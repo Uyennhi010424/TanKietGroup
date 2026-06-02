@@ -1479,3 +1479,166 @@ h2 {
 .grid-2 {
     align-items: stretch;
 }
+/* ================== FORM TUYỂN DỤNG ĐẸP HƠN ================== */
+
+.recruitment-form {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+.form-section {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(134,215,223,0.1);
+    border-radius: 16px;
+    padding: 20px;
+}
+
+.form-section h4 {
+    margin: 0 0 16px 0;
+    color: var(--primary);
+    font-size: 1.1rem;
+    border-bottom: 1px solid rgba(134,215,223,0.15);
+    padding-bottom: 8px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: rgba(19,31,33,0.8);
+    color: var(--text);
+    font-size: 1rem;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-strong);
+    box-shadow: 0 0 0 3px rgba(134,215,223,0.2);
+}
+
+.required {
+    color: #ff6b6b;
+}
+
+/* Label */
+label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: var(--muted);
+    font-size: 0.95rem;
+}
+/* ================== STATS SECTION - SỐ VÀ DẤU BẰNG NHAU ==================== */
+
+.stats {
+    text-align: center;
+}
+
+.stat-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.stat-number .count,
+.stat-number .suffix {
+    font-size: 3.5rem;           /* Kích thước giống nhau */
+    font-weight: 700;
+    line-height: 1;
+    color: var(--primary);
+}
+
+.stat-number .suffix {
+    font-weight: 700;
+    margin-top: 2px;             /* Điều chỉnh nhẹ để cân đối */
+}
+
+/* Responsive cho mobile */
+@media (max-width: 768px) {
+    .stat-number .count,
+    .stat-number .suffix {
+        font-size: 2.6rem;
+    }
+}
+/* ================== SERVICE CARD FIX ==================== */
+
+.service-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.card-media.service-overlay-wrap {
+    position: relative;
+    overflow: hidden;
+    border-radius: 18px 18px 0 0;
+    flex-shrink: 0;
+}
+
+.card-media.service-overlay-wrap img {
+    width: 100%;
+    height: 240px;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.5s ease;
+}
+
+.service-overlay-wrap:hover img {
+    transform: scale(1.08);
+}
+
+.service-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 700;
+    opacity: 0;
+    transition: all 0.4s ease;
+    z-index: 2;
+    border-radius: 18px 18px 0 0;
+}
+
+.service-overlay-wrap:hover .service-overlay {
+    opacity: 1;
+}
+
+.service-card .card-content {
+    flex: 1;
+    padding: 20px 18px;
+    display: flex;
+    flex-direction: column;
+}
+
+.service-card h3 {
+    margin: 0 0 12px 0;
+    font-size: 1.25rem;
+    line-height: 1.4;
+}
+
+.service-card .muted {
+    margin-top: auto;
+    font-size: 0.95rem;
+}
+
+/* Swiper slide fix */
+.services-swiper .swiper-slide {
+    width: 380px !important;
+    height: auto;
+}

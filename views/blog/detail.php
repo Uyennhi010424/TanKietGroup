@@ -52,7 +52,6 @@ if (!$post) {
 			<ul class="contact-list">
 				<li><strong>Danh mục:</strong> <?php echo htmlspecialchars($post['category_name'] ?: '-', ENT_QUOTES, 'UTF-8'); ?></li>
 				<li><strong>Tác giả:</strong> <?php echo htmlspecialchars($post['author_name'] ?: '-', ENT_QUOTES, 'UTF-8'); ?></li>
-				<li><strong>Lượt xem:</strong> <?php echo htmlspecialchars((string)($post['views'] ?? 0), ENT_QUOTES, 'UTF-8'); ?></li>
 				<li><strong>Trạng thái:</strong> published</li>
 			</ul>
 		</article>

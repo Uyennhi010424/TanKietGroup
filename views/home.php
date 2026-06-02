@@ -46,10 +46,37 @@ $posts = site_fetch_all(
 
 <section class="section section-muted">
 	<div class="container grid grid-4">
-		<article class="card stats reveal"><strong class="count" data-target="<?php echo count($projects); ?>">0</strong><span class="muted">Dự án đang hiển thị</span></article>
-		<article class="card stats reveal"><strong class="count" data-target="<?php echo count($services); ?>">0</strong><span class="muted">Dịch vụ đang hiển thị</span></article>
-		<article class="card stats reveal"><strong class="count" data-target="<?php echo count($courses); ?>">0</strong><span class="muted">Khóa học đang hiển thị</span></article>
-		<article class="card stats reveal"><strong class="count" data-target="<?php echo count($posts); ?>">0</strong><span class="muted">Bài viết đang hiển thị</span></article>
+		<article class="card stats reveal">
+			<div class="stat-number">
+				<strong class="count" data-target="150">0</strong>
+				<span class="suffix">+</span>
+			</div>
+			<span class="muted">Dự án thực hiện</span>
+		</article>
+
+		<article class="card stats reveal">
+			<div class="stat-number">
+				<strong class="count" data-target="50">0</strong>
+				<span class="suffix">+</span>
+			</div>
+			<span class="muted">Doanh nghiệp đối tác</span>
+		</article>
+
+		<article class="card stats reveal">
+			<div class="stat-number">
+				<strong class="count" data-target="99">0</strong>
+				<span class="suffix">+</span>
+			</div>
+			<span class="muted">Học viên đào tạo</span>
+		</article>
+
+		<article class="card stats reveal">
+			<div class="stat-number">
+				<strong class="count" data-target="98">0</strong>
+				<span class="suffix">%</span>
+			</div>
+			<span class="muted">Mức độ hài lòng</span>
+		</article>
 	</div>
 </section>
 
@@ -70,15 +97,26 @@ $posts = site_fetch_all(
 						<div class="swiper-slide">
 							<article class="card service-card reveal">
 								<div class="card-media service-overlay-wrap">
-									<img src="<?php echo htmlspecialchars(site_image_url($service['image'] ?? '', '/img/du_an.jpg'), ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($service['title'], ENT_QUOTES, 'UTF-8'); ?>">
-									<a href="/<?php echo htmlspecialchars($service['slug']); ?>"
-										class="service-overlay">
+									<img
+										src="<?php echo htmlspecialchars(site_image_url($service['image'] ?? '', '/img/du_an.jpg'), ENT_QUOTES, 'UTF-8'); ?>"
+										alt="<?php echo htmlspecialchars($service['title'], ENT_QUOTES, 'UTF-8'); ?>"
+										loading="lazy">
+
+									<a href="<?php echo htmlspecialchars(site_page_url('service_detail', ['slug' => $service['slug']]), ENT_QUOTES, 'UTF-8'); ?>"
+										class="service-overlay swiper-no-swiping">
 										Xem chi tiết
 									</a>
 								</div>
 								<div class="card-content">
 									<h3><?php echo htmlspecialchars($service['title'], ENT_QUOTES, 'UTF-8'); ?></h3>
-									<p class="muted"><?php echo htmlspecialchars($service['short_desc'] ?: ($service['industry_name'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></p>
+									<p class="muted">
+										<?php
+										$desc = trim($service['short_desc'] ?? '');
+										if ($desc !== '' && strtolower($desc) !== 'hello') {
+											echo htmlspecialchars($desc, ENT_QUOTES, 'UTF-8');
+										}
+										?>
+									</p>
 								</div>
 							</article>
 						</div>
