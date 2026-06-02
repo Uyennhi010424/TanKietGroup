@@ -28,9 +28,23 @@ if (!$course) {
 <section class="section">
 	<div class="container grid grid-2">
 		<article class="card reveal">
-			<h2>Nội dung khóa học</h2>
-			<?php echo nl2br(htmlspecialchars((string)($course['content'] ?: 'Nội dung khóa học chưa được cập nhật.'), ENT_QUOTES, 'UTF-8')); ?>
-		</article>
+    <h2>Nội dung khóa học</h2>
+    <?php 
+    $content = trim((string)($course['content'] ?? ''));
+    
+    if (!empty($content)): 
+    ?>
+        <div class="course-content prose" style="line-height: 1.7; font-size: 1.05rem;">
+            <?= nl2br(htmlspecialchars($content, ENT_QUOTES, 'UTF-8')) ?>
+        </div>
+    <?php else: ?>
+        <p class="muted" style="font-style: italic;">
+            Nội dung khóa học đang được cập nhật. <br>
+            Vui lòng quay lại sau hoặc liên hệ tư vấn để biết thêm thông tin.
+        </p>
+    <?php endif; ?>
+</article>
+</article>
 		<article class="card reveal">
 			<h2>Thông tin nhanh</h2>
 			<ul class="contact-list">
