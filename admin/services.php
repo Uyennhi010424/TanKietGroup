@@ -38,12 +38,37 @@ function make_slug($text)
     $text = trim((string)$text);
     $text = mb_strtolower($text, 'UTF-8');
     $map = [
-        'à' => 'a', 'á' => 'a', 'ạ' => 'a', 'ả' => 'a', 'ã' => 'a', 'đ' => 'd',
-        'è' => 'e', 'é' => 'e', 'ẹ' => 'e', 'ẻ' => 'e', 'ẽ' => 'e',
-        'ì' => 'i', 'í' => 'i', 'ị' => 'i', 'ỉ' => 'i', 'ĩ' => 'i',
-        'ò' => 'o', 'ó' => 'o', 'ọ' => 'o', 'ỏ' => 'o', 'õ' => 'o',
-        'ù' => 'u', 'ú' => 'u', 'ụ' => 'u', 'ủ' => 'u', 'ũ' => 'u',
-        'ỳ' => 'y', 'ý' => 'y', 'ỵ' => 'y', 'ỷ' => 'y', 'ỹ' => 'y'
+        'à' => 'a',
+        'á' => 'a',
+        'ạ' => 'a',
+        'ả' => 'a',
+        'ã' => 'a',
+        'đ' => 'd',
+        'è' => 'e',
+        'é' => 'e',
+        'ẹ' => 'e',
+        'ẻ' => 'e',
+        'ẽ' => 'e',
+        'ì' => 'i',
+        'í' => 'i',
+        'ị' => 'i',
+        'ỉ' => 'i',
+        'ĩ' => 'i',
+        'ò' => 'o',
+        'ó' => 'o',
+        'ọ' => 'o',
+        'ỏ' => 'o',
+        'õ' => 'o',
+        'ù' => 'u',
+        'ú' => 'u',
+        'ụ' => 'u',
+        'ủ' => 'u',
+        'ũ' => 'u',
+        'ỳ' => 'y',
+        'ý' => 'y',
+        'ỵ' => 'y',
+        'ỷ' => 'y',
+        'ỹ' => 'y'
     ];
     $text = strtr($text, $map);
     $text = preg_replace('/[^a-z0-9]+/', '-', $text);
@@ -93,23 +118,41 @@ if ($db && $_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
 
-            if ($action === 'save') {
+        if ($action === 'save') {
             $id = (int)($_POST['id'] ?? 0);
             $title = trim($_POST['title'] ?? '');
             $slug = trim($_POST['slug'] ?? '');
             $industryId = ($_POST['industry_id'] ?? '') === '' ? null : (int)$_POST['industry_id'];
+            $industryName = '';
+
+            if ($industryId) {
+                $industryStmt = $db->prepare(
+                    'SELECT name FROM industries WHERE id = :id LIMIT 1'
+                );
+                $industryStmt->execute(['id' => $industryId]);
+
+                $industryName = (string)$industryStmt->fetchColumn();
+                if (preg_match('/cho\s+(.+)$/iu', $industryName, $matches)) {
+                    $industryName = trim($matches[1]);
+                }
+            }
             $shortDesc = trim($_POST['short_desc'] ?? '');
-                $content = trim($_POST['content'] ?? '');
-                $image = trim($_POST['current_image'] ?? '');
+            $content = trim($_POST['content'] ?? '');
+            $image = trim($_POST['current_image'] ?? '');
             $status = (int)($_POST['status'] ?? 1);
 
             if ($title === '') {
                 throw new RuntimeException('Tên dịch vụ không được để trống');
             }
             if ($slug === '') {
-                $slug = make_slug($title);
-            }
 
+                $slugSource = $title;
+                if ($industryName !== '') {
+                    $slugSource .= ' ' . $industryName;
+                }
+
+                $slug = make_slug($slugSource);
+            }
             $slugCheck = $db->prepare('SELECT COUNT(*) FROM services WHERE slug = :slug AND id <> :id');
             $slugCheck->execute([
                 'slug' => $slug,
@@ -262,7 +305,7 @@ if ($db) {
 
                 <div class="card" style="padding:16px;margin-bottom:18px;">
                     <h3 style="margin:0 0 12px 0"><?php echo (int)$editing['id'] > 0 ? 'Sửa dịch vụ' : 'Thêm dịch vụ'; ?></h3>
-                        <form method="post" enctype="multipart/form-data" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;">
+                    <form method="post" enctype="multipart/form-data" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;">
                         <input type="hidden" name="action" value="save">
                         <input type="hidden" name="csrf_token" value="<?php echo h($csrfToken); ?>">
                         <input type="hidden" name="id" value="<?php echo (int)$editing['id']; ?>">
@@ -283,7 +326,7 @@ if ($db) {
                         </div>
                         <div>
                             <label class="small">Ngành</label>
-                            <select class="form-control" name="industry_id">
+                            <select class="form-control" name="industry_id" id="industrySelect">
                                 <option value="">-- Chọn ngành --</option>
                                 <?php foreach ($industries as $item): ?>
                                     <option value="<?php echo (int)$item['id']; ?>" <?php echo (int)$editing['industry_id'] === (int)$item['id'] ? 'selected' : ''; ?>><?php echo h($item['name']); ?></option>
@@ -371,40 +414,57 @@ if ($db) {
         </main>
     </div>
     <script>
-    (function () {
-        var titleInput = document.getElementById('serviceTitleInput');
-        var slugInput = document.getElementById('serviceSlugInput');
-        if (!titleInput || !slugInput) return;
+        (function() {
 
-        var manualSlugEdit = false;
-        var lastTitle = titleInput.value || '';
+            var titleInput = document.getElementById('serviceTitleInput');
+            var slugInput = document.getElementById('serviceSlugInput');
+            var industrySelect = document.getElementById('industrySelect');
 
-        function slugify(text) {
-            return String(text || '')
-                .toLowerCase()
-                .normalize('NFD')
-                .replace(/[\u0300-\u036f]/g, '')
-                .replace(/đ/g, 'd')
-                .replace(/[^a-z0-9]+/g, '-')
-                .replace(/^-+|-+$/g, '') || 'service';
-        }
+            if (!titleInput || !slugInput || !industrySelect) return;
 
-        slugInput.addEventListener('input', function () {
-            manualSlugEdit = true;
-        });
-
-        titleInput.addEventListener('input', function () {
-            var currentTitle = titleInput.value.trim();
-            if (!manualSlugEdit || slugInput.value.trim() === '' || slugInput.value === slugify(lastTitle)) {
-                slugInput.value = slugify(currentTitle);
+            function slugify(text) {
+                return String(text || '')
+                    .toLowerCase()
+                    .normalize('NFD')
+                    .replace(/[\u0300-\u036f]/g, '')
+                    .replace(/đ/g, 'd')
+                    .replace(/[^a-z0-9]+/g, '-')
+                    .replace(/^-+|-+$/g, '');
             }
-            lastTitle = currentTitle;
-        });
 
-        if (!slugInput.value.trim() && titleInput.value.trim()) {
-            slugInput.value = slugify(titleInput.value);
-        }
-    })();
+            function updateSlug() {
+
+                var title = titleInput.value.trim();
+
+                var industry = '';
+
+                if (industrySelect.selectedIndex > 0) {
+
+                    industry =
+                        industrySelect.options[industrySelect.selectedIndex].text;
+
+                    var match = industry.match(/cho\s+(.+)$/i);
+
+                    if (match) {
+                        industry = match[1];
+                    }
+                }
+
+                var slug = slugify(title);
+
+                if (industry) {
+                    slug += '-' + slugify(industry);
+                }
+
+                slugInput.value = slug;
+            }
+
+            titleInput.addEventListener('input', updateSlug);
+            industrySelect.addEventListener('change', updateSlug);
+
+            updateSlug();
+
+        })();
     </script>
 </body>
 
