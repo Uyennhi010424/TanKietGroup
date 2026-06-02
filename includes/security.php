@@ -8,10 +8,20 @@ function ensure_session_started(): void
 
         $domain = '';
         $host = trim((string)($_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? ''));
+        
         if ($host !== '') {
             $host = preg_replace('/:\d+$/', '', $host);
-            if ($host !== 'localhost' && !filter_var($host, FILTER_VALIDATE_IP)) {
-                $domain = $host;
+            // Set domain for non-localhost hosts (including IP addresses for shared access)
+            if ($host !== 'localhost' && $host !== '127.0.0.1') {
+                // For IP addresses like 192.168.1.242, keep domain empty so cookie works across network
+                // For domain names, set domain with leading dot for subdomain sharing
+                if (filter_var($host, FILTER_VALIDATE_IP)) {
+                    // IP address - keep domain empty but browser will share within network
+                    $domain = '';
+                } else {
+                    // Domain name - set for subdomain sharing
+                    $domain = $host;
+                }
             }
         }
 
@@ -74,7 +84,17 @@ function admin_is_logged_in(): bool
 function admin_login_user(array $user): void
 {
     ensure_session_started();
+    
+    // Preserve CSRF token during session regeneration
+    $csrfToken = $_SESSION['csrf_token'] ?? null;
+    
     session_regenerate_id(true);
+    
+    // Restore CSRF token after regeneration
+    if ($csrfToken !== null) {
+        $_SESSION['csrf_token'] = $csrfToken;
+    }
+    
     $_SESSION['admin_user'] = [
         'id' => (int)($user['id'] ?? 0),
         'username' => (string)($user['username'] ?? ''),
@@ -87,7 +107,7 @@ function admin_logout_user(): void
 {
     ensure_session_started();
     unset($_SESSION['admin_user']);
-    session_regenerate_id(true);
+    session_destroy();
 }
 
 function admin_require_login(string $loginUrl): void
