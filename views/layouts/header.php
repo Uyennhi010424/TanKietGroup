@@ -10,12 +10,22 @@
     $metaDescription = trim((string)($site['meta_description'] ?? ''));
     $resolvedTitle = $pageTitle ?? ($metaTitle !== '' ? $metaTitle : APP_NAME);
     $servicePresets = [
-    'Marketing trọn gói (Chiến lược xây kênh)',
-    'Chăm sóc fanpage (Đăng bài, Quản lý trang, Viết content)',
-    'Sản xuất video',
-    'Tổ chức sự kiện',
-    'Thiết kế Website chuẩn SEO',
-];
+        'Marketing trọn gói (Chiến lược xây kênh)',
+        'Chăm sóc fanpage (Đăng bài, Quản lý trang, Viết content)',
+        'Sản xuất video',
+        'Tổ chức sự kiện',
+        'Thiết kế Website chuẩn SEO',
+    ];
+    $industries = [
+        'Marketing cho Xây dựng',
+        'Marketing cho Bán lẻ',
+        'Marketing cho Bất động sản',
+        'Marketing cho Beauty',
+        'Marketing cho F&B',
+        'Marketing cho Du lịch',
+        'Marketing cho Nông nghiệp',
+    ];
+
     ?>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -70,7 +80,13 @@
                                 <div class="dropdown-column">
                                     <h4>Marketing theo ngành</h4>
                                     <ul>
-                                        <li><a class="highlight" href="<?php echo htmlspecialchars(site_page_url('services'), ENT_QUOTES, 'UTF-8'); ?>">Giải pháp theo ngành</a></li>
+                                        <?php foreach ($industries as $industry): ?>
+                                            <li>
+                                                <a href="/dich-vu/<?php echo htmlspecialchars($industry, ENT_QUOTES, 'UTF-8'); ?>">
+                                                    <?php echo htmlspecialchars($industry, ENT_QUOTES, 'UTF-8'); ?>
+                                                </a>
+                                            </li>
+                                        <?php endforeach; ?>
                                     </ul>
                                 </div>
                             </div>
