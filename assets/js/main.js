@@ -203,25 +203,25 @@ const consultationForm = document.getElementById('consultationForm');
 if (consultationForm) {
   consultationForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    
+
     const formData = new FormData(consultationForm);
     const messageDiv = document.getElementById('formMessage');
-    
+
     try {
       const response = await fetch('/api/save_consultation.php', {
         method: 'POST',
         body: formData
       });
-      
+
       const result = await response.json();
-      
+
       if (result.success) {
         messageDiv.style.display = 'block';
         messageDiv.style.background = '#d4edda';
         messageDiv.style.color = '#155724';
         messageDiv.textContent = result.message;
         consultationForm.reset();
-        
+
         setTimeout(() => {
           messageDiv.style.display = 'none';
         }, 3000);
@@ -247,60 +247,68 @@ if (document.readyState === 'loading') {
   initCounters();
 }
 
-// Initialize Swiper sliders (services + projects) with accessibility and keyboard support
+// Initialize Swiper sliders
 (function () {
   function initSwipers() {
     if (typeof Swiper !== 'function') return;
 
+    // ================== SERVICES SWIPER ==================
     const servicesEl = document.querySelector('.services-swiper');
     if (servicesEl && !servicesEl.dataset.swiperInit) {
       new Swiper(servicesEl, {
-
         loop: true,
-        centeredSlides: true,
-        speed: 1200,
-
-        slidesPerView: 'auto',
+        centeredSlides: true,           // Quan trọng: giữ card giữa
+        speed: 900,
+        slidesPerView: "auto",
         spaceBetween: 30,
-
         autoplay: {
-          delay: 2500,
-          disableOnInteraction: false
+          delay: 2800,
+          disableOnInteraction: false,
         },
-
-        keyboard: {
-          enabled: true
-        },
-
         pagination: {
           el: '.services-swiper .swiper-pagination',
-          clickable: true
+          clickable: true,
         },
-
         navigation: {
           nextEl: '.services-swiper .swiper-button-next',
-          prevEl: '.services-swiper .swiper-button-prev'
+          prevEl: '.services-swiper .swiper-button-prev',
+        },
+        breakpoints: {
+          640: {
+            slidesPerView: 2,
+            centeredSlides: true,
+          },
+          1024: {
+            slidesPerView: 3,
+            centeredSlides: true,
+          }
         }
-
       });
       servicesEl.dataset.swiperInit = '1';
     }
 
+    // ================== PROJECTS SWIPER ==================
     const projectsEl = document.querySelector('.projects-swiper');
     if (projectsEl && !projectsEl.dataset.swiperInit) {
       new Swiper(projectsEl, {
         loop: true,
-        slidesPerView: 2,
+        speed: 800,
+        slidesPerView: 1,
         spaceBetween: 24,
-        autoplay: { delay: 3500, disableOnInteraction: false },
-        keyboard: { enabled: true },
-        a11y: { enabled: true },
-        navigation: { nextEl: '.projects-swiper .swiper-button-next', prevEl: '.projects-swiper .swiper-button-prev' },
-        pagination: { el: '.projects-swiper .swiper-pagination', clickable: true },
+        autoplay: {
+          delay: 3500,
+          disableOnInteraction: false,
+        },
+        pagination: {
+          el: '.projects-swiper .swiper-pagination',
+          clickable: true,
+        },
+        navigation: {
+          nextEl: '.projects-swiper .swiper-button-next',
+          prevEl: '.projects-swiper .swiper-button-prev',
+        },
         breakpoints: {
-          0: { slidesPerView: 1 },
-          700: { slidesPerView: 1.2 },
-          1000: { slidesPerView: 2 }
+          768: { slidesPerView: 2 }
         }
       });
       projectsEl.dataset.swiperInit = '1';
