@@ -120,6 +120,14 @@ $viewMap = [
 		'view' => __DIR__ . '/views/services/detail.php',
 		'title' => 'Chi tiết dịch vụ',
 	],
+	'services_by_type' => [
+		'view' => __DIR__ . '/views/services/services_by_type.php',
+		'title' => 'Dịch vụ theo loại',
+	],
+	'industry_detail' => [
+		'view' => __DIR__ . '/views/services/services_by_industry.php',
+		'title' => 'Dịch vụ theo ngành',
+	],
 	'courses' => [
 		'view' => __DIR__ . '/views/courses/index.php',
 		'title' => 'Khóa học',

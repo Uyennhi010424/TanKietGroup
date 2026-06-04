@@ -98,44 +98,10 @@ if ($db) {
 </head>
 
 <body class="role-<?php echo h($adminRole); ?>">
-<div class="admin-wrap">
-    <aside class="admin-sidebar" style="display:block">
-        <div class="sidebar-header">
-            <div class="brand-admin"><img src="<?php echo htmlspecialchars($logoUrl, ENT_QUOTES, 'UTF-8'); ?>" alt="TanKiet Group" class="site-logo"></div>
-        </div>
-        <nav>
-            <ul class="nav-admin">
-                <?php if (!$isEditor): ?>
-                    <li><a href="<?php echo $adminRoutes['dashboard']; ?>">Tổng quan</a></li>
-                <?php endif; ?>
-                <li><a href="<?php echo $adminRoutes['courses']; ?>">Khóa học</a></li>
-                <li><a href="<?php echo $adminRoutes['projects']; ?>">Dự án</a></li>
-                <li><a href="<?php echo $adminRoutes['services']; ?>">Dịch vụ</a></li>
-                <li><a href="<?php echo $adminRoutes['users']; ?>">Người dùng</a></li>
-                <li><a href="<?php echo $adminRoutes['blog']; ?>">Blog</a></li>
-                <li><a href="<?php echo $adminRoutes['recruitments']; ?>">Tuyển dụng</a></li>
-                <?php if (!$isEditor): ?>
-                    <li><a href="<?php echo $adminRoutes['stats']; ?>">Thống kê tương tác</a></li>
-                <?php endif; ?>
-                <li><a href="<?php echo $adminRoutes['consultations']; ?>">Tư vấn khách hàng</a></li>
-                <li><a href="<?php echo $logoutRoute; ?>">Đăng xuất</a></li>
-            </ul>
-        </nav>
-    </aside>
-    <div class="sidebar-overlay" data-sidebar-overlay></div>
-
-    <main class="admin-main">
-        <header class="topbar">
-            <div style="display:flex;gap:20px;align-items:center">
-                <div class="title">
-                    <h1>Tư vấn khách hàng</h1>
-                    <div class="small">Quản lý các yêu cầu tư vấn từ khách hàng</div>
-                </div>
-
     <div class="admin-wrap">
         <aside class="admin-sidebar" style="display:block">
             <div class="sidebar-header">
-                <div class="brand-admin"><img src="<?php echo $assetBase; ?>/logo.php" alt="TanKiet Group" class="site-logo"></div>
+                <div class="brand-admin"><img src="<?php echo htmlspecialchars($logoUrl, ENT_QUOTES, 'UTF-8'); ?>" alt="TanKiet Group" class="site-logo"></div>
             </div>
             <nav>
                 <ul class="nav-admin">

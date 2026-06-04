@@ -5,56 +5,93 @@ $slug = trim((string)($_GET['slug'] ?? ($_GET['id'] ?? '')));
 $project = null;
 
 if ($slug !== '') {
-    $project = site_fetch_one('SELECT * FROM projects WHERE slug = :slug AND status = 1 LIMIT 1', ['slug' => $slug]);
+	$project = site_fetch_one('SELECT * FROM projects WHERE slug = :slug AND status = 1 LIMIT 1', ['slug' => $slug]);
 }
 
 if (!$project) {
-    $project = site_fetch_one('SELECT * FROM projects WHERE status = 1 ORDER BY created_at DESC LIMIT 1');
+	$project = site_fetch_one('SELECT * FROM projects WHERE status = 1 ORDER BY created_at DESC LIMIT 1');
 }
 
 if (!$project) {
-    echo '<section class="section"><div class="container"><div class="card"><h3>Chưa có dự án</h3><p class="muted">Thêm dự án trong admin để trang này hiển thị.</p></div></div></section>';
-    return;
+	echo '<section class="section"><div class="container"><div class="card"><h3>Chưa có dự án</h3><p class="muted">Thêm dự án trong admin để trang này hiển thị.</p></div></div></section>';
+	return;
 }
 
 $images = site_parse_json($project['images'] ?? '', []);
-$resultMetrics = site_parse_json($project['result_metrics'] ?? '', []);
+$resultRaw = trim((string)($project['result_metrics'] ?? ''));
+
+$resultMetrics = [];
+
+// thử JSON trước
+if ($resultRaw !== '') {
+	$decoded = json_decode($resultRaw, true);
+
+	if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+		$resultMetrics = $decoded;
+	} else {
+		// fallback: tách dòng thường
+		$resultMetrics = array_filter(array_map('trim', preg_split('/\r\n|\r|\n/', $resultRaw)));
+	}
+}
 ?>
-<section class="section">
-	<div class="container project-detail">
-		<div class="project-back">
-			<a class="btn btn-outline" href="<?php echo htmlspecialchars(site_page_url('projects'), ENT_QUOTES, 'UTF-8'); ?>">← Quay lại</a>
-		</div>
-		<div class="grid grid-2">
-			<div>
-				<div class="project-gallery card">
-					<?php if ($images): ?>
-						<?php foreach ($images as $img): ?>
-							<img src="<?php echo htmlspecialchars(site_image_url((string)$img, '/img/du_an3.jpg'), ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($project['title'], ENT_QUOTES, 'UTF-8'); ?>" style="width:100%;border-radius:12px;margin-bottom:12px;">
-						<?php endforeach; ?>
-					<?php else: ?>
-						<img src="<?php echo htmlspecialchars(site_image_url($project['thumbnail'] ?? '', '/img/du_an3.jpg'), ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($project['title'], ENT_QUOTES, 'UTF-8'); ?>" style="width:100%;border-radius:12px;">
-					<?php endif; ?>
-				</div>
-			</div>
-			<div>
-				<h2><?php echo htmlspecialchars($project['title'], ENT_QUOTES, 'UTF-8'); ?></h2>
-				<p class="lead" style="margin-top:8px;"><?php echo htmlspecialchars($project['short_desc'] ?: 'Dự án được quản lý từ admin.', ENT_QUOTES, 'UTF-8'); ?></p>
+<section class="section project-detail-v2">
+    <div class="container">
 
-				<h4 style="margin-top:18px;">Nội dung dự án</h4>
-				<p class="muted"><?php echo nl2br(htmlspecialchars((string)($project['content'] ?: 'Nội dung chi tiết chưa được cập nhật.'), ENT_QUOTES, 'UTF-8')); ?></p>
+        <!-- BACK -->
+        <div class="project-back">
+            <a class="btn btn-outline" href="<?php echo htmlspecialchars(site_page_url('projects')); ?>">
+                ← Quay lại
+            </a>
+        </div>
 
-				<h4 style="margin-top:12px;">Kết quả đạt được</h4>
-				<?php if ($resultMetrics): ?>
-					<ul>
-						<?php foreach ($resultMetrics as $metric): ?>
-							<li class="muted"><?php echo htmlspecialchars(is_array($metric) ? json_encode($metric, JSON_UNESCAPED_UNICODE) : (string)$metric, ENT_QUOTES, 'UTF-8'); ?></li>
-						<?php endforeach; ?>
-					</ul>
-				<?php else: ?>
-					<p class="muted">Chưa có dữ liệu kết quả.</p>
-				<?php endif; ?>
-			</div>
-		</div>
-	</div>
+        <!-- TITLE -->
+        <h1 class="project-title">
+            <?php echo htmlspecialchars($project['title']); ?>
+        </h1>
+
+        <p class="project-desc">
+            <?php echo htmlspecialchars($project['short_desc'] ?: 'Dự án được quản lý từ admin.'); ?>
+        </p>
+
+        <!-- MAIN GRID -->
+        <div class="project-grid">
+
+            <!-- LEFT IMAGE -->
+            <div class="project-image card-glow">
+                <?php if (!empty($images)): ?>
+                    <img src="<?php echo htmlspecialchars(site_image_url($images[0], '/img/du_an3.jpg')); ?>" />
+                <?php else: ?>
+                    <img src="<?php echo htmlspecialchars(site_image_url($project['thumbnail'] ?? '', '/img/du_an3.jpg')); ?>" />
+                <?php endif; ?>
+            </div>
+
+            <!-- RIGHT CONTENT -->
+            <div class="project-content">
+
+                <div class="info-card">
+                    <h3>📄 Nội dung dự án</h3>
+                    <p>
+                        <?php echo nl2br(htmlspecialchars($project['content'] ?: 'Chưa cập nhật nội dung')); ?>
+                    </p>
+                </div>
+
+                <div class="info-card">
+                    <h3>⭐ Kết quả đạt được</h3>
+
+                    <?php if (!empty($resultMetrics)): ?>
+                        <ul class="result-list">
+                            <?php foreach ($resultMetrics as $metric): ?>
+                                <li>✓ <?php echo htmlspecialchars($metric); ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    <?php else: ?>
+                        <p>Chưa có dữ liệu kết quả</p>
+                    <?php endif; ?>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
 </section>

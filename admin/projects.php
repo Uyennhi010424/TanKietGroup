@@ -38,12 +38,37 @@ function make_slug($text)
     $text = trim((string)$text);
     $text = mb_strtolower($text, 'UTF-8');
     $map = [
-        'à' => 'a', 'á' => 'a', 'ạ' => 'a', 'ả' => 'a', 'ã' => 'a', 'đ' => 'd',
-        'è' => 'e', 'é' => 'e', 'ẹ' => 'e', 'ẻ' => 'e', 'ẽ' => 'e',
-        'ì' => 'i', 'í' => 'i', 'ị' => 'i', 'ỉ' => 'i', 'ĩ' => 'i',
-        'ò' => 'o', 'ó' => 'o', 'ọ' => 'o', 'ỏ' => 'o', 'õ' => 'o',
-        'ù' => 'u', 'ú' => 'u', 'ụ' => 'u', 'ủ' => 'u', 'ũ' => 'u',
-        'ỳ' => 'y', 'ý' => 'y', 'ỵ' => 'y', 'ỷ' => 'y', 'ỹ' => 'y'
+        'à' => 'a',
+        'á' => 'a',
+        'ạ' => 'a',
+        'ả' => 'a',
+        'ã' => 'a',
+        'đ' => 'd',
+        'è' => 'e',
+        'é' => 'e',
+        'ẹ' => 'e',
+        'ẻ' => 'e',
+        'ẽ' => 'e',
+        'ì' => 'i',
+        'í' => 'i',
+        'ị' => 'i',
+        'ỉ' => 'i',
+        'ĩ' => 'i',
+        'ò' => 'o',
+        'ó' => 'o',
+        'ọ' => 'o',
+        'ỏ' => 'o',
+        'õ' => 'o',
+        'ù' => 'u',
+        'ú' => 'u',
+        'ụ' => 'u',
+        'ủ' => 'u',
+        'ũ' => 'u',
+        'ỳ' => 'y',
+        'ý' => 'y',
+        'ỵ' => 'y',
+        'ỷ' => 'y',
+        'ỹ' => 'y'
     ];
     $text = strtr($text, $map);
     $text = preg_replace('/[^a-z0-9]+/', '-', $text);
@@ -419,37 +444,69 @@ if ($db) {
 
         </main>
     </div>
-            <script>
-                (function(){
-                    function qs(sel){return document.querySelector(sel)}
-                    var industrySel = qs('select[name="industry_id"]');
-                    var serviceSel = qs('select[name="service_id"]');
-                    if (!industrySel || !serviceSel) return;
+    <script>
+        (function() {
+            function qs(sel) {
+                return document.querySelector(sel)
+            }
+            var industrySel = qs('select[name="industry_id"]');
+            var serviceSel = qs('select[name="service_id"]');
+            if (!industrySel || !serviceSel) return;
 
-                    function filterServices(){
-                        var selectedIndustry = industrySel.value;
-                        var currentService = serviceSel.value;
-                        Array.prototype.forEach.call(serviceSel.options, function(opt){
-                            if (opt.value === '') { opt.hidden = false; return; }
-                            var optIndustry = opt.dataset.industry === undefined ? '' : opt.dataset.industry;
-                            if (selectedIndustry === '') {
-                                opt.hidden = false;
-                            } else if (optIndustry === selectedIndustry) {
-                                opt.hidden = false;
-                            } else if (opt.value === currentService) {
-                                // keep currently selected service visible even if industries changed
-                                opt.hidden = false;
-                            } else {
-                                opt.hidden = true;
-                            }
-                        });
+            function filterServices() {
+                var selectedIndustry = industrySel.value;
+                var currentService = serviceSel.value;
+                Array.prototype.forEach.call(serviceSel.options, function(opt) {
+                    if (opt.value === '') {
+                        opt.hidden = false;
+                        return;
                     }
+                    var optIndustry = opt.dataset.industry === undefined ? '' : opt.dataset.industry;
+                    if (selectedIndustry === '') {
+                        opt.hidden = false;
+                    } else if (optIndustry === selectedIndustry) {
+                        opt.hidden = false;
+                    } else if (opt.value === currentService) {
+                        // keep currently selected service visible even if industries changed
+                        opt.hidden = false;
+                    } else {
+                        opt.hidden = true;
+                    }
+                });
+            }
 
-                    industrySel.addEventListener('change', filterServices);
-                    // Run once on load to reflect initial selection
-                    filterServices();
-                })();
-            </script>
+            industrySel.addEventListener('change', filterServices);
+            // Run once on load to reflect initial selection
+            filterServices();
+        })();
+    </script>
+
+    <script>
+        function slugify(text) {
+            return text
+                .toLowerCase()
+                .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/(^-|-$)+/g, '');
+        }
+
+        const titleInput = document.querySelector('input[name="title"]');
+        const slugInput = document.querySelector('input[name="slug"]');
+
+        let manualSlug = false;
+
+        // nếu user tự sửa slug thì không auto nữa
+        slugInput.addEventListener('input', () => {
+            manualSlug = true;
+        });
+
+        // auto tạo slug từ title
+        titleInput.addEventListener('input', () => {
+            if (!manualSlug) {
+                slugInput.value = slugify(titleInput.value);
+            }
+        });
+    </script>
 </body>
 
 </html>

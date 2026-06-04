@@ -1,7 +1,17 @@
-# Apache rewrite rules placeholder
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
+
+    # giữ file / folder thật
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # ROUTE NGÀNH
+    RewriteRule ^nganh/([^/]+)$ services_by_industry.php?slug=$1 [L,QSA]
+
+    # ROUTE DỊCH VỤ THEO TYPE
+    RewriteRule ^dich-vu/([^/]+)$ services_by_type.php?slug=$1 [L,QSA]
+
+    # fallback về index.php
     RewriteRule ^ index.php [L]
 </IfModule>
