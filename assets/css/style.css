@@ -913,6 +913,39 @@ h2 {
   visibility: visible;
   pointer-events: auto;
 }
+/* ================== FIX TRÀN DROPDOWN DỊCH VỤ - TỐI GIẢN ================== */
+
+.mega-dropdown {
+    min-width: 820px !important;
+    width: auto !important;
+    padding: 24px 28px !important;
+    left: -80px !important;           /* Dịch sang trái để cân giữa */
+    box-sizing: border-box;
+}
+
+.mega-dropdown .dropdown-grid {
+    gap: 24px;
+}
+
+/* Fix chữ dài bị tràn */
+.dropdown-column a,
+.dropdown-column li,
+.dropdown-column p {
+    white-space: normal !important;
+    word-break: break-word !important;
+    hyphens: auto;
+    line-height: 1.5;
+}
+
+/* Giảm padding bên trong cột */
+.dropdown-column {
+    padding: 0 8px !important;
+}
+
+/* Fix button bên phải không làm tràn */
+.mega-dropdown .dropdown-column:last-child {
+    padding-right: 0 !important;
+}
 
 /* hamburger icon */
 .hamburger {
