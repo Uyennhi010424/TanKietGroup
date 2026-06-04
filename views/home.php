@@ -48,34 +48,34 @@ $posts = site_fetch_all(
 	<div class="container grid grid-4">
 		<article class="card stats reveal">
 			<div class="stat-number">
-				<strong class="count" data-target="150">0</strong>
-				<span class="suffix">+</span>
-			</div>
-			<span class="muted">Dự án thực hiện</span>
-		</article>
-
-		<article class="card stats reveal">
-			<div class="stat-number">
-				<strong class="count" data-target="50">0</strong>
-				<span class="suffix">+</span>
-			</div>
-			<span class="muted">Doanh nghiệp đối tác</span>
-		</article>
-
-		<article class="card stats reveal">
-			<div class="stat-number">
 				<strong class="count" data-target="99">0</strong>
 				<span class="suffix">+</span>
 			</div>
-			<span class="muted">Học viên đào tạo</span>
+			<span class="muted">Khách hàng</span>
 		</article>
 
 		<article class="card stats reveal">
 			<div class="stat-number">
-				<strong class="count" data-target="98">0</strong>
+				<strong class="count" data-target="2">0</strong>
+				<span class="suffix"> tỷ +</span>
+			</div>
+			<span class="muted">Ngân sách quản lý</span>
+		</article>
+
+		<article class="card stats reveal">
+			<div class="stat-number">
+				<strong class="count" data-target="5">0</strong>
+				<span class="suffix"> năm+</span>
+			</div>
+			<span class="muted">Kinh nghiệm</span>
+		</article>
+
+		<article class="card stats reveal">
+			<div class="stat-number">
+				<strong class="count" data-target="89.79">0</strong>
 				<span class="suffix">%</span>
 			</div>
-			<span class="muted">Mức độ hài lòng</span>
+			<span class="muted">Khách hàng gia hạn hợp đồng</span>
 		</article>
 	</div>
 </section>
