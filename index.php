@@ -3,9 +3,75 @@ require_once __DIR__ . '/config/constants.php';
 
 $page = $_GET['page'] ?? 'home';
 
-// Quick asset router: serve static files directly from disk when requests are
-// rewritten to index.php by Apache/Nginx or the built-in PHP server.
 $reqPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+if (!isset($_GET['page'])) {
+	$path = trim($reqPath, '/');
+
+	if (preg_match('#^dich-vu/(.+)$#', $path, $matches)) {
+		$slug = $matches[1];
+
+		require_once __DIR__ . '/includes/site.php';
+
+		$service = site_fetch_one(
+			'SELECT slug FROM services WHERE slug = ?',
+			[$slug]
+		);
+
+		if ($service) {
+			$_GET['page'] = 'service_detail';
+			$_GET['slug'] = $slug;
+			$page = 'service_detail';
+		} 
+	} else if(preg_match('#^du-an/(.+)$#', $path, $matches)) {
+			$slug = $matches[1];
+
+			require_once __DIR__ . '/includes/site.php';
+
+			$project = site_fetch_one(
+				'SELECT slug FROM projects WHERE slug = ?',
+				[$slug]
+			);
+
+			if ($project) {
+				$_GET['page'] = 'project_detail';
+				$_GET['slug'] = $slug;
+				$page = 'project_detail';
+			}
+		} else if(preg_match('#^blog/(.+)$#', $path, $matches)) {
+			$slug = $matches[1];
+
+			require_once __DIR__ . '/includes/site.php';
+
+			$post = site_fetch_one(
+				'SELECT slug FROM blog_posts WHERE slug = ?',
+				[$slug]
+			);
+
+			if ($post) {
+				$_GET['page'] = 'blog_detail';
+				$_GET['slug'] = $slug;
+				$page = 'blog_detail';
+			}
+		} else if(preg_match('#^khoa-hoc/(.+)$#', $path, $matches)) {
+			$slug = $matches[1];
+
+			require_once __DIR__ . '/includes/site.php';
+
+			$course = site_fetch_one(
+				'SELECT slug FROM courses WHERE slug = ?',
+				[$slug]
+			);
+
+			if ($course) {
+				$_GET['page'] = 'course_detail';
+				$_GET['slug'] = $slug;
+				$page = 'course_detail';
+			}
+		} else if ($path === 'lien-he') {
+			$_GET['page'] = 'contact';
+			$page = 'contact';
+		}	
+}
 if (preg_match('#^/(admin/)?(assets|img)/(.*)$#', $reqPath, $m)) {
 	$prefix = !empty($m[1]) ? 'admin/' : '';
 	$type = $m[2];
@@ -15,7 +81,16 @@ if (preg_match('#^/(admin/)?(assets|img)/(.*)$#', $reqPath, $m)) {
 	if ($file && $baseDir && str_starts_with($file, $baseDir) && is_file($file)) {
 		$ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
 		$mimes = [
-			'css' => 'text/css', 'js' => 'application/javascript', 'jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg', 'png' => 'image/png', 'webp' => 'image/webp', 'svg' => 'image/svg+xml', 'gif' => 'image/gif', 'woff' => 'font/woff', 'woff2' => 'font/woff2'
+			'css' => 'text/css',
+			'js' => 'application/javascript',
+			'jpg' => 'image/jpeg',
+			'jpeg' => 'image/jpeg',
+			'png' => 'image/png',
+			'webp' => 'image/webp',
+			'svg' => 'image/svg+xml',
+			'gif' => 'image/gif',
+			'woff' => 'font/woff',
+			'woff2' => 'font/woff2'
 		];
 		header('X-Accel-Buffered-Response: no');
 		header('Content-Type: ' . ($mimes[$ext] ?? 'application/octet-stream'));
@@ -161,8 +236,8 @@ if ($page === 'blog' && !empty($_GET['slug'])) {
 }
 
 if (!isset($viewMap[$page])) {
-    http_response_code(404);
-    $page = 'home';
+	http_response_code(404);
+	$page = 'home';
 }
 
 $currentPage = $page;
