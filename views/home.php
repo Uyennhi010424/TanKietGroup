@@ -212,17 +212,19 @@ $posts = site_fetch_all(
 			<?php else: ?>
 				<?php foreach ($courses as $course): ?>
 					<article class="card reveal course-card">
-						<img src="<?php echo htmlspecialchars(site_image_url($course['thumbnail'] ?? '', '/img/du_an.jpg'), ENT_QUOTES, 'UTF-8'); ?>"
-							alt="<?php echo htmlspecialchars($course['title'], ENT_QUOTES, 'UTF-8'); ?>"
-							style="width:100%;height:200px;object-fit:cover;border-radius:12px;">
-
-						<h3 style="margin-top:14px;"><?php echo htmlspecialchars($course['title'], ENT_QUOTES, 'UTF-8'); ?></h3>
-
-						<!-- <?php echo htmlspecialchars($course['short_desc'] ?? '', ENT_QUOTES, 'UTF-8'); ?></p>  -->
-
-						<p><a href="/khoa-hoc/<?php echo htmlspecialchars($course['slug'], ENT_QUOTES, 'UTF-8'); ?>" class="btn btn-primary">Xem chi tiết</a></p>
-
-
+						<div class="card-media service-overlay-wrap">
+							<img src="<?php echo htmlspecialchars(site_image_url($course['thumbnail'] ?? '', '/img/du_an.jpg'), ENT_QUOTES, 'UTF-8'); ?>"
+								alt="<?php echo htmlspecialchars($course['title'], ENT_QUOTES, 'UTF-8'); ?>"
+								loading="lazy">
+							<a href="/khoa-hoc/<?php echo htmlspecialchars($course['slug'], ENT_QUOTES, 'UTF-8'); ?>"
+								class="service-overlay">
+								Xem chi tiết
+							</a>
+						</div>
+						<div class="card-content">
+							<h3><?php echo htmlspecialchars($course['title'], ENT_QUOTES, 'UTF-8'); ?></h3>
+							<p class="muted"><?php echo htmlspecialchars(($course['duration'] ?? '') . ($course['form_type'] ? ' · ' . $course['form_type'] : ''), ENT_QUOTES, 'UTF-8'); ?></p>
+						</div>
 					</article>
 				<?php endforeach; ?>
 			<?php endif; ?>
@@ -242,9 +244,19 @@ $posts = site_fetch_all(
 			<?php else: ?>
 				<?php foreach ($posts as $post): ?>
 					<article class="card reveal">
-						<img src="<?php echo htmlspecialchars(site_image_url($post['thumbnail'] ?? '', '/img/du_an4.jpg'), ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($post['title'], ENT_QUOTES, 'UTF-8'); ?>" style="width:100%;height:180px;object-fit:cover;border-radius:12px;">
-						<h3 style="margin-top:14px;"><?php echo htmlspecialchars($post['title'], ENT_QUOTES, 'UTF-8'); ?></h3>
-						<p><a href="/blog/<?php echo htmlspecialchars($post['slug'], ENT_QUOTES, 'UTF-8'); ?>">Đọc bài viết</a></p>
+						<div class="card-media service-overlay-wrap">
+							<img src="<?php echo htmlspecialchars(site_image_url($post['thumbnail'] ?? '', '/img/du_an4.jpg'), ENT_QUOTES, 'UTF-8'); ?>"
+								alt="<?php echo htmlspecialchars($post['title'], ENT_QUOTES, 'UTF-8'); ?>"
+								loading="lazy">
+							<a href="/blog/<?php echo htmlspecialchars($post['slug'], ENT_QUOTES, 'UTF-8'); ?>"
+								class="service-overlay">
+								Đọc bài viết
+							</a>
+						</div>
+						<div class="card-content">
+							<h3><?php echo htmlspecialchars($post['title'], ENT_QUOTES, 'UTF-8'); ?></h3>
+							<p class="muted"><?php echo htmlspecialchars($post['category_name'] ?: 'Blog', ENT_QUOTES, 'UTF-8'); ?></p>
+						</div>
 					</article>
 				<?php endforeach; ?>
 			<?php endif; ?>

@@ -187,15 +187,15 @@ admin_header('Tuyển dụng', 'Đăng và quản lý tin tuyển dụng', $admi
                 </select>
             </div>
             <!-- Rich Text Editor Toolbar -->
-            <div class="rte-toolbar" style="display:flex;gap:4px;padding:8px;background:var(--surface-2);border:1px solid var(--border);border-bottom:none;border-radius:8px 8px 0 0;flex-wrap:wrap;">
-                <button type="button" class="rte-btn" data-cmd="bold" title="In đậm (Ctrl+B)" style="padding:6px 10px;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);cursor:pointer;font-weight:700;">B</button>
-                <button type="button" class="rte-btn" data-cmd="italic" title="In nghiêng (Ctrl+I)" style="padding:6px 10px;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);cursor:pointer;font-style:italic;">I</button>
-                <button type="button" class="rte-btn" data-cmd="underline" title="Gạch chân (Ctrl+U)" style="padding:6px 10px;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);cursor:pointer;text-decoration:underline;">U</button>
-                <span style="width:1px;background:var(--border);margin:0 4px;"></span>
-                <button type="button" class="rte-btn" data-cmd="insertUnorderedList" title="Danh sách" style="padding:6px 10px;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);cursor:pointer;">• Liệt kê</button>
-                <button type="button" class="rte-btn" data-cmd="insertOrderedList" title="Đánh số" style="padding:6px 10px;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);cursor:pointer;">1. Danh sách</button>
-                <span style="width:1px;background:var(--border);margin:0 4px;"></span>
-                <select class="rte-fontsize" title="Cỡ chữ" style="padding:6px 8px;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);cursor:pointer;font-size:0.85rem;">
+            <div class="rte-toolbar">
+                <button type="button" class="rte-btn" data-cmd="bold" title="In đậm (Ctrl+B)" style="font-weight:700;">B</button>
+                <button type="button" class="rte-btn" data-cmd="italic" title="In nghiêng (Ctrl+I)" style="font-style:italic;">I</button>
+                <button type="button" class="rte-btn" data-cmd="underline" title="Gạch chân (Ctrl+U)" style="text-decoration:underline;">U</button>
+                <span class="rte-divider"></span>
+                <button type="button" class="rte-btn" data-cmd="insertUnorderedList" title="Danh sách">• Liệt kê</button>
+                <button type="button" class="rte-btn" data-cmd="insertOrderedList" title="Đánh số">1. Danh sách</button>
+                <span class="rte-divider"></span>
+                <select class="rte-fontsize" title="Cỡ chữ">
                     <option value="">Cỡ chữ</option>
                     <option value="1">Nhỏ</option>
                     <option value="3">Vừa</option>
@@ -204,7 +204,7 @@ admin_header('Tuyển dụng', 'Đăng và quản lý tin tuyển dụng', $admi
                 </select>
             </div>
             <!-- Contenteditable Editor -->
-            <div class="rte-editor form-control" contenteditable="true" id="rteEditor" style="min-height:280px;border-radius:0 0 8px 8px;line-height:1.7;overflow-y:auto;"><?php echo $editing['description'] !== '' ? $editing['description'] : '<p>Mô tả chi tiết công việc...</p>'; ?></div>
+            <div class="rte-editor form-control" contenteditable="true" id="rteEditor"><?php echo $editing['description'] !== '' ? $editing['description'] : '<p>Mô tả chi tiết công việc...</p>'; ?></div>
             <!-- Hidden textarea to hold HTML for form submission -->
             <textarea name="description" id="rteHidden" style="display:none;"><?php echo h($editing['description']); ?></textarea>
         </div>

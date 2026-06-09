@@ -24,8 +24,8 @@ function admin_header(string $pageTitle, string $pageSubtitle, array $admin, str
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title><?php echo h($pageTitle); ?> - Trang quản trị</title>
     <link rel="icon" href="<?php echo h(site_favicon_url()); ?>">
-    <link rel="stylesheet" href="<?php echo h($admin['assetBase']); ?>/assets/css/admin.css">
-    <script defer src="<?php echo h($admin['assetBase']); ?>/assets/js/admin.js"></script>
+    <style><?php echo file_get_contents(__DIR__ . '/../../admin/assets/css/admin.css'); ?></style>
+    <script><?php echo file_get_contents(__DIR__ . '/../../admin/assets/js/admin.js'); ?></script>
 </head>
 <body class="role-<?php echo h($role); ?>">
 

@@ -503,3 +503,82 @@ select.form-control option {
     bottom: 16px;
   }
 }
+
+/* ============================================================
+   RICH TEXT EDITOR TOOLBAR
+   ============================================================ */
+
+.rte-toolbar {
+  display: flex;
+  gap: 4px;
+  padding: 8px;
+  background: var(--ak-surface-2);
+  border: 1px solid var(--ak-border);
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.rte-divider {
+  width: 1px;
+  height: 20px;
+  background: var(--ak-border);
+  margin: 0 4px;
+}
+
+.rte-btn {
+  padding: 6px 10px;
+  background: var(--ak-surface);
+  border: 1px solid var(--ak-border);
+  border-radius: 6px;
+  color: var(--ak-text);
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.rte-btn:hover {
+  background: var(--ak-surface-2);
+  border-color: var(--ak-primary);
+}
+
+.rte-btn:active {
+  background: var(--ak-primary-soft);
+}
+
+.rte-fontsize {
+  padding: 6px 8px;
+  background: var(--ak-surface);
+  border: 1px solid var(--ak-border);
+  border-radius: 6px;
+  color: var(--ak-text);
+  cursor: pointer;
+  font-size: 0.85rem;
+  appearance: auto;
+  -webkit-appearance: auto;
+}
+
+.rte-fontsize option {
+  background: var(--ak-surface);
+  color: var(--ak-text);
+  padding: 4px 8px;
+}
+
+.rte-fontsize:focus {
+  outline: none;
+  border-color: var(--ak-primary);
+}
+
+.rte-editor {
+  min-height: 280px;
+  border-radius: 0 0 8px 8px;
+  line-height: 1.7;
+  overflow-y: auto;
+  padding: 12px 14px;
+}
+
+.rte-editor:focus {
+  outline: none;
+  border-color: var(--ak-primary);
+}
