@@ -250,7 +250,11 @@ if ($page === 'blog' && !empty($_GET['slug'])) {
 
 if (!isset($viewMap[$page])) {
 	http_response_code(404);
-	$page = 'home';
+	$pageTitle = '404 - Không tìm thấy trang';
+	include __DIR__ . '/views/layouts/header.php';
+	include __DIR__ . '/views/404.php';
+	include __DIR__ . '/views/layouts/footer.php';
+	exit;
 }
 
 $currentPage = $page;

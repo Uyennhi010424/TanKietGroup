@@ -54,32 +54,28 @@ $posts = site_fetch_all(
 	<div class="container grid grid-4">
 		<article class="card stats reveal">
 			<div class="stat-number">
-				<strong class="count" data-target="99">0</strong>
-				<span class="suffix">+</span>
+				<strong class="count" data-target="99" data-suffix="+">0</strong>
 			</div>
 			<span class="muted">Khách hàng</span>
 		</article>
 
 		<article class="card stats reveal">
 			<div class="stat-number">
-				<strong class="count" data-target="2">0</strong>
-				<span class="suffix"> tỷ +</span>
+				<strong class="count" data-target="2" data-suffix=" tỷ +">0</strong>
 			</div>
 			<span class="muted">Ngân sách quản lý</span>
 		</article>
 
 		<article class="card stats reveal">
 			<div class="stat-number">
-				<strong class="count" data-target="5">0</strong>
-				<span class="suffix"> năm+</span>
+				<strong class="count" data-target="5" data-suffix=" năm+">0</strong>
 			</div>
 			<span class="muted">Kinh nghiệm</span>
 		</article>
 
 		<article class="card stats reveal">
 			<div class="stat-number">
-				<strong class="count" data-target="89.79">0</strong>
-				<span class="suffix">%</span>
+				<strong class="count" data-target="89.79" data-suffix="%">0</strong>
 			</div>
 			<span class="muted">Khách hàng gia hạn hợp đồng</span>
 		</article>

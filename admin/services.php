@@ -1,87 +1,13 @@
 <?php
 // Admin - Services Management
-require_once __DIR__ . '/../includes/site.php';
-require_once __DIR__ . '/../includes/db.php';
-require_once __DIR__ . '/../includes/security.php';
-require_once __DIR__ . '/../includes/functions.php';
+require_once __DIR__ . '/../includes/admin_helpers.php';
+require_once __DIR__ . '/../views/admin/layout.php';
 
-$assetBase = site_admin_base_path();
-$logoUrl = site_logo_url('/img/logo.jpg');
-$adminRoutes = [
-    'dashboard' => site_page_url('admin_index'),
-    'courses' => site_page_url('admin_courses'),
-    'projects' => site_page_url('admin_projects'),
-    'services' => site_page_url('admin_services'),
-    'users' => site_page_url('admin_users'),
-    'blog' => site_page_url('admin_blog'),
-    'recruitments' => site_page_url('admin_recruitments'),
-    'stats' => site_page_url('admin_stats'),
-    'settings' => site_page_url('admin_settings'),
-    'consultations' => site_page_url('admin_consultations'),
-    'clients' => site_page_url('admin_clients'),
-];
+$admin = admin_init();
+$adminRoutes = $admin['routes'];
+$isEditor = $admin['isEditor'];
+$csrfToken = csrf_token();
 $mediaRoute = site_page_url('admin_media') . '&path=';
-
-$loginRoute = site_page_url('admin_login');
-$logoutRoute = site_page_url('admin_login', ['logout' => 1]);
-admin_require_login($loginRoute);
-$currentAdminUser = admin_current_user() ?? [];
-$adminRole = (string)($currentAdminUser['role'] ?? 'editor');
-$isEditor = $adminRole === 'editor';
-
-function h($value)
-{
-    return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8');
-}
-
-function make_slug($text)
-{
-    $text = trim((string)$text);
-    $text = mb_strtolower($text, 'UTF-8');
-    $map = [
-        'à' => 'a',
-        'á' => 'a',
-        'ạ' => 'a',
-        'ả' => 'a',
-        'ã' => 'a',
-        'đ' => 'd',
-        'è' => 'e',
-        'é' => 'e',
-        'ẹ' => 'e',
-        'ẻ' => 'e',
-        'ẽ' => 'e',
-        'ì' => 'i',
-        'í' => 'i',
-        'ị' => 'i',
-        'ỉ' => 'i',
-        'ĩ' => 'i',
-        'ò' => 'o',
-        'ó' => 'o',
-        'ọ' => 'o',
-        'ỏ' => 'o',
-        'õ' => 'o',
-        'ù' => 'u',
-        'ú' => 'u',
-        'ụ' => 'u',
-        'ủ' => 'u',
-        'ũ' => 'u',
-        'ỳ' => 'y',
-        'ý' => 'y',
-        'ỵ' => 'y',
-        'ỷ' => 'y',
-        'ỹ' => 'y'
-    ];
-    $text = strtr($text, $map);
-    $text = preg_replace('/[^a-z0-9]+/', '-', $text);
-    $text = trim((string)$text, '-');
-    return $text !== '' ? $text : 'service';
-}
-
-function with_query($route, $params)
-{
-    $sep = strpos($route, '?') !== false ? '&' : '?';
-    return $route . $sep . http_build_query($params);
-}
 
 $servicePresets = [
     'Marketing trọn gói (Chiến lược xây kênh)',
@@ -94,7 +20,6 @@ $servicePresets = [
 $db = null;
 $dbError = '';
 $flash = $_GET['msg'] ?? '';
-$csrfToken = csrf_token();
 
 try {
     $db = get_db_connection();
@@ -233,64 +158,9 @@ if ($db) {
     $industries = $db->query('SELECT id, name FROM industries ORDER BY name ASC')->fetchAll();
     $rows = $db->query('SELECT s.id, s.title, s.slug, s.status, COALESCE(i.name, "-") AS industry_name FROM services s LEFT JOIN industries i ON i.id = s.industry_id ORDER BY s.id DESC')->fetchAll();
 }
+
+admin_header('Dịch vụ', 'Quản lý các dịch vụ', $admin, 'services');
 ?>
-<!doctype html>
-<html lang="vi">
-
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Dịch vụ - Trang quản trị</title>
-    <link rel="icon" href="<?php echo htmlspecialchars(site_favicon_url(), ENT_QUOTES, 'UTF-8'); ?>">
-    <link rel="stylesheet" href="/assets/css/admin.css">
-    <script defer src="/assets/js/admin.js"></script>
-</head>
-
-<body class="role-<?php echo htmlspecialchars($adminRole, ENT_QUOTES, 'UTF-8'); ?>">
-
-    <div class="admin-wrap">
-        <aside class="admin-sidebar" style="display:block">
-            <div class="sidebar-header">
-                <div class="brand-admin"><img src="<?php echo htmlspecialchars($logoUrl, ENT_QUOTES, 'UTF-8'); ?>" alt="TanKiet Group" class="site-logo"></div>
-            </div>
-            <nav>
-                <ul class="nav-admin">
-                    <?php if (!$isEditor): ?>
-                        <li><a href="<?php echo $adminRoutes['dashboard']; ?>">Tổng quan</a></li>
-                    <?php endif; ?>
-                    <li><a href="<?php echo $adminRoutes['courses']; ?>">Khóa học</a></li>
-                    <li><a href="<?php echo $adminRoutes['projects']; ?>">Dự án</a></li>
-                    <li><a href="<?php echo $adminRoutes['services']; ?>">Dịch vụ</a></li>
-                    <li><a href="<?php echo $adminRoutes['clients']; ?>">Khách hàng</a></li>
-                    <li><a href="<?php echo $adminRoutes['users']; ?>">Người dùng</a></li>
-                    <li><a href="<?php echo $adminRoutes['blog']; ?>">Blog</a></li>
-                    <li><a href="<?php echo $adminRoutes['recruitments']; ?>">Tuyển dụng</a></li>
-                    <?php if (!$isEditor): ?>
-                        <li><a href="<?php echo $adminRoutes['stats']; ?>">Thống kê tương tác</a></li>
-                        <li><a href="<?php echo $adminRoutes['settings']; ?>">Cài đặt hệ thống</a></li>
-                    <?php endif; ?>
-                    <li><a href="<?php echo $adminRoutes['consultations']; ?>">Tư vấn khách hàng</a></li>
-                    <li class="nav-admin-logout"><form method="post" action="<?php echo htmlspecialchars($loginRoute, ENT_QUOTES, 'UTF-8'); ?>" style="display:inline"><input type="hidden" name="action" value="logout"><input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8'); ?>"><button type="submit" style="background:none;border:none;color:inherit;cursor:pointer;font:inherit;padding:0;">Đăng xuất</button></form></li>
-                </ul>
-            </nav>
-        </aside>
-        <div class="sidebar-overlay" data-sidebar-overlay></div>
-
-        <main class="admin-main">
-            <header class="topbar">
-                <div style="display:flex;gap:20px;align-items:center">
-                    <div class="title">
-                        <h1>Dịch vụ</h1>
-                        <div class="small">Quản lý các dịch vụ của công ty</div>
-                    </div>
-                </div>
-                <div style="display:flex;gap:12px;align-items:center">
-                    <div class="search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="opacity:0.7">
-                            <path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-                            <circle cx="11" cy="11" r="6" stroke="currentColor" stroke-width="2"></circle>
-                        </svg><input placeholder="Tìm kiếm..." style="background:transparent;border:0;color:var(--ak-text);outline:none"></div>
-                </div>
-            </header>
 
             <section style="margin-top:22px">
                 <?php if ($flash !== ''): ?>
@@ -413,61 +283,57 @@ if ($db) {
                 </div>
             </section>
 
-        </main>
-    </div>
-    <script>
-        (function() {
+<?php admin_footer(); ?>
+<script>
+    (function() {
 
-            var titleInput = document.getElementById('serviceTitleInput');
-            var slugInput = document.getElementById('serviceSlugInput');
-            var industrySelect = document.getElementById('industrySelect');
+        var titleInput = document.getElementById('serviceTitleInput');
+        var slugInput = document.getElementById('serviceSlugInput');
+        var industrySelect = document.getElementById('industrySelect');
 
-            if (!titleInput || !slugInput || !industrySelect) return;
+        if (!titleInput || !slugInput || !industrySelect) return;
 
-            function slugify(text) {
-                return String(text || '')
-                    .toLowerCase()
-                    .normalize('NFD')
-                    .replace(/[\u0300-\u036f]/g, '')
-                    .replace(/đ/g, 'd')
-                    .replace(/[^a-z0-9]+/g, '-')
-                    .replace(/^-+|-+$/g, '');
+        function slugify(text) {
+            return String(text || '')
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[̀-ͯ]/g, '')
+                .replace(/đ/g, 'd')
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-+|-+$/g, '');
+        }
+
+        function updateSlug() {
+
+            var title = titleInput.value.trim();
+
+            var industry = '';
+
+            if (industrySelect.selectedIndex > 0) {
+
+                industry =
+                    industrySelect.options[industrySelect.selectedIndex].text;
+
+                var match = industry.match(/cho\s+(.+)$/i);
+
+                if (match) {
+                    industry = match[1];
+                }
             }
 
-            function updateSlug() {
+            var slug = slugify(title);
 
-                var title = titleInput.value.trim();
-
-                var industry = '';
-
-                if (industrySelect.selectedIndex > 0) {
-
-                    industry =
-                        industrySelect.options[industrySelect.selectedIndex].text;
-
-                    var match = industry.match(/cho\s+(.+)$/i);
-
-                    if (match) {
-                        industry = match[1];
-                    }
-                }
-
-                var slug = slugify(title);
-
-                if (industry) {
-                    slug += '-' + slugify(industry);
-                }
-
-                slugInput.value = slug;
+            if (industry) {
+                slug += '-' + slugify(industry);
             }
 
-            titleInput.addEventListener('input', updateSlug);
-            industrySelect.addEventListener('change', updateSlug);
+            slugInput.value = slug;
+        }
 
-            updateSlug();
+        titleInput.addEventListener('input', updateSlug);
+        industrySelect.addEventListener('change', updateSlug);
 
-        })();
-    </script>
-</body>
+        updateSlug();
 
-</html>
+    })();
+</script>

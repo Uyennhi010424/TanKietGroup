@@ -59,43 +59,36 @@ if ($resultRaw !== '') {
             <?php echo htmlspecialchars($project['short_desc'] ?: 'Dự án được quản lý từ admin.'); ?>
         </p>
 
-        <!-- MAIN GRID -->
-        <div class="project-grid">
-
-            <!-- LEFT IMAGE -->
-            <div class="project-image card-glow">
+        <!-- IMAGE + CONTENT WRAP -->
+        <div class="project-detail-body">
+            <!-- FLOAT IMAGE -->
+            <div class="project-float-image card-glow">
                 <?php if (!empty($images)): ?>
-                    <img src="<?php echo htmlspecialchars(site_image_url($images[0], '/img/du_an3.jpg')); ?>" />
+                    <img src="<?php echo htmlspecialchars(site_image_url($images[0], '/img/du_an3.jpg')); ?>" alt="<?php echo htmlspecialchars($project['title']); ?>" />
                 <?php else: ?>
-                    <img src="<?php echo htmlspecialchars(site_image_url($project['thumbnail'] ?? '', '/img/du_an3.jpg')); ?>" />
+                    <img src="<?php echo htmlspecialchars(site_image_url($project['thumbnail'] ?? '', '/img/du_an3.jpg')); ?>" alt="<?php echo htmlspecialchars($project['title']); ?>" />
                 <?php endif; ?>
             </div>
 
-            <!-- RIGHT CONTENT -->
-            <div class="project-content">
+            <!-- CONTENT -->
+            <div class="info-card">
+                <h3>📄 Nội dung dự án</h3>
+                <p>
+                    <?php echo nl2br(htmlspecialchars($project['content'] ?: 'Chưa cập nhật nội dung')); ?>
+                </p>
+            </div>
 
-                <div class="info-card">
-                    <h3>📄 Nội dung dự án</h3>
-                    <p>
-                        <?php echo nl2br(htmlspecialchars($project['content'] ?: 'Chưa cập nhật nội dung')); ?>
-                    </p>
-                </div>
-
-                <div class="info-card">
-                    <h3>⭐ Kết quả đạt được</h3>
-
-                    <?php if (!empty($resultMetrics)): ?>
-                        <ul class="result-list">
-                            <?php foreach ($resultMetrics as $metric): ?>
-                                <li>✓ <?php echo htmlspecialchars($metric); ?></li>
-                            <?php endforeach; ?>
-                        </ul>
-                    <?php else: ?>
-                        <p>Chưa có dữ liệu kết quả</p>
-                    <?php endif; ?>
-
-                </div>
-
+            <div class="info-card">
+                <h3>⭐ Kết quả đạt được</h3>
+                <?php if (!empty($resultMetrics)): ?>
+                    <ul class="result-list">
+                        <?php foreach ($resultMetrics as $metric): ?>
+                            <li>✓ <?php echo htmlspecialchars($metric); ?></li>
+                        <?php endforeach; ?>
+                    </ul>
+                <?php else: ?>
+                    <p>Chưa có dữ liệu kết quả</p>
+                <?php endif; ?>
             </div>
         </div>
 
