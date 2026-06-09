@@ -147,24 +147,24 @@ admin_header('Tuyển dụng', 'Đăng và quản lý tin tuyển dụng', $admi
 
         <div class="form-section">
             <h4>Thông tin cơ bản</h4>
-            <div class="form-grid">
+            <div style="display:flex;flex-direction:column;gap:12px;">
                 <div>
                     <label>Tiêu đề tuyển dụng <span class="required">*</span></label>
-                    <input class="form-control" type="text" name="title" required value="<?php echo h($editing['title']); ?>">
+                    <input class="form-control" type="text" name="title" id="recruitTitle" required value="<?php echo h($editing['title']); ?>" placeholder="VD: Chuyên viên Marketing">
                 </div>
                 <div>
                     <label>Slug</label>
-                    <input class="form-control" type="text" name="slug" value="<?php echo h($editing['slug']); ?>">
+                    <input class="form-control" type="text" name="slug" id="recruitSlug" value="<?php echo h($editing['slug']); ?>" placeholder="tự động tạo từ tiêu đề">
                 </div>
             </div>
         </div>
 
         <div class="form-section">
             <h4>Điều kiện & Mức lương</h4>
-            <div class="form-grid">
+            <div class="form-grid" style="grid-template-columns:1fr 1fr 1fr;">
                 <div>
                     <label>Địa điểm</label>
-                    <input class="form-control" type="text" name="location" value="<?php echo h($editing['location']); ?>">
+                    <input class="form-control" type="text" name="location" value="<?php echo h($editing['location']); ?>" placeholder="VD: TP. Hồ Chí Minh">
                 </div>
                 <div>
                     <label>Mức lương</label>
@@ -304,6 +304,57 @@ admin_header('Tuyển dụng', 'Đăng và quản lý tin tuyển dụng', $admi
         });
     }
 })();
-</script>
+
+// Auto-slug from title
+(function() {
+    var titleInput = document.getElementById('recruitTitle');
+    var slugInput = document.getElementById('recruitSlug');
+    if (!titleInput || !slugInput) return;
+
+    var vietnameseMap = {
+        'à':'a','á':'a','ạ':'a','ả':'a','ã':'a',
+        'â':'a','ầ':'a','ấ':'a','ậ':'a','ẩ':'a','ẫ':'a',
+        'ă':'a','ằ':'a','ắ':'a','ặ':'a','ẳ':'a','ẵ':'a',
+        'è':'e','é':'e','ẹ':'e','ẻ':'e','ẽ':'e',
+        'ê':'e','ề':'e','ế':'e','ệ':'e','ể':'e','ễ':'e',
+        'ì':'i','í':'i','ị':'i','ỉ':'i','ĩ':'i',
+        'ò':'o','ó':'o','ọ':'o','ỏ':'o','õ':'o',
+        'ô':'o','ồ':'o','ố':'o','ộ':'o','ổ':'o','ỗ':'o',
+        'ơ':'o','ờ':'o','ớ':'o','ợ':'o','ở':'o','ỡ':'o',
+        'ù':'u','ú':'u','ụ':'u','ủ':'u','ũ':'u',
+        'ư':'u','ừ':'u','ứ':'u','ự':'u','ử':'u','ữ':'u',
+        'ỳ':'y','ý':'y','ỵ':'y','ỷ':'y','ỹ':'y',
+        'đ':'d'
+    };
+
+    function makeSlug(text) {
+        text = text.toLowerCase();
+        var result = '';
+        for (var i = 0; i < text.length; i++) {
+            result += vietnameseMap[text[i]] || text[i];
+        }
+        result = result.replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+        return result;
+    }
+
+    // Track if user manually edited slug
+    var userEditedSlug = slugInput.value.trim() !== '';
+
+    titleInput.addEventListener('input', function() {
+        if (!userEditedSlug) {
+            var slug = makeSlug(titleInput.value);
+            slugInput.value = slug;
+        }
+    });
+
+    slugInput.addEventListener('input', function() {
+        userEditedSlug = true;
+    });
+
+    // Auto-generate on load if title exists but slug is empty
+    if (titleInput.value && !slugInput.value) {
+        slugInput.value = makeSlug(titleInput.value);
+    }
+})();
 
 <?php admin_footer(); ?>
