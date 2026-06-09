@@ -16,6 +16,12 @@ if ($slug !== '') {
     );
 }
 
+if (!$post && $slug !== '') {
+    http_response_code(404);
+    echo '<section class="section"><div class="container"><div class="card"><h3>Không tìm thấy bài viết</h3><p class="muted">Bài viết bạn tìm không tồn tại hoặc đã bị ẩn.</p><a href="' . htmlspecialchars(site_page_url('blog'), ENT_QUOTES, 'UTF-8') . '" class="btn btn-primary" style="margin-top:12px;">Xem tất cả bài viết</a></div></div></section>';
+    return;
+}
+
 if (!$post) {
     $post = site_fetch_one(
         'SELECT p.*, u.full_name AS author_name, c.name AS category_name
@@ -45,7 +51,7 @@ if (!$post) {
 	<div class="container grid grid-2">
 		<article class="card reveal">
 			<h2>Nội dung bài viết</h2>
-			<?php echo $post['content'] ? $post['content'] : '<p>Nội dung bài viết chưa được cập nhật.</p>'; ?>
+			<?php echo $post['content'] ? sanitize_html($post['content']) : '<p>Nội dung bài viết chưa được cập nhật.</p>'; ?>
 		</article>
 		<article class="card reveal">
 			<h2>Thông tin nhanh</h2>

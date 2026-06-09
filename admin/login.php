@@ -21,13 +21,28 @@ $editorHome = site_page_url('admin_courses');
 $siteHome = site_page_url('home');
 
 if (isset($_GET['logout'])) {
-	admin_logout_user();
+	// Legacy GET logout — redirect to login without action (deprecated)
+	header('Location: ' . $loginRoute);
+	exit;
+}
+
+if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST' && ($_POST['action'] ?? '') === 'logout') {
+	if (csrf_validate((string)($_POST['csrf_token'] ?? ''))) {
+		admin_logout_user();
+	}
 	header('Location: ' . $loginRoute);
 	exit;
 }
 
 $error = '';
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
+	if (!csrf_validate((string)($_POST['csrf_token'] ?? ''))) {
+		$error = 'Phiên làm việc không hợp lệ, vui lòng tải lại trang';
+	} else {
+	$waitSeconds = login_rate_limit_check();
+	if ($waitSeconds > 0) {
+		$error = 'Bạn đã nhập sai quá nhiều lần. Vui lòng thử lại sau ' . $waitSeconds . ' giây.';
+	} else {
 	$userInput = trim($_POST['user'] ?? '');
 	$password = (string)($_POST['pass'] ?? '');
 
@@ -45,10 +60,13 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
 
 			if (!$row || (int)$row['status'] !== 1) {
 				$error = 'Tài khoản không tồn tại hoặc đã bị khóa';
+				login_rate_limit_record_failure();
 			} elseif (!in_array((string)$row['role'], ['admin', 'editor'], true)) {
 				$error = 'Tài khoản không có quyền truy cập khu vực quản trị';
+				login_rate_limit_record_failure();
 			} elseif (!(password_verify($password, (string)$row['password']) || hash_equals((string)$row['password'], $password))) {
 				$error = 'Sai mật khẩu';
+				login_rate_limit_record_failure();
 			} else {
 				if (!password_get_info((string)$row['password'])['algo']) {
 					$rehash = $db->prepare('UPDATE users SET password = :password WHERE id = :id');
@@ -58,6 +76,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
 					]);
 				}
 
+				login_rate_limit_reset();
 				admin_login_user($row);
 				$target = ((string)$row['role'] === 'admin') ? $adminHome : $editorHome;
 				header('Location: ' . $target);
@@ -68,6 +87,8 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
 				? 'Không thể đăng nhập lúc này: ' . $e->getMessage()
 				: 'Không thể đăng nhập lúc này';
 		}
+	}
+	}
 	}
 }
 ?>
@@ -95,6 +116,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
 				</div>
 			<?php endif; ?>
 			<form method="post" action="<?php echo htmlspecialchars($loginRoute, ENT_QUOTES, 'UTF-8'); ?>">
+				<input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8'); ?>">
 				<div class="form-group">
 					<label for="user">Tài khoản</label>
 					<input id="user" name="user" class="form-control" autocomplete="username" value="<?php echo htmlspecialchars($_POST['user'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">

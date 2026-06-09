@@ -15,6 +15,12 @@ if ($slug !== '') {
     );
 }
 
+if (!$service && $slug !== '') {
+    http_response_code(404);
+    echo '<section class="section"><div class="container"><div class="card"><h3>Không tìm thấy dịch vụ</h3><p class="muted">Dịch vụ bạn tìm không tồn tại hoặc đã bị ẩn.</p><a href="' . htmlspecialchars(site_page_url('services'), ENT_QUOTES, 'UTF-8') . '" class="btn btn-primary" style="margin-top:12px;">Xem tất cả dịch vụ</a></div></div></section>';
+    return;
+}
+
 if (!$service) {
     $service = site_fetch_one(
         'SELECT s.*, i.name AS industry_name

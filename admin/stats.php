@@ -16,6 +16,7 @@ $adminRoutes = [
     'recruitments' => site_page_url('admin_recruitments'),
     'stats' => site_page_url('admin_stats'),
     'consultations' => site_page_url('admin_consultations'),
+    'clients' => site_page_url('admin_clients'),
 ];
 
 $loginRoute = site_page_url('admin_login');
@@ -70,12 +71,13 @@ try {
                 <li><a href="<?php echo $adminRoutes['courses']; ?>">Khóa học</a></li>
                 <li><a href="<?php echo $adminRoutes['projects']; ?>">Dự án</a></li>
                 <li><a href="<?php echo $adminRoutes['services']; ?>">Dịch vụ</a></li>
+                <li><a href="<?php echo $adminRoutes['clients']; ?>">Khách hàng</a></li>
                 <li><a href="<?php echo $adminRoutes['users']; ?>">Người dùng</a></li>
                 <li><a href="<?php echo $adminRoutes['blog']; ?>">Blog</a></li>
                 <li><a href="<?php echo $adminRoutes['recruitments']; ?>">Tuyển dụng</a></li>
                 <li><a href="<?php echo $adminRoutes['stats']; ?>">Thống kê tương tác</a></li>
                 <li><a href="<?php echo $adminRoutes['consultations']; ?>">Tư vấn khách hàng</a></li>
-                <li><a href="<?php echo $logoutRoute; ?>">Đăng xuất</a></li>
+                <li><form method="post" action="<?php echo htmlspecialchars($loginRoute, ENT_QUOTES, 'UTF-8'); ?>" style="display:inline"><input type="hidden" name="action" value="logout"><input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8'); ?>"><button type="submit" style="background:none;border:none;color:inherit;cursor:pointer;font:inherit;padding:0;">Đăng xuất</button></form></li>
             </ul>
         </nav>
     </aside>

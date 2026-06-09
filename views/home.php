@@ -3,6 +3,12 @@ require_once __DIR__ . '/../includes/site.php';
 
 $site = site_settings();
 $heroBanner = site_image_url($site['banner'] ?? '', '/img/hero.jpg');
+$clients = site_fetch_all(
+	'SELECT id, name, logo, website_url
+     FROM clients
+     WHERE status = 1
+     ORDER BY sort_order ASC, id DESC'
+);
 $services = site_fetch_all(
 	'SELECT s.id, s.title, s.slug, s.short_desc, s.image, i.name AS industry_name
      FROM services s
@@ -79,6 +85,35 @@ $posts = site_fetch_all(
 		</article>
 	</div>
 </section>
+
+<?php if ($clients): ?>
+<section class="section">
+	<div class="container">
+		<h2 class="reveal" style="text-align:center;">Khách Hàng Tiêu Biểu</h2>
+		<p class="muted reveal" style="text-align:center;margin-top:8px;">Những doanh nghiệp đã tin tưởng và hợp tác cùng chúng tôi</p>
+		<div class="clients-grid reveal">
+			<?php foreach ($clients as $client): ?>
+				<?php if (!empty($client['website_url'])): ?>
+					<a href="<?php echo htmlspecialchars($client['website_url'], ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener" class="client-item">
+				<?php else: ?>
+					<div class="client-item">
+				<?php endif; ?>
+					<img
+						src="<?php echo htmlspecialchars(site_image_url($client['logo'] ?? '', '/img/logo.jpg'), ENT_QUOTES, 'UTF-8'); ?>"
+						alt="<?php echo htmlspecialchars($client['name'], ENT_QUOTES, 'UTF-8'); ?>"
+						class="client-logo"
+						loading="lazy">
+					<span class="client-name"><?php echo htmlspecialchars($client['name'], ENT_QUOTES, 'UTF-8'); ?></span>
+				<?php if (!empty($client['website_url'])): ?>
+					</a>
+				<?php else: ?>
+					</div>
+				<?php endif; ?>
+			<?php endforeach; ?>
+		</div>
+	</div>
+</section>
+<?php endif; ?>
 
 <section class="section">
 	<div class="container">
@@ -214,11 +249,6 @@ $posts = site_fetch_all(
 						<img src="<?php echo htmlspecialchars(site_image_url($post['thumbnail'] ?? '', '/img/du_an4.jpg'), ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($post['title'], ENT_QUOTES, 'UTF-8'); ?>" style="width:100%;height:180px;object-fit:cover;border-radius:12px;">
 						<h3 style="margin-top:14px;"><?php echo htmlspecialchars($post['title'], ENT_QUOTES, 'UTF-8'); ?></h3>
 						<p><a href="/blog/<?php echo htmlspecialchars($post['slug'], ENT_QUOTES, 'UTF-8'); ?>">Đọc bài viết</a></p>
-
-						<a href="/du-an/<?php echo htmlspecialchars($project['slug'], ENT_QUOTES, 'UTF-8'); ?>"
-										class="project-overlay swiper-no-swiping">
-										Xem chi tiết
-									</a>
 					</article>
 				<?php endforeach; ?>
 			<?php endif; ?>

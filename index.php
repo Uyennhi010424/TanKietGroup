@@ -219,6 +219,11 @@ $viewMap = [
 		'title' => 'Tư vấn khách hàng',
 		'layout' => 'none',
 	],
+	'admin_clients' => [
+		'view' => __DIR__ . '/admin/clients.php',
+		'title' => 'Quản lý khách hàng',
+		'layout' => 'none',
+	],
 	'admin_login' => [
 		'view' => __DIR__ . '/admin/login.php',
 		'title' => 'Đăng nhập quản trị',

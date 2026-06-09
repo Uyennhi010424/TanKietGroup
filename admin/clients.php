@@ -1,8 +1,9 @@
 <?php
-// Admin - Users Management
+// Admin - Clients Management (Khách hàng tiêu biểu)
 require_once __DIR__ . '/../includes/site.php';
 require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/security.php';
+require_once __DIR__ . '/../includes/functions.php';
 
 $assetBase = site_admin_base_path();
 $logoUrl = site_logo_url('/img/logo.jpg');
@@ -19,11 +20,11 @@ $adminRoutes = [
     'consultations' => site_page_url('admin_consultations'),
     'clients' => site_page_url('admin_clients'),
 ];
+$mediaRoute = site_page_url('admin_media') . '&path=';
 
 $loginRoute = site_page_url('admin_login');
 $logoutRoute = site_page_url('admin_login', ['logout' => 1]);
 admin_require_login($loginRoute);
-admin_require_roles(['admin'], site_page_url('admin_courses'));
 $currentAdminUser = admin_current_user() ?? [];
 $adminRole = (string)($currentAdminUser['role'] ?? 'editor');
 $isEditor = $adminRole === 'editor';
@@ -52,107 +53,62 @@ try {
 
 if ($db && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
-
     try {
         if (!csrf_validate((string)($_POST['csrf_token'] ?? ''))) {
-            throw new RuntimeException('CSRF token khong hop le');
+            throw new RuntimeException('CSRF token không hợp lệ');
         }
 
         if ($action === 'delete') {
             $id = (int)($_POST['id'] ?? 0);
             if ($id > 0) {
-                $stmt = $db->prepare('DELETE FROM users WHERE id = :id');
+                $stmt = $db->prepare('DELETE FROM clients WHERE id = :id');
                 $stmt->execute(['id' => $id]);
             }
-            header('Location: ' . with_query($adminRoutes['users'], ['msg' => 'Da xoa nguoi dung']));
+            header('Location: ' . with_query($adminRoutes['clients'], ['msg' => 'Đã xóa khách hàng']));
             exit;
         }
 
         if ($action === 'save') {
             $id = (int)($_POST['id'] ?? 0);
-            $username = trim($_POST['username'] ?? '');
-            $fullName = trim($_POST['full_name'] ?? '');
-            $email = trim($_POST['email'] ?? '');
-            $phone = trim($_POST['phone'] ?? '');
-            $role = trim($_POST['role'] ?? 'user');
+            $name = trim($_POST['name'] ?? '');
+            $websiteUrl = trim($_POST['website_url'] ?? '');
+            $logo = trim($_POST['current_logo'] ?? '');
+            $sortOrder = (int)($_POST['sort_order'] ?? 0);
             $status = (int)($_POST['status'] ?? 1);
-            $password = trim($_POST['password'] ?? '');
 
-            if ($username === '' || $email === '') {
-                throw new RuntimeException('Username va email khong duoc de trong');
+            if ($name === '') {
+                throw new RuntimeException('Tên công ty không được để trống');
             }
 
-            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                throw new RuntimeException('Email khong dung dinh dang');
-            }
-
-            if (!in_array($role, ['admin', 'editor', 'user'], true)) {
-                $role = 'user';
-            }
-
-            $userNameCheck = $db->prepare('SELECT COUNT(*) FROM users WHERE username = :username AND id <> :id');
-            $userNameCheck->execute([
-                'username' => $username,
-                'id' => $id,
-            ]);
-            if ((int)$userNameCheck->fetchColumn() > 0) {
-                throw new RuntimeException('Username da ton tai');
-            }
-
-            $emailCheck = $db->prepare('SELECT COUNT(*) FROM users WHERE email = :email AND id <> :id');
-            $emailCheck->execute([
-                'email' => $email,
-                'id' => $id,
-            ]);
-            if ((int)$emailCheck->fetchColumn() > 0) {
-                throw new RuntimeException('Email da ton tai');
+            // handle uploaded logo
+            $uploaded = store_uploaded_image('logo_file', 'uploads/clients');
+            if ($uploaded !== null) {
+                $logo = $uploaded;
             }
 
             if ($id > 0) {
-                if ($password !== '') {
-                    $stmt = $db->prepare('UPDATE users SET username = :username, full_name = :full_name, email = :email, phone = :phone, role = :role, status = :status, password = :password WHERE id = :id');
-                    $stmt->execute([
-                        'id' => $id,
-                        'username' => $username,
-                        'full_name' => $fullName,
-                        'email' => $email,
-                        'phone' => $phone,
-                        'role' => $role,
-                        'status' => $status,
-                        'password' => password_hash($password, PASSWORD_DEFAULT),
-                    ]);
-                } else {
-                    $stmt = $db->prepare('UPDATE users SET username = :username, full_name = :full_name, email = :email, phone = :phone, role = :role, status = :status WHERE id = :id');
-                    $stmt->execute([
-                        'id' => $id,
-                        'username' => $username,
-                        'full_name' => $fullName,
-                        'email' => $email,
-                        'phone' => $phone,
-                        'role' => $role,
-                        'status' => $status,
-                    ]);
-                }
-
-                header('Location: ' . with_query($adminRoutes['users'], ['msg' => 'Đã cập nhật người dùng']));
+                $stmt = $db->prepare('UPDATE clients SET name = :name, logo = :logo, website_url = :website_url, sort_order = :sort_order, status = :status WHERE id = :id');
+                $stmt->execute([
+                    'id' => $id,
+                    'name' => $name,
+                    'logo' => $logo,
+                    'website_url' => $websiteUrl,
+                    'sort_order' => $sortOrder,
+                    'status' => $status,
+                ]);
+                header('Location: ' . with_query($adminRoutes['clients'], ['msg' => 'Đã cập nhật khách hàng']));
                 exit;
             }
 
-            if ($password === '') {
-                throw new RuntimeException('Mật khẩu không được để trống khi tạo mới người dùng');
-            }
-
-            $stmt = $db->prepare('INSERT INTO users (username, password, full_name, email, phone, role, status) VALUES (:username, :password, :full_name, :email, :phone, :role, :status)');
+            $stmt = $db->prepare('INSERT INTO clients (name, logo, website_url, sort_order, status) VALUES (:name, :logo, :website_url, :sort_order, :status)');
             $stmt->execute([
-                'username' => $username,
-                'password' => password_hash($password, PASSWORD_DEFAULT),
-                'full_name' => $fullName,
-                'email' => $email,
-                'phone' => $phone,
-                'role' => $role,
+                'name' => $name,
+                'logo' => $logo,
+                'website_url' => $websiteUrl,
+                'sort_order' => $sortOrder,
                 'status' => $status,
             ]);
-            header('Location: ' . with_query($adminRoutes['users'], ['msg' => 'Đã thêm người dùng']));
+            header('Location: ' . with_query($adminRoutes['clients'], ['msg' => 'Đã thêm khách hàng']));
             exit;
         }
     } catch (Throwable $e) {
@@ -162,18 +118,17 @@ if ($db && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $editing = [
     'id' => 0,
-    'username' => '',
-    'full_name' => '',
-    'email' => '',
-    'phone' => '',
-    'role' => 'user',
+    'name' => '',
+    'logo' => '',
+    'website_url' => '',
+    'sort_order' => 0,
     'status' => 1,
 ];
 
 if ($db && isset($_GET['edit'])) {
     $editId = (int)$_GET['edit'];
     if ($editId > 0) {
-        $stmt = $db->prepare('SELECT id, username, full_name, email, phone, role, status FROM users WHERE id = :id LIMIT 1');
+        $stmt = $db->prepare('SELECT id, name, logo, website_url, sort_order, status FROM clients WHERE id = :id LIMIT 1');
         $stmt->execute(['id' => $editId]);
         $row = $stmt->fetch();
         if ($row) {
@@ -184,7 +139,7 @@ if ($db && isset($_GET['edit'])) {
 
 $rows = [];
 if ($db) {
-    $rows = $db->query('SELECT id, full_name, email, phone, role, status FROM users ORDER BY id DESC')->fetchAll();
+    $rows = $db->query('SELECT id, name, logo, website_url, sort_order, status FROM clients ORDER BY sort_order ASC, id DESC')->fetchAll();
 }
 ?>
 <!doctype html>
@@ -193,7 +148,7 @@ if ($db) {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Người dùng - Trang quản trị</title>
+    <title>Khách hàng - Trang quản trị</title>
     <link rel="icon" href="<?php echo htmlspecialchars(site_favicon_url(), ENT_QUOTES, 'UTF-8'); ?>">
     <link rel="stylesheet" href="/assets/css/admin.css">
     <script defer src="/assets/js/admin.js"></script>
@@ -214,7 +169,7 @@ if ($db) {
                     <li><a href="<?php echo $adminRoutes['courses']; ?>">Khóa học</a></li>
                     <li><a href="<?php echo $adminRoutes['projects']; ?>">Dự án</a></li>
                     <li><a href="<?php echo $adminRoutes['services']; ?>">Dịch vụ</a></li>
-                    <li><a href="<?php echo $adminRoutes['clients']; ?>">Khách hàng</a></li>
+                    <li><a href="<?php echo $adminRoutes['clients']; ?>" class="active">Khách hàng</a></li>
                     <li><a href="<?php echo $adminRoutes['users']; ?>">Người dùng</a></li>
                     <li><a href="<?php echo $adminRoutes['blog']; ?>">Blog</a></li>
                     <li><a href="<?php echo $adminRoutes['recruitments']; ?>">Tuyển dụng</a></li>
@@ -233,8 +188,8 @@ if ($db) {
             <header class="topbar">
                 <div style="display:flex;gap:20px;align-items:center">
                     <div class="title">
-                        <h1>Người dùng</h1>
-                        <div class="small">Quản lý các người dùng hệ thống</div>
+                        <h1>Khách hàng tiêu biểu</h1>
+                        <div class="small">Quản lý logo và thông tin khách hàng hợp tác</div>
                     </div>
                 </div>
                 <div style="display:flex;gap:12px;align-items:center">
@@ -254,94 +209,98 @@ if ($db) {
 
                 <?php if ($dbError !== ''): ?>
                     <div class="card" style="margin-bottom:16px;background:rgba(255,120,120,0.12);padding:12px 16px;color:#ffb0b0;">
-                        Loi DB: <?php echo h($dbError); ?>
+                        Lỗi DB: <?php echo h($dbError); ?>
                     </div>
                 <?php endif; ?>
 
                 <div class="card" style="padding:16px;margin-bottom:18px;">
-                    <h3 style="margin:0 0 12px 0"><?php echo (int)$editing['id'] > 0 ? 'Sửa người dùng' : 'Thêm người dùng'; ?></h3>
-                    <form method="post" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;">
+                    <h3 style="margin:0 0 12px 0"><?php echo (int)$editing['id'] > 0 ? 'Sửa khách hàng' : 'Thêm khách hàng'; ?></h3>
+                    <form method="post" enctype="multipart/form-data" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;">
                         <input type="hidden" name="action" value="save">
                         <input type="hidden" name="csrf_token" value="<?php echo h($csrfToken); ?>">
                         <input type="hidden" name="id" value="<?php echo (int)$editing['id']; ?>">
 
                         <div>
-                            <label class="small">Username</label>
-                            <input class="form-control" type="text" name="username" required value="<?php echo h($editing['username']); ?>">
+                            <label class="small">Tên công ty</label>
+                            <input class="form-control" type="text" name="name" required value="<?php echo h($editing['name']); ?>" placeholder="Nhập tên công ty">
                         </div>
                         <div>
-                            <label class="small">Họ tên</label>
-                            <input class="form-control" type="text" name="full_name" value="<?php echo h($editing['full_name']); ?>">
+                            <label class="small">Website URL</label>
+                            <input class="form-control" type="url" name="website_url" value="<?php echo h($editing['website_url']); ?>" placeholder="https://example.com">
                         </div>
                         <div>
-                            <label class="small">Email</label>
-                            <input class="form-control" type="email" name="email" required value="<?php echo h($editing['email']); ?>">
-                        </div>
-
-                        <div>
-                            <label class="small">Điện thoại</label>
-                            <input class="form-control" type="text" name="phone" value="<?php echo h($editing['phone']); ?>">
-                        </div>
-                        <div>
-                            <label class="small">Vai trò</label>
-                            <select class="form-control" name="role">
-                                <option value="admin" <?php echo $editing['role'] === 'admin' ? 'selected' : ''; ?>>Admin</option>
-                                <option value="editor" <?php echo $editing['role'] === 'editor' ? 'selected' : ''; ?>>Editor</option>
-                                <option value="user" <?php echo $editing['role'] === 'user' ? 'selected' : ''; ?>>User</option>
-                            </select>
+                            <label class="small">Thứ tự hiển thị</label>
+                            <input class="form-control" type="number" name="sort_order" value="<?php echo (int)$editing['sort_order']; ?>" min="0">
                         </div>
                         <div>
                             <label class="small">Trạng thái</label>
                             <select class="form-control" name="status">
-                                <option value="1" <?php echo (int)$editing['status'] === 1 ? 'selected' : ''; ?>>Active</option>
-                                <option value="0" <?php echo (int)$editing['status'] === 0 ? 'selected' : ''; ?>>Inactive</option>
+                                <option value="1" <?php echo (int)$editing['status'] === 1 ? 'selected' : ''; ?>>Hiển thị</option>
+                                <option value="0" <?php echo (int)$editing['status'] === 0 ? 'selected' : ''; ?>>Ẩn</option>
                             </select>
                         </div>
-
-                        <div style="grid-column:1 / -1;">
-                            <label class="small">Mật khẩu <?php echo (int)$editing['id'] > 0 ? '(để trống nếu không đổi)' : ''; ?></label>
-                            <input class="form-control" type="password" name="password" <?php echo (int)$editing['id'] > 0 ? '' : 'required'; ?>>
+                        <div>
+                            <label class="small">Logo công ty</label>
+                            <input class="form-control" type="file" name="logo_file" accept="image/*">
+                            <input type="hidden" name="current_logo" value="<?php echo h($editing['logo'] ?? ''); ?>">
+                            <?php if (!empty($editing['logo'])): ?>
+                                <div class="small" style="margin-top:8px">Logo hiện tại: <?php echo h($editing['logo']); ?></div>
+                                <img src="<?php echo h($mediaRoute . rawurlencode($editing['logo'])); ?>" alt="" style="max-height:60px;margin-top:8px;border-radius:8px;border:1px solid rgba(0,0,0,0.06);">
+                            <?php endif; ?>
                         </div>
-
                         <div style="grid-column:1 / -1;display:flex;gap:10px;">
                             <button class="btn-admin" type="submit"><?php echo (int)$editing['id'] > 0 ? 'Cập nhật' : 'Thêm mới'; ?></button>
                             <?php if ((int)$editing['id'] > 0): ?>
-                                <a class="btn-admin" href="<?php echo h($adminRoutes['users']); ?>" style="text-decoration:none;display:inline-flex;align-items:center;">Hủy</a>
+                                <a class="btn-admin" href="<?php echo h($adminRoutes['clients']); ?>" style="text-decoration:none;display:inline-flex;align-items:center;">Hủy</a>
                             <?php endif; ?>
                         </div>
                     </form>
                 </div>
 
                 <div class="card" style="padding:8px 16px">
-                    <h3 style="margin:8px 0 12px 0">Danh sách người dùng</h3>
+                    <h3 style="margin:8px 0 12px 0">Danh sách khách hàng</h3>
                     <div style="overflow:auto">
                         <table class="data-table">
                             <thead>
                                 <tr>
                                     <th>ID</th>
-                                    <th>Tên</th>
-                                    <th>Email</th>
-                                    <th>Điện thoại</th>
-                                    <th>Vai trò</th>
+                                    <th>Logo</th>
+                                    <th>Tên công ty</th>
+                                    <th>Website</th>
+                                    <th>Thứ tự</th>
+                                    <th>Trạng thái</th>
                                     <th></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php if (!$rows): ?>
                                     <tr>
-                                        <td colspan="6" style="text-align:center;color:var(--ak-muted);">Chưa có dữ liệu người dùng</td>
+                                        <td colspan="7" style="text-align:center;color:var(--ak-muted);">Chưa có dữ liệu khách hàng</td>
                                     </tr>
                                 <?php else: ?>
                                     <?php foreach ($rows as $row): ?>
                                         <tr>
-                                            <td>#USR-<?php echo str_pad((string)$row['id'], 3, '0', STR_PAD_LEFT); ?></td>
-                                            <td><?php echo h($row['full_name'] ?: '-'); ?></td>
-                                            <td><?php echo h($row['email']); ?></td>
-                                            <td><?php echo h($row['phone'] ?: '-'); ?></td>
-                                            <td><span class="badge"><?php echo h($row['role']); ?></span></td>
+                                            <td>#CL-<?php echo str_pad((string)$row['id'], 6, '0', STR_PAD_LEFT); ?></td>
+                                            <td>
+                                                <?php if (!empty($row['logo'])): ?>
+                                                    <img src="<?php echo h($mediaRoute . rawurlencode($row['logo'])); ?>" alt="<?php echo h($row['name']); ?>" style="max-height:40px;max-width:80px;border-radius:6px;">
+                                                <?php else: ?>
+                                                    <span class="small" style="color:var(--ak-muted);">Chưa có</span>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td><?php echo h($row['name']); ?></td>
+                                            <td>
+                                                <?php if (!empty($row['website_url'])): ?>
+                                                    <a href="<?php echo h($row['website_url']); ?>" target="_blank" style="color:var(--ak-primary);"><?php echo h($row['website_url']); ?></a>
+                                                <?php else: ?>
+                                                    <span class="small" style="color:var(--ak-muted);">-</span>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td><?php echo (int)$row['sort_order']; ?></td>
+                                            <td><?php echo (int)$row['status'] === 1 ? 'Hiển thị' : 'Ẩn'; ?></td>
                                             <td style="text-align:right;display:flex;gap:8px;justify-content:flex-end;">
-                                                <a class="btn-admin" style="text-decoration:none;" href="<?php echo h(with_query($adminRoutes['users'], ['edit' => (int)$row['id']])); ?>">Sửa</a>
-                                                <form method="post" onsubmit="return confirm('Bạn có chắc muốn xóa người dùng này?');" style="margin:0;">
+                                                <a class="btn-admin" style="text-decoration:none;" href="<?php echo h(with_query($adminRoutes['clients'], ['edit' => (int)$row['id']])); ?>">Sửa</a>
+                                                <form method="post" onsubmit="return confirm('Bạn có chắc muốn xóa khách hàng này?');" style="margin:0;">
                                                     <input type="hidden" name="action" value="delete">
                                                     <input type="hidden" name="csrf_token" value="<?php echo h($csrfToken); ?>">
                                                     <input type="hidden" name="id" value="<?php echo (int)$row['id']; ?>">
