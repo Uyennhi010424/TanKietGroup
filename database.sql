@@ -217,6 +217,20 @@ CREATE TABLE testimonials (
     status TINYINT(1) DEFAULT 1
 );
 
+-- =============================================
+-- KHÁCH HÀNG TIÊU BIỂU
+-- =============================================
+CREATE TABLE clients (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    logo VARCHAR(255),
+    website_url VARCHAR(255),
+    sort_order INT DEFAULT 0,
+    status TINYINT(1) DEFAULT 1,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
 -- Gallery chung
 CREATE TABLE gallery (
     id INT PRIMARY KEY AUTO_INCREMENT,

@@ -153,12 +153,14 @@ a {
   padding-top: 10px;
 }
 
-.nav-admin-logout a {
+.nav-admin-logout a,
+.nav-admin-logout button {
   background: rgba(255, 120, 120, 0.12);
   color: #ffd0d0;
 }
 
-.nav-admin-logout a:hover {
+.nav-admin-logout a:hover,
+.nav-admin-logout button:hover {
   background: rgba(255, 120, 120, 0.2);
   color: #ffe6e6;
 }

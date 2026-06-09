@@ -38,8 +38,29 @@ function store_uploaded_image(string $inputName, string $subDir = 'uploads'): ?s
 		throw new RuntimeException('Dinh dang anh khong hop le');
 	}
 
+	// Validate actual MIME type via file content
+	$allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+	if (function_exists('finfo_open')) {
+		$finfo = finfo_open(FILEINFO_MIME_TYPE);
+		if ($finfo) {
+			$detectedMime = finfo_file($finfo, $tmpPath);
+			finfo_close($finfo);
+			if (!is_string($detectedMime) || !in_array($detectedMime, $allowedMimes, true)) {
+				throw new RuntimeException('Noi dung file khong phai anh hop le');
+			}
+		}
+	}
+
+	// Verify file is a valid image
+	if (function_exists('getimagesize')) {
+		$imageInfo = @getimagesize($tmpPath);
+		if ($imageInfo === false) {
+			throw new RuntimeException('File khong phai anh hop le');
+		}
+	}
+
 	$targetDir = rtrim(__DIR__ . '/../' . trim($subDir, '/\\'), '/\\');
-	if (!is_dir($targetDir) && !mkdir($targetDir, 0777, true) && !is_dir($targetDir)) {
+	if (!is_dir($targetDir) && !mkdir($targetDir, 0755, true) && !is_dir($targetDir)) {
 		throw new RuntimeException('Khong tao duoc thu muc upload');
 	}
 
@@ -50,4 +71,29 @@ function store_uploaded_image(string $inputName, string $subDir = 'uploads'): ?s
 	}
 
 	return trim($subDir, '/\\') . '/' . $filename;
+}
+
+/**
+ * Sanitize HTML content to prevent XSS while keeping safe formatting tags.
+ * Use for content stored in DB that may contain rich-text HTML.
+ */
+function sanitize_html(?string $html): string
+{
+    if ($html === null || $html === '') {
+        return '';
+    }
+
+    // Allow common safe HTML tags
+    $allowed = '<p><br><strong><b><em><i><u><s><sub><sup>'
+        . '<ul><ol><li><h1><h2><h3><h4><h5><h6>'
+        . '<a><img><blockquote><table><thead><tbody><tr><th><td>'
+        . '<div><span><hr><pre><code>';
+
+    $html = strip_tags($html, $allowed);
+
+    // Remove dangerous attributes: event handlers (on*), javascript: URIs
+    $html = preg_replace('#\s+on\w+\s*=\s*(?:"[^"]*"|\'[^\']*\'|[^\s>]*)#i', '', $html);
+    $html = preg_replace('#(href|src|action)\s*=\s*(?:"javascript:[^"]*"|\'javascript:[^\']*\')#i', '', $html);
+
+    return $html;
 }

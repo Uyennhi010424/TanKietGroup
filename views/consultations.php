@@ -25,6 +25,7 @@ $site = site_settings();
 		<article class="card reveal">
 			<h2>Gửi yêu cầu tư vấn</h2>
 			<form id="consultationForm" method="POST" action="/api/save_consultation.php">
+				<input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8'); ?>">
 				<div class="form-grid">
 					<input class="input" type="text" name="name" placeholder="Tên công ty hoặc cá nhân" required>
 					<input class="input" type="tel" name="phone" placeholder="Số điện thoại" required>

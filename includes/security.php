@@ -140,3 +140,57 @@ function admin_require_roles(array $allowedRoles, string $fallbackUrl): void
         exit;
     }
 }
+
+/**
+ * Simple session-based rate limiter for login attempts.
+ * Returns the number of seconds the user must wait, or 0 if allowed.
+ */
+function login_rate_limit_check(): int
+{
+    ensure_session_started();
+    $attempts = $_SESSION['login_attempts'] ?? 0;
+    $lastAttempt = $_SESSION['login_last_attempt'] ?? 0;
+
+    if ($attempts >= 5) {
+        $waitTime = min(300, 30 * pow(2, $attempts - 5)); // 30s, 60s, 120s, 240s, 300s max
+        $elapsed = time() - $lastAttempt;
+        if ($elapsed < $waitTime) {
+            return (int)ceil($waitTime - $elapsed);
+        }
+        // Reset after cooldown
+        $_SESSION['login_attempts'] = 0;
+    }
+
+    return 0;
+}
+
+function login_rate_limit_record_failure(): void
+{
+    ensure_session_started();
+    $_SESSION['login_attempts'] = ($_SESSION['login_attempts'] ?? 0) + 1;
+    $_SESSION['login_last_attempt'] = time();
+}
+
+function login_rate_limit_reset(): void
+{
+    ensure_session_started();
+    unset($_SESSION['login_attempts'], $_SESSION['login_last_attempt']);
+}
+
+/**
+ * Simple session-based rate limiter for form submissions.
+ * Returns true if the submission is allowed, false if too soon.
+ */
+function api_rate_limit_check(string $action, int $minIntervalSeconds = 30): bool
+{
+    ensure_session_started();
+    $key = 'rate_limit_' . $action;
+    $lastSubmit = $_SESSION[$key] ?? 0;
+    return (time() - $lastSubmit) >= $minIntervalSeconds;
+}
+
+function api_rate_limit_record(string $action): void
+{
+    ensure_session_started();
+    $_SESSION['rate_limit_' . $action] = time();
+}

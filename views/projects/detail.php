@@ -8,6 +8,12 @@ if ($slug !== '') {
 	$project = site_fetch_one('SELECT * FROM projects WHERE slug = :slug AND status = 1 LIMIT 1', ['slug' => $slug]);
 }
 
+if (!$project && $slug !== '') {
+	http_response_code(404);
+	echo '<section class="section"><div class="container"><div class="card"><h3>Không tìm thấy dự án</h3><p class="muted">Dự án bạn tìm không tồn tại hoặc đã bị ẩn.</p><a href="' . htmlspecialchars(site_page_url('projects'), ENT_QUOTES, 'UTF-8') . '" class="btn btn-primary" style="margin-top:12px;">Xem tất cả dự án</a></div></div></section>';
+	return;
+}
+
 if (!$project) {
 	$project = site_fetch_one('SELECT * FROM projects WHERE status = 1 ORDER BY created_at DESC LIMIT 1');
 }

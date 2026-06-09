@@ -39,6 +39,16 @@ if (function_exists('finfo_open')) {
     }
 }
 
+// Only allow serving image files — block PHP, HTML, and other executable types
+$allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
+if (!in_array($mime, $allowedMimes, true)) {
+    http_response_code(403);
+    header('Content-Type: text/plain; charset=utf-8');
+    echo 'Forbidden';
+    exit;
+}
+
 header('Content-Type: ' . $mime);
 header('Content-Length: ' . filesize($filePath));
+header('Cache-Control: public, max-age=86400');
 readfile($filePath);

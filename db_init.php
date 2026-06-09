@@ -63,6 +63,8 @@ try {
 
     $pdo->exec("\n        CREATE TABLE IF NOT EXISTS consultations (\n            id INT PRIMARY KEY AUTO_INCREMENT,\n            name VARCHAR(100) NOT NULL,\n            email VARCHAR(100) NOT NULL,\n            phone VARCHAR(20) NOT NULL,\n            service VARCHAR(255),\n            message TEXT,\n            status ENUM('new','processing','done') DEFAULT 'new',\n            created_at DATETIME DEFAULT CURRENT_TIMESTAMP\n        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci\n    ");
 
+    $pdo->exec("\n        CREATE TABLE IF NOT EXISTS clients (\n            id INT PRIMARY KEY AUTO_INCREMENT,\n            name VARCHAR(255) NOT NULL,\n            logo VARCHAR(255),\n            website_url VARCHAR(255),\n            sort_order INT DEFAULT 0,\n            status TINYINT(1) DEFAULT 1,\n            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,\n            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP\n        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci\n    ");
+
     echo 'Database tables created successfully!';
 } catch (PDOException $e) {
     echo 'Error: ' . $e->getMessage();

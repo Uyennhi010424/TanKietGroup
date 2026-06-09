@@ -34,7 +34,7 @@ try {
                             <li><strong>Lương:</strong> <?php echo htmlspecialchars($r['salary'] ?: '-', ENT_QUOTES, 'UTF-8'); ?></li>
                             <li><strong>Hạn nộp:</strong> <?php echo htmlspecialchars($r['deadline'] ?: '-', ENT_QUOTES, 'UTF-8'); ?></li>
                         </ul>
-                        <div><?php echo $r['description'] ? $r['description'] : '<p>Chưa có mô tả.</p>'; ?></div>
+                        <div><?php echo $r['description'] ? sanitize_html($r['description']) : '<p>Chưa có mô tả.</p>'; ?></div>
                     </article>
                 <?php endforeach; ?>
             </div>

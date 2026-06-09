@@ -8,6 +8,12 @@ if ($slug !== '') {
     $course = site_fetch_one('SELECT * FROM courses WHERE slug = :slug AND status = 1 LIMIT 1', ['slug' => $slug]);
 }
 
+if (!$course && $slug !== '') {
+    http_response_code(404);
+    echo '<section class="section"><div class="container"><div class="card"><h3>Không tìm thấy khóa học</h3><p class="muted">Khóa học bạn tìm không tồn tại hoặc đã bị ẩn.</p><a href="' . htmlspecialchars(site_page_url('courses'), ENT_QUOTES, 'UTF-8') . '" class="btn btn-primary" style="margin-top:12px;">Xem tất cả khóa học</a></div></div></section>';
+    return;
+}
+
 if (!$course) {
     $course = site_fetch_one('SELECT * FROM courses WHERE status = 1 ORDER BY sort_order ASC, created_at DESC LIMIT 1');
 }

@@ -1,11 +1,10 @@
 <?php
 // API endpoint to save consultation requests
 header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: POST');
 
-require_once '../config/config.php';
+require_once '../includes/site.php';
 require_once '../includes/db.php';
+require_once '../includes/security.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
@@ -13,25 +12,39 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
+// CSRF validation
+if (!csrf_validate((string)($_POST['csrf_token'] ?? ''))) {
+    http_response_code(403);
+    echo json_encode(['success' => false, 'message' => 'Phiên làm việc không hợp lệ, vui lòng tải lại trang']);
+    exit;
+}
+
+// Rate limiting — max 1 submission per 30 seconds
+if (!api_rate_limit_check('consultation', 30)) {
+    http_response_code(429);
+    echo json_encode(['success' => false, 'message' => 'Bạn gửi quá nhanh, vui lòng đợi vài giây rồi thử lại']);
+    exit;
+}
+
 try {
     $pdo = get_db_connection();
-    
+
     // Collect form data
-    $name = $_POST['name'] ?? '';
-    $email = $_POST['email'] ?? '';
-    $phone = $_POST['phone'] ?? '';
-    $service = $_POST['goal'] ?? '';
-    $message = $_POST['message'] ?? '';
+    $name = trim((string)($_POST['name'] ?? ''));
+    $email = trim((string)($_POST['email'] ?? ''));
+    $phone = trim((string)($_POST['phone'] ?? ''));
+    $service = trim((string)($_POST['goal'] ?? ''));
+    $message = trim((string)($_POST['message'] ?? ''));
     $created_at = date('Y-m-d H:i:s');
-    
-    // Validation
-    if (empty($name) || empty($email) || empty($phone) || empty($message)) {
+
+    // Validation — name, phone, message are required; email is optional but must be valid if provided
+    if ($name === '' || $phone === '' || $message === '') {
         http_response_code(400);
         echo json_encode(['success' => false, 'message' => 'Vui lòng điền đầy đủ thông tin']);
         exit;
     }
-    
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+
+    if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
         http_response_code(400);
         echo json_encode(['success' => false, 'message' => 'Email không hợp lệ']);
         exit;
@@ -51,11 +64,13 @@ try {
         ':message' => $message,
         ':created_at' => $created_at
     ]);
-    
+
+    api_rate_limit_record('consultation');
     http_response_code(200);
     echo json_encode(['success' => true, 'message' => 'Yêu cầu tư vấn của bạn đã được gửi thành công']);
 } catch (Exception $e) {
+    error_log('Consultation API error: ' . $e->getMessage());
     http_response_code(500);
-    echo json_encode(['success' => false, 'message' => 'Lỗi server: ' . $e->getMessage()]);
+    echo json_encode(['success' => false, 'message' => 'Đã xảy ra lỗi, vui lòng thử lại sau']);
 }
 ?>
