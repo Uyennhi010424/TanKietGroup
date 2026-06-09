@@ -14,8 +14,8 @@ $industries = site_fetch_all('SELECT id, name, slug, description FROM industries
 <section class="hero">
 	<div class="container reveal">
 		<span class="tag">Dịch vụ</span>
-		<h1>Bộ dịch vụ đang được quản lý trong admin</h1>
-		<p class="lead">Các dịch vụ hiển thị ở đây lấy trực tiếp từ bảng `services`, nên khi admin thêm hoặc sửa là trang người dùng cập nhật ngay.</p>
+		<h1>Dịch vụ của chúng tôi</h1>
+		<p class="lead">Khám phá các dịch vụ marketing chuyên nghiệp mà TanKiet Group cung cấp để giúp doanh nghiệp bạn phát triển.</p>
 	</div>
 </section>
 

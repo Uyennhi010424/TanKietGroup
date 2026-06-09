@@ -7,7 +7,7 @@ $site = site_settings();
 	<div class="container reveal">
 		<span class="tag">Tư vấn</span>
 		<h1>Tư vấn chiến lược theo dữ liệu thực</h1>
-		<p class="lead">Nội dung tư vấn và thông tin liên hệ lấy từ cấu hình hệ thống, nên admin cập nhật là người dùng thấy ngay.</p>
+		<p class="lead">Gửi thông tin nhu cầu, đội ngũ của chúng tôi sẽ liên hệ và tư vấn lộ trình phù hợp trong vòng 24 giờ.</p>
 	</div>
 </section>
 

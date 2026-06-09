@@ -74,6 +74,19 @@ img {
   text-align: center;
 }
 
+/* Card flex layout — push button to bottom */
+.grid > .card {
+  display: flex;
+  flex-direction: column;
+}
+.grid > .card > p:last-child {
+  margin-top: auto;
+}
+.grid > .card > p:last-child .btn {
+  width: 100%;
+  text-align: center;
+}
+
 .site-header {
   position: sticky;
   top: 0;
@@ -581,16 +594,22 @@ h2 {
   line-height: 1.6;
 }
 
-.project-grid {
-  display: grid;
-  grid-template-columns: 1.2fr 1fr;
-  gap: 30px;
+.project-detail-body {
+  overflow: hidden;
 }
 
-.project-image img {
+.project-float-image {
+  float: left;
+  width: 45%;
+  max-width: 480px;
+  margin: 0 28px 20px 0;
+}
+
+.project-float-image img {
   width: 100%;
   border-radius: 16px;
   object-fit: cover;
+  display: block;
 }
 
 .card-glow {
@@ -623,9 +642,12 @@ h2 {
   color: #cfe9ea;
 }
 
-@media (max-width: 900px) {
-  .project-grid {
-    grid-template-columns: 1fr;
+@media (max-width: 768px) {
+  .project-float-image {
+    float: none;
+    width: 100%;
+    max-width: none;
+    margin: 0 0 20px 0;
   }
 }
 
@@ -1912,6 +1934,57 @@ label {
 
   .header-cta .btn {
     display: none;
+  }
+}
+
+/* ============================================================
+   RECRUITMENT PAGE
+   ============================================================ */
+
+.recruitment-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.recruitment-card {
+  padding: 28px;
+}
+
+.recruitment-header h3 {
+  font-size: 1.3rem;
+  margin: 0 0 4px 0;
+  color: var(--primary-strong);
+}
+
+.recruitment-desc {
+  margin: 16px 0;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+
+.recruitment-desc ul,
+.recruitment-desc ol {
+  padding-left: 20px;
+  margin: 8px 0;
+}
+
+.recruitment-desc li {
+  margin-bottom: 4px;
+}
+
+.apply-form .form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 600px) {
+  .apply-form .form-grid {
+    grid-template-columns: 1fr;
   }
 }
 

@@ -22,31 +22,11 @@ if (isset($adminViewMap[$page])) {
     exit;
 }
 
-require_once __DIR__ . '/../includes/db.php';
-require_once __DIR__ . '/../includes/security.php';
-require_once __DIR__ . '/../includes/site.php';
+require_once __DIR__ . '/../includes/admin_helpers.php';
+require_once __DIR__ . '/../views/admin/layout.php';
 
-$assetBase = site_admin_base_path();
-$logoUrl = site_logo_url('/img/logo.jpg');
-$adminRoutes = [
-    'dashboard' => site_page_url('admin_index'),
-    'courses' => site_page_url('admin_courses'),
-    'projects' => site_page_url('admin_projects'),
-    'services' => site_page_url('admin_services'),
-    'users' => site_page_url('admin_users'),
-    'blog' => site_page_url('admin_blog'),
-    'recruitments' => site_page_url('admin_recruitments'),
-    'stats' => site_page_url('admin_stats'),
-    'settings' => site_page_url('admin_settings'),
-    'consultations' => site_page_url('admin_consultations'),
-    'clients' => site_page_url('admin_clients'),
-];
-$loginRoute = site_page_url('admin_login');
-$logoutRoute = site_page_url('admin_login', ['logout' => 1]);
-admin_require_login($loginRoute);
-admin_require_roles(['admin'], $adminRoutes['courses']);
-$currentAdminUser = admin_current_user() ?? [];
-$adminRole = (string)($currentAdminUser['role'] ?? 'admin');
+$admin = admin_init(['require_admin' => true]);
+$adminRoutes = $admin['routes'];
 
 $db = null;
 $serviceRows = [];
@@ -62,60 +42,9 @@ try {
 } catch (Throwable $e) {
     // leave counts as zero and rows empty if DB not available
 }
+
+admin_header('Tổng quan', 'Chào mừng đến trang quản trị', $admin, 'dashboard');
 ?>
-<!doctype html>
-<html lang="vi">
-
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Trang quản trị - TanKiet Group</title>
-    <link rel="icon" href="<?php echo htmlspecialchars(site_favicon_url(), ENT_QUOTES, 'UTF-8'); ?>">
-    <link rel="stylesheet" href="/assets/css/admin.css">
-    <script defer src="/assets/js/admin.js"></script>
-</head>
-
-<body class="role-<?php echo htmlspecialchars($adminRole, ENT_QUOTES, 'UTF-8'); ?>">
-
-    <div class="admin-wrap">
-        <aside class="admin-sidebar" style="display:block">
-            <div class="sidebar-header">
-                <div class="brand-admin"><img src="<?php echo htmlspecialchars($logoUrl, ENT_QUOTES, 'UTF-8'); ?>" alt="TanKiet Group" class="site-logo"></div>
-            </div>
-            <nav>
-                <ul class="nav-admin">
-                    <li><a href="<?php echo $adminRoutes['dashboard']; ?>">Tổng quan</a></li>
-                    <li><a href="<?php echo $adminRoutes['courses']; ?>">Khóa học</a></li>
-                    <li><a href="<?php echo $adminRoutes['projects']; ?>">Dự án</a></li>
-                    <li><a href="<?php echo $adminRoutes['services']; ?>">Dịch vụ</a></li>
-                    <li><a href="<?php echo $adminRoutes['clients']; ?>">Khách hàng</a></li>
-                    <li><a href="<?php echo $adminRoutes['users']; ?>">Người dùng</a></li>
-                    <li><a href="<?php echo $adminRoutes['blog']; ?>">Blog</a></li>
-                    <li><a href="<?php echo $adminRoutes['recruitments']; ?>">Tuyển dụng</a></li>
-                    <li><a href="<?php echo $adminRoutes['stats']; ?>">Thống kê tương tác</a></li>
-                    <li><a href="<?php echo $adminRoutes['settings']; ?>">Cài đặt hệ thống</a></li>
-                    <li><a href="<?php echo $adminRoutes['consultations']; ?>">Tư vấn khách hàng</a></li>
-                    <li class="nav-admin-logout"><form method="post" action="<?php echo htmlspecialchars($loginRoute, ENT_QUOTES, 'UTF-8'); ?>" style="display:inline"><input type="hidden" name="action" value="logout"><input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8'); ?>"><button type="submit" style="background:none;border:none;color:inherit;cursor:pointer;font:inherit;padding:0;">Đăng xuất</button></form></li>
-                </ul>
-            </nav>
-        </aside>
-        <div class="sidebar-overlay" data-sidebar-overlay></div>
-
-        <main class="admin-main">
-            <header class="topbar">
-                <div style="display:flex;gap:20px;align-items:center">
-                    <div class="title">
-                        <h1>Tổng quan</h1>
-                        <div class="small">Chào mừng đến trang quản trị</div>
-                    </div>
-                </div>
-                <div style="display:flex;gap:12px;align-items:center">
-                    <div class="search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="opacity:0.7">
-                            <path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-                            <circle cx="11" cy="11" r="6" stroke="currentColor" stroke-width="2"></circle>
-                        </svg><input placeholder="Tìm kiếm..." style="background:transparent;border:0;color:var(--ak-text);outline:none"></div>
-                </div>
-            </header>
 
             <section class="card-grid" style="margin-top:18px">
                 <div class="card">
@@ -198,8 +127,4 @@ try {
 
             <button class="fab" title="Thêm">+</button>
 
-        </main>
-    </div>
-</body>
-
-</html>
+<?php admin_footer(); ?>

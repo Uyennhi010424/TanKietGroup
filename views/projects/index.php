@@ -11,8 +11,8 @@ $projects = site_fetch_all(
 <section class="hero">
 	<div class="container reveal">
 		<span class="tag">Dự án</span>
-		<h1>Dự án đang được quản lý trong admin</h1>
-		<p class="lead">Mọi dự án hiển thị ở đây đều lấy từ bảng `projects`, không còn dữ liệu mẫu tĩnh nữa.</p>
+		<h1>Dự án tiêu biểu</h1>
+		<p class="lead">Những dự án đã thực hiện thành công, giúp khách hàng đạt được mục tiêu kinh doanh.</p>
 	</div>
 </section>
 
@@ -28,7 +28,7 @@ $projects = site_fetch_all(
 						<h3 style="margin-top:14px;"><?php echo htmlspecialchars($project['title'], ENT_QUOTES, 'UTF-8'); ?></h3>
 						<p class="muted"><?php echo htmlspecialchars($project['short_desc'] ?? '', ENT_QUOTES, 'UTF-8'); ?></p>
 						<p class="muted"><?php echo htmlspecialchars($project['client_name'] ?: 'Khách hàng', ENT_QUOTES, 'UTF-8'); ?></p>
-						<p><a href="<?php echo htmlspecialchars(site_page_url('project_detail', ['slug' => $project['slug']]), ENT_QUOTES, 'UTF-8'); ?>">Xem chi tiết</a></p>
+						<p><a href="<?php echo htmlspecialchars(site_page_url('project_detail', ['slug' => $project['slug']]), ENT_QUOTES, 'UTF-8'); ?>" class="btn btn-primary">Xem chi tiết</a></p>
 					</article>
 				<?php endforeach; ?>
 			<?php endif; ?>

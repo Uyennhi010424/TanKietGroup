@@ -1,41 +1,11 @@
 <?php
 // Admin - Consultations Management
-require_once __DIR__ . '/../includes/site.php';
-require_once __DIR__ . '/../includes/db.php';
-require_once __DIR__ . '/../includes/security.php';
+require_once __DIR__ . '/../includes/admin_helpers.php';
+require_once __DIR__ . '/../views/admin/layout.php';
 
-$assetBase = site_admin_base_path();
-$logoUrl = site_logo_url('/img/logo.jpg');
-$adminRoutes = [
-    'dashboard' => site_page_url('admin_index'),
-    'courses' => site_page_url('admin_courses'),
-    'projects' => site_page_url('admin_projects'),
-    'services' => site_page_url('admin_services'),
-    'users' => site_page_url('admin_users'),
-    'blog' => site_page_url('admin_blog'),
-    'recruitments' => site_page_url('admin_recruitments'),
-    'stats' => site_page_url('admin_stats'),
-    'consultations' => site_page_url('admin_consultations'),
-    'clients' => site_page_url('admin_clients'),
-];
-
-$loginRoute = site_page_url('admin_login');
-$logoutRoute = site_page_url('admin_login', ['logout' => 1]);
-admin_require_login($loginRoute);
-$currentAdminUser = admin_current_user() ?? [];
-$adminRole = (string)($currentAdminUser['role'] ?? 'editor');
-$isEditor = $adminRole === 'editor';
-
-function h($value)
-{
-    return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8');
-}
-
-function with_query($route, $params)
-{
-    $sep = strpos($route, '?') !== false ? '&' : '?';
-    return $route . $sep . http_build_query($params);
-}
+$admin = admin_init();
+$adminRoutes = $admin['routes'];
+$isEditor = $admin['isEditor'];
 
 $dbError = '';
 $flash = $_GET['msg'] ?? '';
@@ -52,7 +22,7 @@ if ($db && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
     try {
         if (!csrf_validate((string)($_POST['csrf_token'] ?? ''))) {
-            throw new RuntimeException('CSRF token khong hop le');
+            throw new RuntimeException('CSRF token không hợp lệ');
         }
 
         if ($action === 'update_status') {
@@ -85,56 +55,9 @@ if ($db) {
         $detail = $stmt->fetch();
     }
 }
+
+admin_header('Tư vấn khách hàng', 'Quản lý các yêu cầu tư vấn từ khách hàng', $admin, 'consultations');
 ?>
-<!doctype html>
-<html lang="vi">
-
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Tư vấn khách hàng - Trang quản trị</title>
-    <link rel="icon" href="<?php echo htmlspecialchars(site_favicon_url(), ENT_QUOTES, 'UTF-8'); ?>">
-    <link rel="stylesheet" href="/assets/css/admin.css">
-    <script defer src="/assets/js/admin.js"></script>
-</head>
-
-<body class="role-<?php echo h($adminRole); ?>">
-    <div class="admin-wrap">
-        <aside class="admin-sidebar" style="display:block">
-            <div class="sidebar-header">
-                <div class="brand-admin"><img src="<?php echo htmlspecialchars($logoUrl, ENT_QUOTES, 'UTF-8'); ?>" alt="TanKiet Group" class="site-logo"></div>
-            </div>
-            <nav>
-                <ul class="nav-admin">
-                    <?php if (!$isEditor): ?>
-                        <li><a href="<?php echo $adminRoutes['dashboard']; ?>">Tổng quan</a></li>
-                    <?php endif; ?>
-                    <li><a href="<?php echo $adminRoutes['courses']; ?>">Khóa học</a></li>
-                    <li><a href="<?php echo $adminRoutes['projects']; ?>">Dự án</a></li>
-                    <li><a href="<?php echo $adminRoutes['services']; ?>">Dịch vụ</a></li>
-                    <li><a href="<?php echo $adminRoutes['clients']; ?>">Khách hàng</a></li>
-                    <li><a href="<?php echo $adminRoutes['users']; ?>">Người dùng</a></li>
-                    <li><a href="<?php echo $adminRoutes['blog']; ?>">Blog</a></li>
-                    <li><a href="<?php echo $adminRoutes['recruitments']; ?>">Tuyển dụng</a></li>
-                    <?php if (!$isEditor): ?>
-                        <li><a href="<?php echo $adminRoutes['stats']; ?>">Thống kê tương tác</a></li>
-                    <?php endif; ?>
-                    <li><a href="<?php echo $adminRoutes['consultations']; ?>">Tư vấn khách hàng</a></li>
-                    <li><form method="post" action="<?php echo htmlspecialchars($loginRoute, ENT_QUOTES, 'UTF-8'); ?>" style="display:inline"><input type="hidden" name="action" value="logout"><input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8'); ?>"><button type="submit" style="background:none;border:none;color:inherit;cursor:pointer;font:inherit;padding:0;">Đăng xuất</button></form></li>
-                </ul>
-            </nav>
-        </aside>
-        <div class="sidebar-overlay" data-sidebar-overlay></div>
-
-        <main class="admin-main">
-            <header class="topbar">
-                <div style="display:flex;gap:20px;align-items:center">
-                    <div class="title">
-                        <h1>Tư vấn khách hàng</h1>
-                        <div class="small">Quản lý các yêu cầu tư vấn từ khách hàng</div>
-                    </div>
-                </div>
-            </header>
 
             <section style="margin-top:22px">
                 <?php if ($flash !== ''): ?>
@@ -217,8 +140,5 @@ if ($db) {
                     </div>
                 </div>
             </section>
-        </main>
-    </div>
-</body>
 
-</html>
+<?php admin_footer(); ?>

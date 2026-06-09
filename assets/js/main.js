@@ -146,6 +146,7 @@ document.addEventListener('click', (e) => {
 function animateCount(el, target, duration = 1400, opts = {}) {
   const start = 0;
   const startTime = performance.now();
+  const decimals = (String(target).split('.')[1] || '').length;
 
   function easeOutQuad(t) { return t * (2 - t); }
 
@@ -153,8 +154,8 @@ function animateCount(el, target, duration = 1400, opts = {}) {
     const elapsed = now - startTime;
     const progress = Math.min(elapsed / duration, 1);
     const eased = easeOutQuad(progress);
-    const current = Math.floor(start + (target - start) * eased);
-    render(current);
+    const current = start + (target - start) * eased;
+    render(decimals > 0 ? parseFloat(current.toFixed(decimals)) : Math.floor(current));
     if (progress < 1) {
       requestAnimationFrame(frame);
     } else {
@@ -166,8 +167,6 @@ function animateCount(el, target, duration = 1400, opts = {}) {
     if (opts.abbrev === 'k') {
       const k = Math.floor(value / 1000);
       el.textContent = k + (opts.suffix || '');
-    } else if (opts.percent) {
-      el.textContent = value + (opts.suffix || '');
     } else {
       el.textContent = value + (opts.suffix || '');
     }
@@ -185,11 +184,10 @@ function initCounters() {
       if (!entry.isIntersecting) return;
       const el = entry.target;
       if (el.dataset.counted) return;
-      const target = parseInt(el.getAttribute('data-target') || '0', 10);
+      const target = parseFloat(el.getAttribute('data-target') || '0');
       const suffix = el.getAttribute('data-suffix') || '';
       const abbrev = el.getAttribute('data-abbrev') || '';
-      const isPercent = suffix === '%';
-      animateCount(el, target, 1400, { abbrev: abbrev, suffix: suffix, percent: isPercent });
+      animateCount(el, target, 1400, { abbrev: abbrev, suffix: suffix });
       el.dataset.counted = '1';
       observer.unobserve(el);
     });
