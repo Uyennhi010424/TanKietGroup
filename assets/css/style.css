@@ -1944,36 +1944,93 @@ label {
 .recruitment-list {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 28px;
 }
 
 .recruitment-card {
-  padding: 28px;
+  padding: 32px;
+  border: 1px solid var(--border);
+  transition: border-color 0.2s;
+}
+
+.recruitment-card:hover {
+  border-color: rgba(134, 215, 223, 0.2);
+}
+
+.recruitment-header {
+  margin-bottom: 20px;
 }
 
 .recruitment-header h3 {
-  font-size: 1.3rem;
-  margin: 0 0 4px 0;
+  font-size: 1.4rem;
+  margin: 0 0 12px 0;
   color: var(--primary-strong);
+  font-weight: 700;
+}
+
+.recruitment-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.recruitment-tag {
+  display: inline-block;
+  padding: 4px 12px;
+  background: rgba(134, 215, 223, 0.08);
+  border: 1px solid rgba(134, 215, 223, 0.15);
+  border-radius: 20px;
+  font-size: 0.85rem;
+  color: var(--primary);
 }
 
 .recruitment-desc {
-  margin: 16px 0;
-  padding: 16px;
-  background: rgba(255, 255, 255, 0.03);
+  margin: 20px 0;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
   border-radius: 12px;
-  line-height: 1.7;
-  color: var(--muted);
+  line-height: 1.8;
+  color: var(--text);
+}
+
+.recruitment-desc p {
+  margin: 8px 0;
 }
 
 .recruitment-desc ul,
 .recruitment-desc ol {
-  padding-left: 20px;
-  margin: 8px 0;
+  padding-left: 24px;
+  margin: 12px 0;
 }
 
 .recruitment-desc li {
-  margin-bottom: 4px;
+  margin-bottom: 6px;
+}
+
+.recruitment-desc font[size="1"] { font-size: 0.75rem; }
+.recruitment-desc font[size="2"] { font-size: 0.875rem; }
+.recruitment-desc font[size="3"] { font-size: 1rem; }
+.recruitment-desc font[size="4"] { font-size: 1.25rem; }
+.recruitment-desc font[size="5"] { font-size: 1.5rem; }
+.recruitment-desc font[size="6"] { font-size: 1.75rem; }
+.recruitment-desc font[size="7"] { font-size: 2rem; }
+
+.recruitment-desc strong,
+.recruitment-desc b {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.recruitment-desc em,
+.recruitment-desc i {
+  font-style: italic;
+}
+
+.apply-form {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
 }
 
 .apply-form .form-grid {
@@ -1982,9 +2039,18 @@ label {
   gap: 12px;
 }
 
+.apply-message {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 8px;
+}
+
 @media (max-width: 600px) {
   .apply-form .form-grid {
     grid-template-columns: 1fr;
+  }
+  .recruitment-card {
+    padding: 20px;
   }
 }
 
