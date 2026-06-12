@@ -83,11 +83,11 @@ function sanitize_html(?string $html): string
         return '';
     }
 
-    // Allow common safe HTML tags
+    // Allow common safe HTML tags (including <font> for rich text editor sizes)
     $allowed = '<p><br><strong><b><em><i><u><s><sub><sup>'
         . '<ul><ol><li><h1><h2><h3><h4><h5><h6>'
         . '<a><img><blockquote><table><thead><tbody><tr><th><td>'
-        . '<div><span><hr><pre><code>';
+        . '<div><span><hr><pre><code><font>';
 
     $html = strip_tags($html, $allowed);
 

@@ -1,0 +1,48 @@
+<?php
+// Router for ADMIN pages only (port 8001)
+define('APP_MODE', 'admin');
+
+$uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+
+// Serve admin static files (CSS, JS)
+if (preg_match('#^/admin/assets/(css|js)/(.+)$#', $uri, $m)) {
+    $file = realpath(__DIR__ . '/admin/assets/' . $m[1] . '/' . $m[2]);
+    if ($file && is_file($file)) {
+        $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+        $mimes = ['css' => 'text/css', 'js' => 'application/javascript'];
+        header('Content-Type: ' . ($mimes[$ext] ?? 'application/octet-stream'));
+        header('Content-Length: ' . filesize($file));
+        readfile($file);
+        return true;
+    }
+}
+
+// Serve API routes
+if (preg_match('#^/api/([a-z_]+)\.php$#', $uri, $m)) {
+    $apiFile = __DIR__ . '/api/' . $m[1] . '.php';
+    if (is_file($apiFile)) {
+        require $apiFile;
+        exit;
+    }
+}
+
+// Serve upload files (for media endpoint)
+if (preg_match('#^/uploads/(.+)$#', $uri, $m)) {
+    $file = realpath(__DIR__ . '/uploads/' . $m[1]);
+    if ($file && is_file($file)) {
+        $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+        $allowedExts = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'pdf', 'doc', 'docx'];
+        if (in_array($ext, $allowedExts, true)) {
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mime = finfo_file($finfo, $file);
+            finfo_close($finfo);
+            header('Content-Type: ' . $mime);
+            header('Content-Length: ' . filesize($file));
+            readfile($file);
+            return true;
+        }
+    }
+}
+
+// Default: serve admin pages through index.php
+require __DIR__ . '/index.php';

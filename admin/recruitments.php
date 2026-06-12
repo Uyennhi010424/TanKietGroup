@@ -26,6 +26,21 @@ try {
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
+    $db->exec("CREATE TABLE IF NOT EXISTS job_applications (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        recruitment_id INT NOT NULL,
+        name VARCHAR(255) NOT NULL,
+        email VARCHAR(255) NOT NULL,
+        phone VARCHAR(50) NOT NULL,
+        position VARCHAR(255),
+        message TEXT,
+        cv_file VARCHAR(500),
+        status VARCHAR(20) DEFAULT 'new',
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        INDEX idx_recruitment (recruitment_id),
+        INDEX idx_status (status)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 } catch (Throwable $e) {
     $dbError = $e->getMessage();
 }
@@ -265,6 +280,7 @@ admin_header('Tuyển dụng', 'Đăng và quản lý tin tuyển dụng', $admi
                         </table>
                     </div>
                 </div>
+
             </section>
 
 <script>
@@ -356,5 +372,6 @@ admin_header('Tuyển dụng', 'Đăng và quản lý tin tuyển dụng', $admi
         slugInput.value = makeSlug(titleInput.value);
     }
 })();
+</script>
 
 <?php admin_footer(); ?>

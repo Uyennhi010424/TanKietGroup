@@ -46,6 +46,7 @@ function admin_header(string $pageTitle, string $pageSubtitle, array $admin, str
                     <li><a href="<?php echo $routes['users']; ?>"<?php if ($currentPage === 'users') echo ' class="active"'; ?>>Người dùng</a></li>
                     <li><a href="<?php echo $routes['blog']; ?>"<?php if ($currentPage === 'blog') echo ' class="active"'; ?>>Blog</a></li>
                     <li><a href="<?php echo $routes['recruitments']; ?>"<?php if ($currentPage === 'recruitments') echo ' class="active"'; ?>>Tuyển dụng</a></li>
+                    <li><a href="<?php echo $routes['applications']; ?>"<?php if ($currentPage === 'applications') echo ' class="active"'; ?>>Đơn ứng tuyển</a></li>
                     <?php if (!$isEditor): ?>
                         <li><a href="<?php echo $routes['stats']; ?>"<?php if ($currentPage === 'stats') echo ' class="active"'; ?>>Thống kê tương tác</a></li>
                         <li><a href="<?php echo $routes['settings']; ?>"<?php if ($currentPage === 'settings') echo ' class="active"'; ?>>Cài đặt hệ thống</a></li>

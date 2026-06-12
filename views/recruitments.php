@@ -55,19 +55,30 @@ try {
                             Ứng tuyển ngay
                         </button>
 
-                        <form class="apply-form" id="apply-form-<?php echo (int)$r['id']; ?>" style="display:none;" onsubmit="submitApply(event, <?php echo (int)$r['id']; ?>)">
+                        <form class="apply-form" id="apply-form-<?php echo (int)$r['id']; ?>" style="display:none;" enctype="multipart/form-data" onsubmit="submitApply(event, <?php echo (int)$r['id']; ?>)">
                             <input type="hidden" name="job_id" value="<?php echo (int)$r['id']; ?>">
-                            <input type="hidden" name="job_title" value="<?php echo htmlspecialchars($r['title'], ENT_QUOTES, 'UTF-8'); ?>">
                             <div class="form-grid">
-                                <input class="input" type="text" name="apply_name" placeholder="Họ và tên" required>
-                                <input class="input" type="email" name="apply_email" placeholder="Email" required>
+                                <div>
+                                    <input class="input" type="text" name="apply_name" placeholder="Họ và tên *" required>
+                                </div>
+                                <div>
+                                    <input class="input" type="email" name="apply_email" placeholder="Email *" required>
+                                </div>
                             </div>
                             <div class="form-grid" style="margin-top:12px;">
-                                <input class="input" type="tel" name="apply_phone" placeholder="Số điện thoại" required>
-                                <input class="input" type="text" name="apply_position" placeholder="Vị trí ứng tuyển" value="<?php echo htmlspecialchars($r['title'], ENT_QUOTES, 'UTF-8'); ?>">
+                                <div>
+                                    <input class="input" type="tel" name="apply_phone" placeholder="Số điện thoại *" required pattern="[0-9]{10,11}" title="Vui lòng nhập 10-11 chữ số">
+                                </div>
+                                <div>
+                                    <input class="input" type="text" name="apply_position" placeholder="Vị trí ứng tuyển" value="<?php echo htmlspecialchars($r['title'], ENT_QUOTES, 'UTF-8'); ?>">
+                                </div>
                             </div>
-                            <textarea class="textarea" name="apply_message" style="margin-top:12px;" placeholder="Giới thiệu ngắn về bản thân và lý do bạn quan tâm đến vị trí này" rows="4"></textarea>
-                            <button class="btn btn-primary" type="submit" style="margin-top:12px;">Gửi đơn ứng tuyển</button>
+                            <textarea class="textarea" name="apply_message" style="margin-top:12px;" placeholder="Giới thiệu ngắn về bản thân và lý do bạn quan tâm" rows="3"></textarea>
+                            <div style="margin-top:12px;">
+                                <label style="display:block;margin-bottom:6px;font-size:0.9rem;color:var(--muted);">Đính kèm CV (PDF, DOC, DOCX, JPG, PNG - tối đa 10MB)</label>
+                                <input class="input" type="file" name="cv_file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" style="padding:8px;">
+                            </div>
+                            <button class="btn btn-primary" type="submit" style="margin-top:16px;">Gửi đơn ứng tuyển</button>
                             <div class="apply-message" id="apply-msg-<?php echo (int)$r['id']; ?>" style="display:none;"></div>
                         </form>
                     </article>
@@ -94,18 +105,51 @@ function submitApply(e, id) {
     var msgDiv = document.getElementById('apply-msg-' + id);
     var btn = form.querySelector('button[type="submit"]');
 
+    // Client-side phone validation
+    var phoneInput = form.querySelector('input[name="apply_phone"]');
+    var phoneDigits = phoneInput.value.replace(/[^0-9]/g, '');
+    if (phoneDigits.length < 10) {
+        msgDiv.style.display = 'block';
+        msgDiv.style.background = 'rgba(231,76,60,0.15)';
+        msgDiv.style.color = '#e74c3c';
+        msgDiv.textContent = 'Số điện thoại phải có ít nhất 10 chữ số';
+        phoneInput.focus();
+        return;
+    }
+
     btn.disabled = true;
     btn.textContent = 'Đang gửi...';
 
-    setTimeout(function() {
+    var formData = new FormData(form);
+
+    fetch('/api/apply_job.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(function(response) { return response.json(); })
+    .then(function(result) {
         msgDiv.style.display = 'block';
-        msgDiv.style.background = 'rgba(46,204,113,0.15)';
-        msgDiv.style.color = '#2ecc71';
-        msgDiv.textContent = 'Đã gửi đơn ứng tuyển thành công! Chúng tôi sẽ liên hệ với bạn sớm.';
-        form.reset();
+        if (result.success) {
+            msgDiv.style.background = 'rgba(46,204,113,0.15)';
+            msgDiv.style.color = '#2ecc71';
+            msgDiv.textContent = result.message;
+            form.reset();
+        } else {
+            msgDiv.style.background = 'rgba(231,76,60,0.15)';
+            msgDiv.style.color = '#e74c3c';
+            msgDiv.textContent = result.message;
+        }
         btn.disabled = false;
         btn.textContent = 'Gửi đơn ứng tuyển';
         setTimeout(function() { msgDiv.style.display = 'none'; }, 5000);
-    }, 800);
+    })
+    .catch(function(error) {
+        msgDiv.style.display = 'block';
+        msgDiv.style.background = 'rgba(231,76,60,0.15)';
+        msgDiv.style.color = '#e74c3c';
+        msgDiv.textContent = 'Đã xảy ra lỗi, vui lòng thử lại sau';
+        btn.disabled = false;
+        btn.textContent = 'Gửi đơn ứng tuyển';
+    });
 }
 </script>

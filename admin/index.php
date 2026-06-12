@@ -9,6 +9,7 @@ $adminViewMap = [
     'admin_users'        => __DIR__ . '/users.php',
     'admin_blog'         => __DIR__ . '/blog.php',
     'admin_recruitments' => __DIR__ . '/recruitments.php',
+    'admin_applications' => __DIR__ . '/applications.php',
     'admin_stats'        => __DIR__ . '/stats.php',
     'admin_settings'     => __DIR__ . '/settings.php',
     'admin_consultations'=> __DIR__ . '/consultations.php',
