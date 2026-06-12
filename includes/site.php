@@ -76,7 +76,8 @@ function site_public_media_url(string $path): string
         return $path;
     }
 
-    return site_base_path() . '/?page=admin_media&path=' . rawurlencode($path);
+    // Serve uploads directly as static files (no PHP routing)
+    return site_base_path() . '/' . ltrim($path, '/');
 }
 
 function site_image_url(?string $path, string $fallback = ''): string
