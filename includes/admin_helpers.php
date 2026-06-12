@@ -64,6 +64,7 @@ function admin_routes(): array
         'users'          => site_page_url('admin_users'),
         'blog'           => site_page_url('admin_blog'),
         'recruitments'   => site_page_url('admin_recruitments'),
+        'applications'   => site_page_url('admin_applications'),
         'stats'          => site_page_url('admin_stats'),
         'settings'       => site_page_url('admin_settings'),
         'consultations'  => site_page_url('admin_consultations'),

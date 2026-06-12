@@ -1,6 +1,25 @@
 <?php
 require_once __DIR__ . '/config/constants.php';
 
+// Mode-based routing: separate user (8000) and admin (8001) ports
+$reqPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+$isAdminPage = str_starts_with($_GET['page'] ?? '', 'admin_');
+$isApiRoute = str_starts_with($reqPath, '/api/');
+$serverPort = (string)($_SERVER['SERVER_PORT'] ?? '');
+
+// Port 8000 = user only (block admin pages)
+if ($serverPort === '8000' && $isAdminPage) {
+    http_response_code(404);
+    echo 'Not found';
+    exit;
+}
+// Port 8001 = admin + API only (block user pages)
+if ($serverPort === '8001' && !$isAdminPage && !$isApiRoute) {
+    http_response_code(404);
+    echo 'Not found';
+    exit;
+}
+
 $page = $_GET['page'] ?? 'home';
 
 $reqPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
@@ -103,6 +122,15 @@ if (preg_match('#^/(admin/)?(assets|img)/(.*)$#', $reqPath, $m)) {
 	exit;
 }
 
+// API routes — forward to PHP files in /api/ directory
+if (preg_match('#^/api/([a-z_]+)\.php$#', $reqPath, $m)) {
+	$apiFile = __DIR__ . '/api/' . $m[1] . '.php';
+	if (is_file($apiFile)) {
+		require $apiFile;
+		exit;
+	}
+}
+
 $viewMap = [
 	'home' => [
 		'view' => __DIR__ . '/views/home.php',
@@ -197,6 +225,11 @@ $viewMap = [
 	'admin_recruitments' => [
 		'view' => __DIR__ . '/admin/recruitments.php',
 		'title' => 'Quản lý tuyển dụng',
+		'layout' => 'none',
+	],
+	'admin_applications' => [
+		'view' => __DIR__ . '/admin/applications.php',
+		'title' => 'Đơn ứng tuyển',
 		'layout' => 'none',
 	],
 	'admin_stats' => [

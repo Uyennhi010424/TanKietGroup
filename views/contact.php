@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../includes/site.php';
+require_once __DIR__ . '/../includes/security.php';
 
 $site = site_settings();
 ?>

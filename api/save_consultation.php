@@ -2,9 +2,9 @@
 // API endpoint to save consultation requests
 header('Content-Type: application/json');
 
-require_once '../includes/site.php';
-require_once '../includes/db.php';
-require_once '../includes/security.php';
+require_once __DIR__ . '/../includes/site.php';
+require_once __DIR__ . '/../includes/db.php';
+require_once __DIR__ . '/../includes/security.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
