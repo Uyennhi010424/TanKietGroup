@@ -36,7 +36,7 @@ $courses = site_fetch_all(
 
 						<p class="muted"><?php echo htmlspecialchars(($course['duration'] ?? '') . ' · ' . ($course['form_type'] ?? 'online'), ENT_QUOTES, 'UTF-8'); ?></p>
 
-						<p><a href="<?php echo htmlspecialchars(site_page_url('course_detail', ['slug' => $course['slug']]), ENT_QUOTES, 'UTF-8'); ?>" class="btn btn-primary">Xem chi tiết</a></p>
+						<div style="margin-top:auto;padding-top:12px;"><a href="<?php echo htmlspecialchars(site_page_url('course_detail', ['slug' => $course['slug']]), ENT_QUOTES, 'UTF-8'); ?>" class="btn btn-outline btn-sm">Xem chi tiết →</a></div>
 					</article>
 				<?php endforeach; ?>
 			<?php endif; ?>

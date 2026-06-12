@@ -59,6 +59,8 @@ img {
   display: flex;
   flex-direction: column;
   height: 100%;
+  overflow: visible;
+  padding-bottom: 20px;
 }
 
 .course-card h3 {
@@ -70,7 +72,7 @@ img {
 }
 
 .course-card .btn {
-  width: 100%;
+  width: auto;
   text-align: center;
 }
 
@@ -222,8 +224,7 @@ img {
 .btn-sm {
   padding: 8px 16px;
   font-size: 0.84rem;
-  margin-top: auto;
-  align-self: flex-start;
+  display: inline-block;
 }
 
 main {
@@ -329,10 +330,12 @@ h2 {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: var(--space-4);
+  padding-bottom: 28px;
   box-shadow: var(--shadow);
   display: flex;
   flex-direction: column;
   height: 100%;
+  overflow: visible;
   transition: all 0.35s ease;
 }
 
@@ -1267,6 +1270,7 @@ article.service-card:hover .service-card__thumb img {
   display: flex;
   flex-direction: column;
   height: 100%;
+  overflow: visible;
 }
 
 .grid-3 .card.reveal img {
@@ -1303,14 +1307,14 @@ article.service-card:hover .service-card__thumb img {
   padding-top: 12px;
 }
 
-.grid-3 .card.reveal p:last-child a {
+.grid-3 .card.reveal p:last-child a:not(.btn) {
   color: var(--primary);
   font-weight: 600;
   font-size: 0.9rem;
   transition: color 150ms ease;
 }
 
-.grid-3 .card.reveal p:last-child a:hover {
+.grid-3 .card.reveal p:last-child a:not(.btn):hover {
   color: var(--accent);
 }
 

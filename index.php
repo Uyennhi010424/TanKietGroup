@@ -7,6 +7,71 @@ $isAdminPage = str_starts_with($_GET['page'] ?? '', 'admin_');
 $isApiRoute = str_starts_with($reqPath, '/api/');
 $serverPort = (string)($_SERVER['SERVER_PORT'] ?? '');
 
+// Serve static files FIRST (works on ALL ports)
+// uploads/
+if (preg_match('#^/uploads/(.*)$#', $reqPath, $m)) {
+	$file = realpath(__DIR__ . '/uploads/' . $m[1]);
+	$baseDir = realpath(__DIR__ . '/uploads');
+	if ($file && $baseDir && str_starts_with($file, $baseDir) && is_file($file)) {
+		$ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+		$mimes = [
+			'jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg',
+			'png' => 'image/png', 'webp' => 'image/webp',
+			'svg' => 'image/svg+xml', 'gif' => 'image/gif',
+			'pdf' => 'application/pdf',
+		];
+		header('Content-Type: ' . ($mimes[$ext] ?? 'application/octet-stream'));
+		header('Content-Length: ' . filesize($file));
+		readfile($file);
+		exit;
+	}
+	http_response_code(404);
+	echo 'Not Found';
+	exit;
+}
+
+// assets/ and img/
+if (preg_match('#^/(admin/)?(assets|img)/(.*)$#', $reqPath, $m)) {
+	$prefix = !empty($m[1]) ? 'admin/' : '';
+	$type = $m[2];
+	$sub = $m[3];
+	$file = realpath(__DIR__ . '/' . $prefix . $type . '/' . $sub);
+	$baseDir = realpath(__DIR__ . '/' . $prefix . $type);
+	if ($file && $baseDir && str_starts_with($file, $baseDir) && is_file($file)) {
+		$ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+		$mimes = [
+			'css' => 'text/css',
+			'js' => 'application/javascript',
+			'jpg' => 'image/jpeg',
+			'jpeg' => 'image/jpeg',
+			'png' => 'image/png',
+			'webp' => 'image/webp',
+			'svg' => 'image/svg+xml',
+			'gif' => 'image/gif',
+			'woff' => 'font/woff',
+			'woff2' => 'font/woff2'
+		];
+		header('X-Accel-Buffered-Response: no');
+		header('Content-Type: ' . ($mimes[$ext] ?? 'application/octet-stream'));
+		header('Content-Length: ' . filesize($file));
+		readfile($file);
+		exit;
+	}
+	http_response_code(404);
+	echo 'Not Found';
+	exit;
+}
+
+// API routes — forward to PHP files in /api/ directory
+if (preg_match('#^/api/([a-z_]+)\.php$#', $reqPath, $m)) {
+	$apiFile = __DIR__ . '/api/' . $m[1] . '.php';
+	if (is_file($apiFile)) {
+		require $apiFile;
+		exit;
+	}
+}
+
+// Port restriction AFTER static files
 // Port 8000 = user only (block admin pages)
 if ($serverPort === '8000' && $isAdminPage) {
     http_response_code(404);
@@ -22,7 +87,6 @@ if ($serverPort === '8001' && !$isAdminPage && !$isApiRoute) {
 
 $page = $_GET['page'] ?? 'home';
 
-$reqPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
 if (!isset($_GET['page'])) {
 	$path = trim($reqPath, '/');
 
@@ -89,68 +153,7 @@ if (!isset($_GET['page'])) {
 		} else if ($path === 'lien-he') {
 			$_GET['page'] = 'contact';
 			$page = 'contact';
-		}	
-}
-// Serve uploads/ as static files (no PHP routing needed)
-if (preg_match('#^/uploads/(.*)$#', $reqPath, $m)) {
-	$file = realpath(__DIR__ . '/uploads/' . $m[1]);
-	$baseDir = realpath(__DIR__ . '/uploads');
-	if ($file && $baseDir && str_starts_with($file, $baseDir) && is_file($file)) {
-		$ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
-		$mimes = [
-			'jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg',
-			'png' => 'image/png', 'webp' => 'image/webp',
-			'svg' => 'image/svg+xml', 'gif' => 'image/gif',
-			'pdf' => 'application/pdf',
-		];
-		header('Content-Type: ' . ($mimes[$ext] ?? 'application/octet-stream'));
-		header('Content-Length: ' . filesize($file));
-		readfile($file);
-		exit;
-	}
-	http_response_code(404);
-	echo 'Not Found';
-	exit;
-}
-
-if (preg_match('#^/(admin/)?(assets|img)/(.*)$#', $reqPath, $m)) {
-	$prefix = !empty($m[1]) ? 'admin/' : '';
-	$type = $m[2];
-	$sub = $m[3];
-	$file = realpath(__DIR__ . '/' . $prefix . $type . '/' . $sub);
-	$baseDir = realpath(__DIR__ . '/' . $prefix . $type);
-	if ($file && $baseDir && str_starts_with($file, $baseDir) && is_file($file)) {
-		$ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
-		$mimes = [
-			'css' => 'text/css',
-			'js' => 'application/javascript',
-			'jpg' => 'image/jpeg',
-			'jpeg' => 'image/jpeg',
-			'png' => 'image/png',
-			'webp' => 'image/webp',
-			'svg' => 'image/svg+xml',
-			'gif' => 'image/gif',
-			'woff' => 'font/woff',
-			'woff2' => 'font/woff2'
-		];
-		header('X-Accel-Buffered-Response: no');
-		header('Content-Type: ' . ($mimes[$ext] ?? 'application/octet-stream'));
-		header('Content-Length: ' . filesize($file));
-		readfile($file);
-		exit;
-	}
-	http_response_code(404);
-	echo 'Not Found';
-	exit;
-}
-
-// API routes — forward to PHP files in /api/ directory
-if (preg_match('#^/api/([a-z_]+)\.php$#', $reqPath, $m)) {
-	$apiFile = __DIR__ . '/api/' . $m[1] . '.php';
-	if (is_file($apiFile)) {
-		require $apiFile;
-		exit;
-	}
+		}
 }
 
 $viewMap = [
