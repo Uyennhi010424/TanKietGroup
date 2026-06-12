@@ -415,12 +415,15 @@ h2 {
   height: 220px;
   overflow: hidden;
   border-radius: 14px 14px 0 0;
+  position: relative;
 }
 
 .card-media img {
   width: 100%;
-  height: 180px;
+  height: 100%;
   object-fit: cover;
+  object-position: center;
+  display: block;
 }
 
 /* ============================================================
@@ -445,6 +448,7 @@ h2 {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center;
   border-radius: calc(var(--radius) - 6px);
   display: block;
 }
@@ -700,22 +704,24 @@ h2 {
 
 .service-card img {
   width: 100%;
-  height: 260px;
+  height: 100%;
   object-fit: cover;
+  object-position: center;
   display: block;
   transition: 0.6s;
 }
 
 .service-card .card-media img {
   width: 100%;
-  height: 160px;
+  height: 100%;
   object-fit: cover;
+  object-position: center;
   display: block;
   border-radius: var(--radius) var(--radius) 0 0;
 }
 
 @media (max-width: 900px) {
-  .service-card .card-media img {
+  .service-card .card-media {
     height: 200px;
   }
 }
@@ -860,6 +866,9 @@ article.service-card:hover .service-card__thumb img {
 
 .service-overlay-wrap img {
   width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
   display: block;
   transition: 0.4s;
 }
@@ -901,8 +910,9 @@ article.service-card:hover .service-card__thumb img {
 
 .card-media.service-overlay-wrap img {
   width: 100%;
-  height: 240px;
+  height: 100%;
   object-fit: cover;
+  object-position: center;
   display: block;
   transition: transform 0.5s ease;
 }
