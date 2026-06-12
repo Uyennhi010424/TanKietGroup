@@ -91,6 +91,28 @@ if (!isset($_GET['page'])) {
 			$page = 'contact';
 		}	
 }
+// Serve uploads/ as static files (no PHP routing needed)
+if (preg_match('#^/uploads/(.*)$#', $reqPath, $m)) {
+	$file = realpath(__DIR__ . '/uploads/' . $m[1]);
+	$baseDir = realpath(__DIR__ . '/uploads');
+	if ($file && $baseDir && str_starts_with($file, $baseDir) && is_file($file)) {
+		$ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+		$mimes = [
+			'jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg',
+			'png' => 'image/png', 'webp' => 'image/webp',
+			'svg' => 'image/svg+xml', 'gif' => 'image/gif',
+			'pdf' => 'application/pdf',
+		];
+		header('Content-Type: ' . ($mimes[$ext] ?? 'application/octet-stream'));
+		header('Content-Length: ' . filesize($file));
+		readfile($file);
+		exit;
+	}
+	http_response_code(404);
+	echo 'Not Found';
+	exit;
+}
+
 if (preg_match('#^/(admin/)?(assets|img)/(.*)$#', $reqPath, $m)) {
 	$prefix = !empty($m[1]) ? 'admin/' : '';
 	$type = $m[2];
