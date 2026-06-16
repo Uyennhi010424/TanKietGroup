@@ -62,14 +62,18 @@ php db_init.php
 **Dùng PHP built-in server:**
 
 ```bash
-# Trang người dùng (port 8000)
-php -S localhost:8000 router.php
+# Trang người dùng (port 8000) — cho phép truy cập từ máy khác trong LAN
+php -S 0.0.0.0:8000 router.php
 
 # Trang quản trị (port 8001) — terminal riêng
-php -S localhost:8001 router.php
+php -S 0.0.0.0:8001 router.php
 ```
 
 **Hoặc dùng XAMPP/WAMP:** Đặt thư mục vào `htdocs`, truy qua `http://localhost/TanKietGroup/`
+
+**Truy cập từ máy khác trong LAN:**
+- Trang người dùng: `http://192.168.1.242:8000`
+- Trang quản trị: `http://192.168.1.242:8001`
 
 ### 5. Đăng nhập admin
 
