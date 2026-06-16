@@ -78,6 +78,12 @@ if ($db && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if ($id > 0) {
                 if ($password !== '') {
+                    if (mb_strlen($password) < 8) {
+                        throw new RuntimeException('Mật khẩu phải có ít nhất 8 ký tự');
+                    }
+                    if (!preg_match('/[^a-zA-Z0-9]/', $password)) {
+                        throw new RuntimeException('Mật khẩu phải chứa ít nhất 1 ký tự đặc biệt (vd: !@#$%...)');
+                    }
                     $stmt = $db->prepare('UPDATE users SET username = :username, full_name = :full_name, email = :email, phone = :phone, role = :role, status = :status, password = :password WHERE id = :id');
                     $stmt->execute([
                         'id' => $id,
@@ -108,6 +114,12 @@ if ($db && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if ($password === '') {
                 throw new RuntimeException('Mật khẩu không được để trống khi tạo mới người dùng');
+            }
+            if (mb_strlen($password) < 8) {
+                throw new RuntimeException('Mật khẩu phải có ít nhất 8 ký tự');
+            }
+            if (!preg_match('/[^a-zA-Z0-9]/', $password)) {
+                throw new RuntimeException('Mật khẩu phải chứa ít nhất 1 ký tự đặc biệt (vd: !@#$%...)');
             }
 
             $stmt = $db->prepare('INSERT INTO users (username, password, full_name, email, phone, role, status) VALUES (:username, :password, :full_name, :email, :phone, :role, :status)');
@@ -213,7 +225,8 @@ admin_header('Người dùng', 'Quản lý tài khoản người dùng', $admin,
 
             <div style="grid-column:1 / -1;">
                 <label class="small">Mật khẩu <?php echo (int)$editing['id'] > 0 ? '(để trống nếu không đổi)' : ''; ?></label>
-                <input class="form-control" type="password" name="password" <?php echo (int)$editing['id'] > 0 ? '' : 'required'; ?>>
+                <input class="form-control" type="password" name="password" <?php echo (int)$editing['id'] > 0 ? '' : 'required'; ?> minlength="8" placeholder="Tối thiểu 8 ký tự, có ký tự đặc biệt">
+                <div class="small" style="margin-top:4px;color:var(--ak-muted);">Tối thiểu 8 ký tự, phải có ít nhất 1 ký tự đặc biệt (!@#$%...)</div>
             </div>
 
             <div style="grid-column:1 / -1;display:flex;gap:10px;">

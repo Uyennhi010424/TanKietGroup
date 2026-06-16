@@ -11,11 +11,11 @@ try {
 }
 
 ?>
-<section class="hero">
+<section class="vintage-hero" style="--hero-banner: url('/img/hero.jpg');">
     <div class="container reveal">
-        <span class="tag">Tuyển dụng</span>
-        <h1>Cơ hội nghề nghiệp</h1>
-        <p class="lead">Gia nhập đội ngũ TanKiet Group — nơi bạn được phát triển và tỏa sáng.</p>
+        <span class="vintage-hero__category">Tuyển dụng</span>
+        <h1 class="vintage-hero__title">Cơ hội nghề nghiệp</h1>
+        <p class="vintage-hero__lead">Gia nhập đội ngũ TanKiet Group — nơi bạn được phát triển và tỏa sáng.</p>
     </div>
 </section>
 

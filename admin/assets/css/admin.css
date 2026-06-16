@@ -54,11 +54,14 @@ a {
 
 .admin-sidebar {
   width: 272px;
+  height: 100vh;
   position: fixed;
-  inset: 0 auto 0 0;
+  top: 0;
+  left: 0;
   display: flex;
   flex-direction: column;
   padding: 18px 14px;
+  box-sizing: border-box;
   background: linear-gradient(180deg, rgba(21, 32, 34, 0.98), rgba(11, 18, 19, 0.96));
   border-right: 1px solid var(--ak-border);
   box-shadow: var(--ak-shadow);
@@ -68,6 +71,23 @@ a {
   overflow: hidden;
 }
 
+.admin-sidebar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Edge */
+}
+
+.admin-sidebar nav::-webkit-scrollbar {
+  width: 4px;
+}
+
+.admin-sidebar nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.admin-sidebar nav::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
 .sidebar-header {
   display: flex;
   align-items: center;
@@ -75,6 +95,7 @@ a {
   padding-bottom: 18px;
   margin-bottom: 18px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  flex-shrink: 0;
 }
 
 .sidebar-toggle {
@@ -109,10 +130,12 @@ a {
 }
 
 .admin-sidebar nav {
-  display: flex;
-  flex-direction: column;
   flex: 1;
   min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.1) transparent;
 }
 
 .nav-admin {
@@ -121,11 +144,7 @@ a {
   margin: 0;
   display: flex;
   flex-direction: column;
-  flex: 1;
   gap: 8px;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(146, 221, 214, 0.2) transparent;
 }
 
 .nav-admin::-webkit-scrollbar {

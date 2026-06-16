@@ -51,6 +51,8 @@ $breadcrumbJsonLd = json_encode([
     ]
 ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 ?>
+
+<!-- Breadcrumb -->
 <nav class="breadcrumb" aria-label="Đường dẫn">
 	<div class="container">
 		<a href="<?php echo htmlspecialchars(site_page_url('home'), ENT_QUOTES, 'UTF-8'); ?>">Trang chủ</a>
@@ -60,28 +62,65 @@ $breadcrumbJsonLd = json_encode([
 		<span class="current"><?php echo htmlspecialchars($service['title'], ENT_QUOTES, 'UTF-8'); ?></span>
 	</div>
 </nav>
-<section class="hero" style="--hero-banner: url('<?php echo htmlspecialchars(site_image_url($service['image'] ?? '', '/img/hero.jpg'), ENT_QUOTES, 'UTF-8'); ?>');">
-	<div class="container reveal">
-		<span class="tag"><?php echo htmlspecialchars($service['industry_name'] ?? 'Dịch vụ', ENT_QUOTES, 'UTF-8'); ?></span>
-		<h1><?php echo htmlspecialchars($service['title'], ENT_QUOTES, 'UTF-8'); ?></h1>
-		<p class="lead"><?php echo htmlspecialchars($service['short_desc'] ?: 'Dịch vụ được quản lý từ admin và hiển thị trực tiếp cho người dùng.', ENT_QUOTES, 'UTF-8'); ?></p>
-	</div>
+
+<!-- Hero Banner + Title -->
+<section class="vintage-hero" style="--hero-banner: url('<?php echo htmlspecialchars(site_image_url($service['image'] ?? '', '/img/hero.jpg'), ENT_QUOTES, 'UTF-8'); ?>');">
+    <div class="container reveal">
+        <span class="vintage-hero__category"><?php echo htmlspecialchars($service['industry_name'] ?? 'Dịch vụ', ENT_QUOTES, 'UTF-8'); ?></span>
+        <h1 class="vintage-hero__title"><?php echo htmlspecialchars($service['title'], ENT_QUOTES, 'UTF-8'); ?></h1>
+        <?php if (!empty($service['short_desc'])): ?>
+        <p class="vintage-hero__lead"><?php echo htmlspecialchars($service['short_desc'], ENT_QUOTES, 'UTF-8'); ?></p>
+        <?php endif; ?>
+    </div>
 </section>
 
-<section class="section">
-	<div class="container grid grid-2">
-		<article class="card reveal">
-			<h2>Về dịch vụ</h2>
-			<?php echo nl2br(htmlspecialchars((string)($service['content'] ?: 'Nội dung chi tiết chưa được cập nhật.'), ENT_QUOTES, 'UTF-8')); ?>
-		</article>
-		<article class="card reveal">
-			<h2>Thông tin nhanh</h2>
-			<ul class="contact-list">
-				<li><strong>Ngành:</strong> <?php echo htmlspecialchars($service['industry_name'] ?? 'Chưa phân loại', ENT_QUOTES, 'UTF-8'); ?></li>
-				<li><strong>Trạng thái:</strong> Đang hiển thị</li>
-				<li><strong>Liên hệ:</strong> <?php echo htmlspecialchars((site_settings()['hotline'] ?? '') ?: 'Liên hệ qua trang tư vấn', ENT_QUOTES, 'UTF-8'); ?></li>
-			</ul>
-			<p style="margin-top:16px;"><a class="btn btn-primary" href="<?php echo htmlspecialchars(site_page_url('consultations'), ENT_QUOTES, 'UTF-8'); ?>">Nhận tư vấn ngay</a></p>
-		</article>
-	</div>
+<!-- Article Content -->
+<section class="vintage-article">
+    <div class="container">
+        <div class="vintage-article__layout">
+            <article class="vintage-article__content reveal">
+                <div class="vintage-prose">
+                    <?php echo $service['content'] ? sanitize_html($service['content']) : '<p>Nội dung chi tiết chưa được cập nhật.</p>'; ?>
+                </div>
+            </article>
+
+            <aside class="vintage-article__sidebar reveal">
+                <div class="vintage-sidebar-card">
+                    <div class="vintage-sidebar-card__header">
+                        <span>✦</span> Thông tin dịch vụ
+                    </div>
+                    <ul class="vintage-sidebar-card__list">
+                        <li>
+                            <span class="vintage-sidebar-card__label">Ngành</span>
+                            <span class="vintage-sidebar-card__value"><?php echo htmlspecialchars($service['industry_name'] ?? 'Chưa phân loại', ENT_QUOTES, 'UTF-8'); ?></span>
+                        </li>
+                        <li>
+                            <span class="vintage-sidebar-card__label">Trạng thái</span>
+                            <span class="vintage-sidebar-card__value">Đang hiển thị</span>
+                        </li>
+                        <?php if (!empty($service['service_type'])): ?>
+                        <li>
+                            <span class="vintage-sidebar-card__label">Loại dịch vụ</span>
+                            <span class="vintage-sidebar-card__value"><?php echo htmlspecialchars($service['service_type'], ENT_QUOTES, 'UTF-8'); ?></span>
+                        </li>
+                        <?php endif; ?>
+                        <?php
+                        $hotline = trim((string)(site_settings()['hotline'] ?? ''));
+                        if ($hotline !== ''): ?>
+                        <li>
+                            <span class="vintage-sidebar-card__label">Hotline</span>
+                            <span class="vintage-sidebar-card__value"><?php echo htmlspecialchars($hotline, ENT_QUOTES, 'UTF-8'); ?></span>
+                        </li>
+                        <?php endif; ?>
+                    </ul>
+                    <div class="vintage-sidebar-card__footer">
+                        <a href="<?php echo htmlspecialchars(site_page_url('consultations'), ENT_QUOTES, 'UTF-8'); ?>" class="btn btn-primary" style="width:100%;text-align:center;">Nhận tư vấn ngay</a>
+                        <a href="<?php echo htmlspecialchars(site_page_url('services'), ENT_QUOTES, 'UTF-8'); ?>" class="vintage-btn-back" style="margin-top:12px;display:block;text-align:center;">
+                            ← Quay lại Dịch vụ
+                        </a>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
 </section>
