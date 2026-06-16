@@ -37,6 +37,8 @@ $breadcrumbJsonLd = json_encode([
     ]
 ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 ?>
+
+<!-- Breadcrumb -->
 <nav class="breadcrumb" aria-label="Đường dẫn">
 	<div class="container">
 		<a href="<?php echo htmlspecialchars(site_page_url('home'), ENT_QUOTES, 'UTF-8'); ?>">Trang chủ</a>
@@ -46,41 +48,69 @@ $breadcrumbJsonLd = json_encode([
 		<span class="current"><?php echo htmlspecialchars($course['title'], ENT_QUOTES, 'UTF-8'); ?></span>
 	</div>
 </nav>
-<section class="hero" style="--hero-banner: url('<?php echo htmlspecialchars(site_image_url($course['thumbnail'] ?? '', '/img/hero.jpg'), ENT_QUOTES, 'UTF-8'); ?>');">
-	<div class="container reveal">
-		<span class="tag">Khóa học</span>
-		<h1><?php echo htmlspecialchars($course['title'], ENT_QUOTES, 'UTF-8'); ?></h1>
-	</div>
+
+<!-- Hero Banner + Title -->
+<section class="vintage-hero" style="--hero-banner: url('<?php echo htmlspecialchars(site_image_url($course['thumbnail'] ?? '', '/img/hero.jpg'), ENT_QUOTES, 'UTF-8'); ?>');">
+    <div class="container reveal">
+        <span class="vintage-hero__category">Khóa học</span>
+        <h1 class="vintage-hero__title"><?php echo htmlspecialchars($course['title'], ENT_QUOTES, 'UTF-8'); ?></h1>
+        <?php if (!empty($course['short_desc'])): ?>
+        <p class="vintage-hero__lead"><?php echo htmlspecialchars(mb_strimwidth(strip_tags($course['short_desc']), 0, 150, '…'), ENT_QUOTES, 'UTF-8'); ?></p>
+        <?php endif; ?>
+    </div>
 </section>
 
-<section class="section">
-	<div class="container grid grid-2">
-		<article class="card reveal">
-    <h2>Nội dung khóa học</h2>
-    <?php 
-    $content = trim((string)($course['short_desc'] ?? ''));
-    
-    if (!empty($content)): 
-    ?>
-        <div class="course-content prose" style="line-height: 1.7; font-size: 1.05rem;">
-            <?= nl2br(htmlspecialchars($content, ENT_QUOTES, 'UTF-8')) ?>
+<!-- Article Content -->
+<section class="vintage-article">
+    <div class="container">
+        <div class="vintage-article__layout">
+            <article class="vintage-article__content reveal">
+                <div class="vintage-prose">
+                    <h2>Nội dung khóa học</h2>
+                    <?php
+                    $content = trim((string)($course['content'] ?? $course['short_desc'] ?? ''));
+                    if (!empty($content)):
+                    ?>
+                        <?php echo sanitize_html($content); ?>
+                    <?php else: ?>
+                        <p>Nội dung khóa học đang được cập nhật. Vui lòng quay lại sau hoặc liên hệ tư vấn để biết thêm thông tin.</p>
+                    <?php endif; ?>
+                </div>
+            </article>
+
+            <aside class="vintage-article__sidebar reveal">
+                <div class="vintage-sidebar-card">
+                    <div class="vintage-sidebar-card__header">
+                        <span>✦</span> Thông tin khóa học
+                    </div>
+                    <ul class="vintage-sidebar-card__list">
+                        <?php if (!empty($course['price'])): ?>
+                        <li>
+                            <span class="vintage-sidebar-card__label">Học phí</span>
+                            <span class="vintage-sidebar-card__value"><?php echo htmlspecialchars(format_vnd($course['price']), ENT_QUOTES, 'UTF-8'); ?></span>
+                        </li>
+                        <?php endif; ?>
+                        <?php if (!empty($course['duration'])): ?>
+                        <li>
+                            <span class="vintage-sidebar-card__label">Thời lượng</span>
+                            <span class="vintage-sidebar-card__value"><?php echo htmlspecialchars($course['duration'], ENT_QUOTES, 'UTF-8'); ?></span>
+                        </li>
+                        <?php endif; ?>
+                        <?php if (!empty($course['form_type'])): ?>
+                        <li>
+                            <span class="vintage-sidebar-card__label">Hình thức</span>
+                            <span class="vintage-sidebar-card__value"><?php echo htmlspecialchars($course['form_type'], ENT_QUOTES, 'UTF-8'); ?></span>
+                        </li>
+                        <?php endif; ?>
+                    </ul>
+                    <div class="vintage-sidebar-card__footer">
+                        <a href="<?php echo htmlspecialchars(site_page_url('consultations'), ENT_QUOTES, 'UTF-8'); ?>" class="btn btn-primary" style="width:100%;text-align:center;">Đăng ký tư vấn</a>
+                        <a href="<?php echo htmlspecialchars(site_page_url('courses'), ENT_QUOTES, 'UTF-8'); ?>" class="vintage-btn-back" style="margin-top:12px;display:block;text-align:center;">
+                            ← Quay lại Khóa học
+                        </a>
+                    </div>
+                </div>
+            </aside>
         </div>
-    <?php else: ?>
-        <p class="muted" style="font-style: italic;">
-            Nội dung khóa học đang được cập nhật. <br>
-            Vui lòng quay lại sau hoặc liên hệ tư vấn để biết thêm thông tin.
-        </p>
-    <?php endif; ?>
-</article>
-</article>
-		<article class="card reveal">
-			<h2>Thông tin</h2>
-			<ul class="contact-list">
-				<li><strong>Giá:</strong> <?php echo htmlspecialchars(format_vnd($course['price'] ?? 0), ENT_QUOTES, 'UTF-8'); ?></li>
-				<li><strong>Thời lượng:</strong> <?php echo htmlspecialchars($course['duration'] ?? '-', ENT_QUOTES, 'UTF-8'); ?></li>
-				<li><strong>Hình thức:</strong> <?php echo htmlspecialchars($course['form_type'] ?? '-', ENT_QUOTES, 'UTF-8'); ?></li>
-			</ul>
-			<p style="margin-top:16px;"><a class="btn btn-primary" href="<?php echo htmlspecialchars(site_page_url('consultations'), ENT_QUOTES, 'UTF-8'); ?>">Đăng ký tư vấn</a></p>
-		</article>
-	</div>
+    </div>
 </section>

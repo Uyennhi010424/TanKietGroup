@@ -120,6 +120,13 @@ function admin_require_login(string $loginUrl): void
             return;
         }
 
+        // Pass current URL so user returns here after login
+        $currentUrl = (string)($_SERVER['REQUEST_URI'] ?? '');
+        if ($currentUrl !== '') {
+            $sep = str_contains($loginUrl, '?') ? '&' : '?';
+            $loginUrl = $loginUrl . $sep . 'redirect=' . rawurlencode($currentUrl);
+        }
+
         header('Location: ' . $loginUrl);
         exit;
     }

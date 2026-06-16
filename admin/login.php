@@ -27,6 +27,7 @@ $adminHome = site_page_url('admin_index');
 $editorHome = site_page_url('admin_courses');
 $siteHome = site_page_url('home');
 
+// Process logout FIRST (before redirect)
 if (isset($_GET['logout'])) {
 	// Legacy GET logout — redirect to login without action (deprecated)
 	header('Location: ' . $loginRoute);
@@ -39,6 +40,19 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST' && ($_POST['action'] ?? '')
 	}
 	header('Location: ' . $loginRoute);
 	exit;
+}
+
+// If already logged in, redirect to admin
+if (admin_is_logged_in()) {
+    $redirect = trim((string)($_GET['redirect'] ?? ''));
+    if ($redirect !== '' && str_starts_with($redirect, '/')) {
+        header('Location: ' . $redirect);
+    } else {
+        $currentUser = admin_current_user();
+        $target = ((string)($currentUser['role'] ?? '') === 'admin') ? $adminHome : $editorHome;
+        header('Location: ' . $target);
+    }
+    exit;
 }
 
 $error = '';
@@ -85,8 +99,13 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
 
 				ip_rate_limit_reset('login');
 				admin_login_user($row);
-				$target = ((string)$row['role'] === 'admin') ? $adminHome : $editorHome;
-				header('Location: ' . $target);
+				$redirect = trim((string)($_POST['redirect'] ?? $_GET['redirect'] ?? ''));
+				if ($redirect !== '' && str_starts_with($redirect, '/')) {
+					header('Location: ' . $redirect);
+				} else {
+					$target = ((string)$row['role'] === 'admin') ? $adminHome : $editorHome;
+					header('Location: ' . $target);
+				}
 				exit;
 			}
 		} catch (Throwable $e) {
@@ -124,13 +143,23 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
 			<?php endif; ?>
 			<form method="post" action="<?php echo htmlspecialchars($loginRoute, ENT_QUOTES, 'UTF-8'); ?>">
 				<input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8'); ?>">
+				<?php $redirectVal = trim((string)($_GET['redirect'] ?? '')); ?>
+				<?php if ($redirectVal !== ''): ?>
+					<input type="hidden" name="redirect" value="<?php echo htmlspecialchars($redirectVal, ENT_QUOTES, 'UTF-8'); ?>">
+				<?php endif; ?>
 				<div class="form-group">
 					<label for="user">Tài khoản</label>
 					<input id="user" name="user" class="form-control" autocomplete="username" value="<?php echo htmlspecialchars($_POST['user'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
 				</div>
 				<div class="form-group">
 					<label for="pass">Mật khẩu</label>
-					<input id="pass" type="password" name="pass" class="form-control" autocomplete="current-password">
+					<div style="position:relative;">
+						<input id="pass" type="password" name="pass" class="form-control" autocomplete="current-password" style="padding-right:40px;">
+						<button type="button" id="togglePass" aria-label="Hiện mật khẩu" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--ak-muted);padding:4px;">
+							<svg id="eyeOpen" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+							<svg id="eyeClosed" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+						</button>
+					</div>
 				</div>
 				<div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px">
 					<button class="btn-admin" type="submit">Đăng nhập</button>
@@ -139,5 +168,23 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
 			</form>
 		</div>
 	</div>
+	<script>
+	document.getElementById('togglePass').addEventListener('click', function() {
+		var pass = document.getElementById('pass');
+		var eyeOpen = document.getElementById('eyeOpen');
+		var eyeClosed = document.getElementById('eyeClosed');
+		if (pass.type === 'password') {
+			pass.type = 'text';
+			eyeOpen.style.display = 'none';
+			eyeClosed.style.display = 'block';
+			this.setAttribute('aria-label', 'Ẩn mật khẩu');
+		} else {
+			pass.type = 'password';
+			eyeOpen.style.display = 'block';
+			eyeClosed.style.display = 'none';
+			this.setAttribute('aria-label', 'Hiện mật khẩu');
+		}
+	});
+	</script>
 </body>
 </html>
