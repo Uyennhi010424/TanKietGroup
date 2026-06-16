@@ -2403,17 +2403,14 @@ label {
 }
 
 .client-logo {
-  width: 100px;
-  height: 60px;
+  width: 120px;
+  height: 70px;
   object-fit: contain;
-  filter: grayscale(1) brightness(1.6);
-  opacity: 0.65;
-  transition: all 0.35s ease;
+  transition: transform 0.35s ease;
 }
 
 .client-item:hover .client-logo {
-  filter: grayscale(0) brightness(1);
-  opacity: 1;
+  transform: scale(1.08);
 }
 
 .client-name {
@@ -2442,7 +2439,7 @@ label {
   }
 
   .client-logo {
-    width: 80px;
-    height: 48px;
+    width: 100px;
+    height: 60px;
   }
 }

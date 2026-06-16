@@ -29,13 +29,19 @@ if (preg_match('#^/api/([a-z_]+)\.php$#', $uri, $m)) {
 // Serve upload files (for media endpoint)
 if (preg_match('#^/uploads/(.+)$#', $uri, $m)) {
     $file = realpath(__DIR__ . '/uploads/' . $m[1]);
+    // Fallback when realpath() fails (e.g., Windows with Unicode path characters)
+    if (!$file && !str_contains($m[1], '..') && $m[1] !== '') {
+        $candidate = __DIR__ . '/uploads/' . $m[1];
+        if (is_file($candidate)) {
+            $file = $candidate;
+        }
+    }
     if ($file && is_file($file)) {
         $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
         $allowedExts = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'pdf', 'doc', 'docx'];
         if (in_array($ext, $allowedExts, true)) {
             $finfo = finfo_open(FILEINFO_MIME_TYPE);
             $mime = finfo_file($finfo, $file);
-            finfo_close($finfo);
             header('Content-Type: ' . $mime);
             header('Content-Length: ' . filesize($file));
             readfile($file);

@@ -23,7 +23,7 @@ function admin_header(string $pageTitle, string $pageSubtitle, array $admin, str
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title><?php echo h($pageTitle); ?> - Trang quản trị</title>
-    <link rel="icon" href="<?php echo h(site_favicon_url()); ?>">
+    <link rel="icon" href="<?php echo h($admin['faviconUrl'] ?? site_favicon_url()); ?>">
     <style><?php echo file_get_contents(__DIR__ . '/../../admin/assets/css/admin.css'); ?></style>
     <script><?php echo file_get_contents(__DIR__ . '/../../admin/assets/js/admin.js'); ?></script>
 </head>

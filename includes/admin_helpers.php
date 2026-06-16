@@ -91,6 +91,25 @@ function admin_init(array $options = []): array
     $user = admin_current_user() ?? [];
     $role = (string)($user['role'] ?? 'editor');
 
+    // Use media proxy for uploads paths (avoids realpath() issues on Windows with Unicode paths)
+    $site = site_settings();
+    $logoSetting = trim((string)($site['logo'] ?? ''));
+    if ($logoSetting !== '' && str_starts_with($logoSetting, 'uploads/')) {
+        $logoUrl = site_page_url('admin_media') . '&path=' . rawurlencode($logoSetting);
+    } else {
+        $logoUrl = site_logo_url('/img/logo.jpg');
+    }
+
+    $favSetting = trim((string)($site['favicon'] ?? ''));
+    if ($favSetting === '' && $logoSetting !== '') {
+        $favSetting = $logoSetting;
+    }
+    if ($favSetting !== '' && str_starts_with($favSetting, 'uploads/')) {
+        $faviconUrl = site_page_url('admin_media') . '&path=' . rawurlencode($favSetting);
+    } else {
+        $faviconUrl = site_favicon_url('/img/favicon.ico');
+    }
+
     return [
         'routes'    => admin_routes(),
         'loginRoute'=> $loginRoute,
@@ -98,6 +117,7 @@ function admin_init(array $options = []): array
         'role'      => $role,
         'isEditor'  => $role === 'editor',
         'assetBase' => site_admin_base_path(),
-        'logoUrl'   => site_logo_url('/img/logo.jpg'),
+        'logoUrl'   => $logoUrl,
+        'faviconUrl'=> $faviconUrl,
     ];
 }

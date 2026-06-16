@@ -12,6 +12,19 @@ if ($relativePath === '' || preg_match('#^(https?:)?//#i', $relativePath)) {
 $relativePath = ltrim(str_replace(['..', '\\'], ['', '/'], $relativePath), '/');
 $baseDir = realpath(__DIR__ . '/../uploads');
 $filePath = $baseDir !== false ? realpath(__DIR__ . '/../' . $relativePath) : false;
+// Fallback when realpath() fails (e.g., Windows with Unicode path characters)
+if ($filePath === false && $baseDir === false) {
+    $candidate = __DIR__ . '/../uploads/' . $relativePath;
+    if (is_file($candidate)) {
+        $baseDir = __DIR__ . '/../uploads';
+        $filePath = $candidate;
+    }
+} elseif ($filePath === false && $baseDir !== false) {
+    $candidate = __DIR__ . '/../' . $relativePath;
+    if (is_file($candidate)) {
+        $filePath = $candidate;
+    }
+}
 
 if ($baseDir === false) {
     http_response_code(404);
@@ -44,7 +57,6 @@ if (function_exists('finfo_open')) {
         if (is_string($detected) && $detected !== '') {
             $mime = $detected;
         }
-        finfo_close($finfo);
     }
 }
 
