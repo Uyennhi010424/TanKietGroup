@@ -12,7 +12,15 @@ $serverPort = (string)($_SERVER['SERVER_PORT'] ?? '');
 if (preg_match('#^/uploads/(.*)$#', $reqPath, $m)) {
 	$file = realpath(__DIR__ . '/uploads/' . $m[1]);
 	$baseDir = realpath(__DIR__ . '/uploads');
-	if ($file && $baseDir && str_starts_with($file, $baseDir) && is_file($file)) {
+	// Fallback when realpath() fails (e.g., Windows with Unicode path characters)
+	if (!$file && $m[1] !== '' && !str_contains($m[1], '..')) {
+		$candidate = __DIR__ . '/uploads/' . $m[1];
+		if (is_file($candidate)) {
+			$file = $candidate;
+			if (!$baseDir) { $baseDir = __DIR__ . '/uploads'; }
+		}
+	}
+	if ($file && $baseDir && str_starts_with(str_replace('\\', '/', $file), str_replace('\\', '/', $baseDir) . '/') && is_file($file)) {
 		$ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
 		$mimes = [
 			'jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg',

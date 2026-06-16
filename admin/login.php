@@ -11,7 +11,14 @@ if (is_file($adminCssFile)) {
 	$inlineAdminCss = (string)file_get_contents($adminCssFile);
 }
 
-$logoSrc = site_logo_url('/img/logo.jpg');
+// Use media proxy for uploads paths (avoids realpath() issues on Windows with Unicode paths)
+$loginSite = site_settings();
+$loginLogo = trim((string)($loginSite['logo'] ?? ''));
+if ($loginLogo !== '' && str_starts_with($loginLogo, 'uploads/')) {
+    $logoSrc = site_page_url('admin_media') . '&path=' . rawurlencode($loginLogo);
+} else {
+    $logoSrc = site_logo_url('/img/logo.jpg');
+}
 $host = strtolower((string)($_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? ''));
 $isLocalDebug = str_contains($host, 'localhost') || str_contains($host, '127.0.0.1');
 

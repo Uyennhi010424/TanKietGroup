@@ -7,6 +7,7 @@ $admin = admin_init();
 $adminRoutes = $admin['routes'];
 $isEditor = $admin['isEditor'];
 $csrfToken = csrf_token();
+$mediaRoute = site_page_url('admin_media') . '&path=';
 
 $db = null;
 $dbError = '';
@@ -188,7 +189,7 @@ admin_header('Khóa học', 'Quản lý các khóa học', $admin, 'courses');
                 <input class="form-control" type="file" name="thumbnail_file" accept="image/*">
                 <?php if (!empty($editing['thumbnail'])): ?>
                     <div class="small" style="margin-top:8px;">Ảnh hiện tại: <?php echo h($editing['thumbnail']); ?></div>
-                    <img src="/<?php echo h($editing['thumbnail']); ?>" alt="Course thumbnail" style="margin-top:8px;max-height:80px;border-radius:8px;border:1px solid rgba(255,255,255,0.08);">
+                    <img src="<?php echo h($mediaRoute . rawurlencode($editing['thumbnail'])); ?>" alt="Course thumbnail" style="margin-top:8px;max-height:80px;border-radius:8px;border:1px solid rgba(255,255,255,0.08);">
                 <?php endif; ?>
             </div>
             <div style="grid-column:1 / -1;display:flex;gap:10px;">
@@ -231,7 +232,7 @@ admin_header('Khóa học', 'Quản lý các khóa học', $admin, 'courses');
                                 <td><?php echo h(format_vnd($row['price'] ?? 0)); ?></td>
                                 <td>
                                     <?php if (!empty($row['thumbnail'])): ?>
-                                        <img src="/<?php echo h($row['thumbnail']); ?>" alt="Thumbnail" style="max-height:44px;border-radius:8px;border:1px solid rgba(255,255,255,0.08);">
+                                        <img src="<?php echo h($mediaRoute . rawurlencode($row['thumbnail'])); ?>" alt="Thumbnail" style="max-height:44px;border-radius:8px;border:1px solid rgba(255,255,255,0.08);">
                                     <?php else: ?>
                                         -
                                     <?php endif; ?>
