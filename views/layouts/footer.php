@@ -7,7 +7,7 @@ $footerLogo = site_logo_url('/img/logo1.jpg');
     <div class="container footer-grid">
         <div>
             <a class="brand" href="<?php echo htmlspecialchars(site_page_url('home'), ENT_QUOTES, 'UTF-8'); ?>">
-            <img src="<?php echo htmlspecialchars($footerLogo, ENT_QUOTES, 'UTF-8'); ?>" alt="TanKiet Group" class="site-logo">
+            <img src="<?php echo htmlspecialchars($footerLogo, ENT_QUOTES, 'UTF-8'); ?>" alt="TanKiet Group" class="site-logo" loading="lazy">
         </a>
             <p class="muted"><?php echo htmlspecialchars($site['meta_description'] ?: 'Giải pháp Marketing tăng trưởng toàn diện và bền vững cho doanh nghiệp Việt.', ENT_QUOTES, 'UTF-8'); ?></p>
         </div>
@@ -26,10 +26,11 @@ $footerLogo = site_logo_url('/img/logo1.jpg');
         <div>
             <h4 class="footer-title">Dịch vụ</h4>
             <ul class="footer-links">
-                <li>Marketing tổng thể</li>
-                <li>Quản trị Fanpage</li>
-                <li>Thiết kế Website</li>
-                <li>Sản xuất Video</li>
+                <li><a href="<?php echo htmlspecialchars(site_page_url('services_by_type') . '&slug=marketing-tron-goi', ENT_QUOTES, 'UTF-8'); ?>">Marketing tổng thể</a></li>
+                <li><a href="<?php echo htmlspecialchars(site_page_url('services_by_type') . '&slug=cham-soc-fanpage', ENT_QUOTES, 'UTF-8'); ?>">Quản trị Fanpage</a></li>
+                <li><a href="<?php echo htmlspecialchars(site_page_url('services_by_type') . '&slug=thiet-ke-website', ENT_QUOTES, 'UTF-8'); ?>">Thiết kế Website</a></li>
+                <li><a href="<?php echo htmlspecialchars(site_page_url('services_by_type') . '&slug=san-xuat-video', ENT_QUOTES, 'UTF-8'); ?>">Sản xuất Video</a></li>
+                <li><a href="<?php echo htmlspecialchars(site_page_url('services_by_type') . '&slug=to-chuc-su-kien', ENT_QUOTES, 'UTF-8'); ?>">Tổ chức sự kiện</a></li>
             </ul>
         </div>
         <div>
@@ -43,7 +44,9 @@ $footerLogo = site_logo_url('/img/logo1.jpg');
     </div>
     <div class="footer-bottom">&copy; <?php echo date('Y'); ?> TanKiet Group. All rights reserved.</div>
 </footer>
+<?php if (!empty($loadSwiper)): ?>
 <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
+<?php endif; ?>
 <script src="<?php echo site_base_path() . '/assets/js/main.js'; ?>"></script>
 </body>
 </html>

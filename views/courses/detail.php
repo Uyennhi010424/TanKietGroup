@@ -22,7 +22,30 @@ if (!$course) {
     echo '<section class="section"><div class="container"><div class="card"><h3>Chưa có khóa học</h3><p class="muted">Thêm khóa học trong admin để trang này hiển thị.</p></div></div></section>';
     return;
 }
+
+// Dynamic SEO
+$pageTitle = $course['title'] . ' - Khóa học';
+$metaDescOverride = $course['short_desc'] ?: '';
+$ogImageOverride = site_image_url($course['thumbnail'] ?? '', '/img/hero.jpg');
+$breadcrumbJsonLd = json_encode([
+    '@context' => 'https://schema.org',
+    '@type' => 'BreadcrumbList',
+    'itemListElement' => [
+        ['@type' => 'ListItem', 'position' => 1, 'name' => 'Trang chủ', 'item' => site_page_url('home')],
+        ['@type' => 'ListItem', 'position' => 2, 'name' => 'Khóa học', 'item' => site_page_url('courses')],
+        ['@type' => 'ListItem', 'position' => 3, 'name' => $course['title']],
+    ]
+], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 ?>
+<nav class="breadcrumb" aria-label="Đường dẫn">
+	<div class="container">
+		<a href="<?php echo htmlspecialchars(site_page_url('home'), ENT_QUOTES, 'UTF-8'); ?>">Trang chủ</a>
+		<span class="separator" aria-hidden="true">›</span>
+		<a href="<?php echo htmlspecialchars(site_page_url('courses'), ENT_QUOTES, 'UTF-8'); ?>">Khóa học</a>
+		<span class="separator" aria-hidden="true">›</span>
+		<span class="current"><?php echo htmlspecialchars($course['title'], ENT_QUOTES, 'UTF-8'); ?></span>
+	</div>
+</nav>
 <section class="hero" style="--hero-banner: url('<?php echo htmlspecialchars(site_image_url($course['thumbnail'] ?? '', '/img/hero.jpg'), ENT_QUOTES, 'UTF-8'); ?>');">
 	<div class="container reveal">
 		<span class="tag">Khóa học</span>

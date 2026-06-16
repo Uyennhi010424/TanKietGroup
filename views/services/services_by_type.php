@@ -61,9 +61,9 @@ if ($slug !== '' && $db) {
     }
 }
 
-if ($slug === '' || (!$services && !$dbError)) {
+if ($slug === '' || (!isset($typeLabels[$slug]))) {
     http_response_code(404);
-    echo '<div class="container section"><p>Không tìm thấy dịch vụ.</p></div>';
+    echo '<div class="container section"><p>Không tìm thấy loại dịch vụ.</p></div>';
     return;
 }
 ?>

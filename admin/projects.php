@@ -41,10 +41,24 @@ if ($db && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $title = trim($_POST['title'] ?? '');
             $slug = trim($_POST['slug'] ?? '');
             $clientName = trim($_POST['client_name'] ?? '');
-            $industryId = ($_POST['industry_id'] ?? '') === '' ? null : (int)$_POST['industry_id'];
+            $industryId = null;
+            $industryName = trim($_POST['industry_name'] ?? '');
+            if ($industryName !== '') {
+                $industryStmt = $db->prepare('SELECT id FROM industries WHERE name = :name LIMIT 1');
+                $industryStmt->execute(['name' => $industryName]);
+                $existing = $industryStmt->fetch();
+                if ($existing) {
+                    $industryId = (int)$existing['id'];
+                } else {
+                    $newSlug = make_slug($industryName);
+                    $insStmt = $db->prepare('INSERT INTO industries (name, slug) VALUES (:name, :slug)');
+                    $insStmt->execute(['name' => $industryName, 'slug' => $newSlug]);
+                    $industryId = (int)$db->lastInsertId();
+                }
+            }
             $serviceId = ($_POST['service_id'] ?? '') === '' ? null : (int)$_POST['service_id'];
             $shortDesc = trim($_POST['short_desc'] ?? '');
-            $content = trim($_POST['content'] ?? '');
+            $content = sanitize_html(trim($_POST['content'] ?? ''));
             $resultMetrics = trim($_POST['result_metrics'] ?? '');
             $thumbnail = trim($_POST['current_thumbnail'] ?? '');
             $status = (int)($_POST['status'] ?? 1);
@@ -115,6 +129,7 @@ $editing = [
     'slug' => '',
     'client_name' => '',
     'industry_id' => null,
+    'industry_name' => '',
     'service_id' => null,
     'short_desc' => '',
     'content' => '',
@@ -126,7 +141,7 @@ $editing = [
 if ($db && isset($_GET['edit'])) {
     $editId = (int)$_GET['edit'];
     if ($editId > 0) {
-        $stmt = $db->prepare('SELECT id, title, slug, client_name, industry_id, service_id, short_desc, content, result_metrics, thumbnail, status FROM projects WHERE id = :id LIMIT 1');
+        $stmt = $db->prepare('SELECT p.id, p.title, p.slug, p.client_name, p.industry_id, p.service_id, p.short_desc, p.content, p.result_metrics, p.thumbnail, p.status, i.name AS industry_name FROM projects p LEFT JOIN industries i ON i.id = p.industry_id WHERE p.id = :id LIMIT 1');
         $stmt->execute(['id' => $editId]);
         $row = $stmt->fetch();
         if ($row) {
@@ -140,7 +155,7 @@ $services = [];
 $rows = [];
 if ($db) {
     $industries = $db->query('SELECT id, name FROM industries ORDER BY name ASC')->fetchAll();
-    $services = $db->query('SELECT id, title, industry_id FROM services ORDER BY title ASC')->fetchAll();
+    $services = $db->query('SELECT s.id, s.title, s.industry_id, i.name AS industry_name FROM services s LEFT JOIN industries i ON i.id = s.industry_id ORDER BY s.title ASC')->fetchAll();
     $rows = $db->query('SELECT p.id, p.title, p.slug, p.client_name, p.thumbnail, p.status, COALESCE(i.name, "-") AS industry_name FROM projects p LEFT JOIN industries i ON i.id = p.industry_id ORDER BY p.id DESC')->fetchAll();
 }
 
@@ -183,19 +198,19 @@ admin_header('Dự án', 'Quản lý các dự án', $admin, 'projects');
 
                         <div>
                             <label class="small">Ngành</label>
-                            <select class="form-control" name="industry_id">
-                                <option value="">-- Chọn ngành --</option>
+                            <input class="form-control" type="text" name="industry_name" id="industryInput" list="industryList" value="<?php echo h($editing['industry_name'] ?? ''); ?>" placeholder="Chọn hoặc nhập ngành...">
+                            <datalist id="industryList">
                                 <?php foreach ($industries as $item): ?>
-                                    <option value="<?php echo (int)$item['id']; ?>" <?php echo (int)$editing['industry_id'] === (int)$item['id'] ? 'selected' : ''; ?>><?php echo h($item['name']); ?></option>
+                                    <option value="<?php echo h($item['name']); ?>">
                                 <?php endforeach; ?>
-                            </select>
+                            </datalist>
                         </div>
                         <div>
                             <label class="small">Dịch vụ liên quan</label>
                             <select class="form-control" name="service_id">
                                 <option value="">-- Chọn dịch vụ --</option>
                                 <?php foreach ($services as $item): ?>
-                                    <option value="<?php echo (int)$item['id']; ?>" data-industry="<?php echo isset($item['industry_id']) ? (int)$item['industry_id'] : ''; ?>" <?php echo (int)$editing['service_id'] === (int)$item['id'] ? 'selected' : ''; ?>><?php echo h($item['title']); ?></option>
+                                    <option value="<?php echo (int)$item['id']; ?>" data-industry="<?php echo h($item['industry_name'] ?? ''); ?>" <?php echo (int)$editing['service_id'] === (int)$item['id'] ? 'selected' : ''; ?>><?php echo h($item['title']); ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
@@ -300,25 +315,24 @@ admin_header('Dự án', 'Quản lý các dự án', $admin, 'projects');
         function qs(sel) {
             return document.querySelector(sel)
         }
-        var industrySel = qs('select[name="industry_id"]');
+        var industryInput = qs('input[name="industry_name"]');
         var serviceSel = qs('select[name="service_id"]');
-        if (!industrySel || !serviceSel) return;
+        if (!industryInput || !serviceSel) return;
 
         function filterServices() {
-            var selectedIndustry = industrySel.value;
+            var selectedIndustry = industryInput.value.trim();
             var currentService = serviceSel.value;
             Array.prototype.forEach.call(serviceSel.options, function(opt) {
                 if (opt.value === '') {
                     opt.hidden = false;
                     return;
                 }
-                var optIndustry = opt.dataset.industry === undefined ? '' : opt.dataset.industry;
+                var optIndustry = opt.dataset.industry || '';
                 if (selectedIndustry === '') {
                     opt.hidden = false;
                 } else if (optIndustry === selectedIndustry) {
                     opt.hidden = false;
                 } else if (opt.value === currentService) {
-                    // keep currently selected service visible even if industries changed
                     opt.hidden = false;
                 } else {
                     opt.hidden = true;
@@ -326,8 +340,7 @@ admin_header('Dự án', 'Quản lý các dự án', $admin, 'projects');
             });
         }
 
-        industrySel.addEventListener('change', filterServices);
-        // Run once on load to reflect initial selection
+        industryInput.addEventListener('input', filterServices);
         filterServices();
     })();
 </script>

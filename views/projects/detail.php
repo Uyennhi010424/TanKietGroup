@@ -23,6 +23,20 @@ if (!$project) {
 	return;
 }
 
+// Dynamic SEO
+$pageTitle = $project['title'] . ' - Dự án';
+$metaDescOverride = $project['short_desc'] ?: '';
+$ogImageOverride = site_image_url($project['thumbnail'] ?? '', '/img/hero.jpg');
+$breadcrumbJsonLd = json_encode([
+    '@context' => 'https://schema.org',
+    '@type' => 'BreadcrumbList',
+    'itemListElement' => [
+        ['@type' => 'ListItem', 'position' => 1, 'name' => 'Trang chủ', 'item' => site_page_url('home')],
+        ['@type' => 'ListItem', 'position' => 2, 'name' => 'Dự án', 'item' => site_page_url('projects')],
+        ['@type' => 'ListItem', 'position' => 3, 'name' => $project['title']],
+    ]
+], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
 $images = site_parse_json($project['images'] ?? '', []);
 $resultRaw = trim((string)($project['result_metrics'] ?? ''));
 
@@ -40,6 +54,15 @@ if ($resultRaw !== '') {
 	}
 }
 ?>
+<nav class="breadcrumb" aria-label="Đường dẫn">
+	<div class="container">
+		<a href="<?php echo htmlspecialchars(site_page_url('home'), ENT_QUOTES, 'UTF-8'); ?>">Trang chủ</a>
+		<span class="separator" aria-hidden="true">›</span>
+		<a href="<?php echo htmlspecialchars(site_page_url('projects'), ENT_QUOTES, 'UTF-8'); ?>">Dự án</a>
+		<span class="separator" aria-hidden="true">›</span>
+		<span class="current"><?php echo htmlspecialchars($project['title'], ENT_QUOTES, 'UTF-8'); ?></span>
+	</div>
+</nav>
 <section class="section project-detail-v2">
     <div class="container">
 
@@ -64,9 +87,9 @@ if ($resultRaw !== '') {
             <!-- FLOAT IMAGE -->
             <div class="project-float-image card-glow">
                 <?php if (!empty($images)): ?>
-                    <img src="<?php echo htmlspecialchars(site_image_url($images[0], '/img/du_an3.jpg')); ?>" alt="<?php echo htmlspecialchars($project['title']); ?>" />
+                    <img src="<?php echo htmlspecialchars(site_image_url($images[0], '/img/du_an3.jpg')); ?>" alt="<?php echo htmlspecialchars($project['title']); ?>" loading="lazy" />
                 <?php else: ?>
-                    <img src="<?php echo htmlspecialchars(site_image_url($project['thumbnail'] ?? '', '/img/du_an3.jpg')); ?>" alt="<?php echo htmlspecialchars($project['title']); ?>" />
+                    <img src="<?php echo htmlspecialchars(site_image_url($project['thumbnail'] ?? '', '/img/du_an3.jpg')); ?>" alt="<?php echo htmlspecialchars($project['title']); ?>" loading="lazy" />
                 <?php endif; ?>
             </div>
 

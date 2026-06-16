@@ -2,6 +2,11 @@
 // Router for ADMIN pages only (port 8001)
 define('APP_MODE', 'admin');
 
+// Security headers
+header('X-Content-Type-Options: nosniff');
+header('X-Frame-Options: SAMEORIGIN');
+header('Referrer-Policy: strict-origin-when-cross-origin');
+
 $uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
 
 // Serve admin static files (CSS, JS)
@@ -44,6 +49,11 @@ if (preg_match('#^/uploads/(.+)$#', $uri, $m)) {
             $mime = finfo_file($finfo, $file);
             header('Content-Type: ' . $mime);
             header('Content-Length: ' . filesize($file));
+            // Force download SVG files to prevent embedded script execution
+            if ($ext === 'svg') {
+                header('Content-Disposition: attachment; filename="' . basename($file) . '"');
+                header('X-Content-Type-Options: nosniff');
+            }
             readfile($file);
             return true;
         }

@@ -23,6 +23,11 @@ $flash = $_GET['msg'] ?? '';
 
 try {
     $db = get_db_connection();
+    // Auto-migration: add service_type column if missing
+    $col = $db->query("SHOW COLUMNS FROM services LIKE 'service_type'")->fetch();
+    if (!$col) {
+        $db->exec("ALTER TABLE services ADD COLUMN service_type VARCHAR(100) AFTER industry_id");
+    }
 } catch (Throwable $e) {
     $dbError = $e->getMessage();
 }
@@ -48,22 +53,32 @@ if ($db && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = (int)($_POST['id'] ?? 0);
             $title = trim($_POST['title'] ?? '');
             $slug = trim($_POST['slug'] ?? '');
-            $industryId = ($_POST['industry_id'] ?? '') === '' ? null : (int)$_POST['industry_id'];
-            $industryName = '';
+            $industryId = null;
+            $industryName = trim($_POST['industry_name'] ?? '');
 
-            if ($industryId) {
-                $industryStmt = $db->prepare(
-                    'SELECT name FROM industries WHERE id = :id LIMIT 1'
-                );
-                $industryStmt->execute(['id' => $industryId]);
+            if ($industryName !== '') {
+                // Find existing industry by exact name
+                $industryStmt = $db->prepare('SELECT id, name FROM industries WHERE name = :name LIMIT 1');
+                $industryStmt->execute(['name' => $industryName]);
+                $existing = $industryStmt->fetch();
 
-                $industryName = (string)$industryStmt->fetchColumn();
+                if ($existing) {
+                    $industryId = (int)$existing['id'];
+                } else {
+                    // Create new industry
+                    $newSlug = make_slug($industryName);
+                    $insStmt = $db->prepare('INSERT INTO industries (name, slug) VALUES (:name, :slug)');
+                    $insStmt->execute(['name' => $industryName, 'slug' => $newSlug]);
+                    $industryId = (int)$db->lastInsertId();
+                }
+
                 if (preg_match('/cho\s+(.+)$/iu', $industryName, $matches)) {
                     $industryName = trim($matches[1]);
                 }
             }
+            $serviceType = trim($_POST['service_type'] ?? '');
             $shortDesc = trim($_POST['short_desc'] ?? '');
-            $content = trim($_POST['content'] ?? '');
+            $content = sanitize_html(trim($_POST['content'] ?? ''));
             $image = trim($_POST['current_image'] ?? '');
             $status = (int)($_POST['status'] ?? 1);
 
@@ -95,12 +110,13 @@ if ($db && $_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             if ($id > 0) {
-                $stmt = $db->prepare('UPDATE services SET title = :title, slug = :slug, industry_id = :industry_id, short_desc = :short_desc, content = :content, image = :image, status = :status WHERE id = :id');
+                $stmt = $db->prepare('UPDATE services SET title = :title, slug = :slug, industry_id = :industry_id, service_type = :service_type, short_desc = :short_desc, content = :content, image = :image, status = :status WHERE id = :id');
                 $stmt->execute([
                     'id' => $id,
                     'title' => $title,
                     'slug' => $slug,
                     'industry_id' => $industryId,
+                    'service_type' => $serviceType !== '' ? $serviceType : null,
                     'short_desc' => $shortDesc,
                     'content' => $content,
                     'image' => $image,
@@ -110,11 +126,12 @@ if ($db && $_SERVER['REQUEST_METHOD'] === 'POST') {
                 exit;
             }
 
-            $stmt = $db->prepare('INSERT INTO services (title, slug, industry_id, short_desc, content, image, status) VALUES (:title, :slug, :industry_id, :short_desc, :content, :image, :status)');
+            $stmt = $db->prepare('INSERT INTO services (title, slug, industry_id, service_type, short_desc, content, image, status) VALUES (:title, :slug, :industry_id, :service_type, :short_desc, :content, :image, :status)');
             $stmt->execute([
                 'title' => $title,
                 'slug' => $slug,
                 'industry_id' => $industryId,
+                'service_type' => $serviceType !== '' ? $serviceType : null,
                 'short_desc' => $shortDesc,
                 'content' => $content,
                 'image' => $image,
@@ -134,6 +151,8 @@ $editing = [
     'title' => '',
     'slug' => '',
     'industry_id' => null,
+    'industry_name' => '',
+    'service_type' => '',
     'short_desc' => '',
     'content' => '',
     'image' => '',
@@ -143,7 +162,7 @@ $editing = [
 if ($db && isset($_GET['edit'])) {
     $editId = (int)$_GET['edit'];
     if ($editId > 0) {
-        $stmt = $db->prepare('SELECT id, title, slug, industry_id, short_desc, content, image, status FROM services WHERE id = :id LIMIT 1');
+        $stmt = $db->prepare('SELECT s.id, s.title, s.slug, s.industry_id, s.service_type, s.short_desc, s.content, s.image, s.status, i.name AS industry_name FROM services s LEFT JOIN industries i ON i.id = s.industry_id WHERE s.id = :id LIMIT 1');
         $stmt->execute(['id' => $editId]);
         $row = $stmt->fetch();
         if ($row) {
@@ -198,10 +217,27 @@ admin_header('Dịch vụ', 'Quản lý các dịch vụ', $admin, 'services');
                         </div>
                         <div>
                             <label class="small">Ngành</label>
-                            <select class="form-control" name="industry_id" id="industrySelect">
-                                <option value="">-- Chọn ngành --</option>
+                            <input class="form-control" type="text" name="industry_name" id="industrySelect" list="industryList" value="<?php echo h($editing['industry_name'] ?? ''); ?>" placeholder="Chọn hoặc nhập ngành...">
+                            <datalist id="industryList">
                                 <?php foreach ($industries as $item): ?>
-                                    <option value="<?php echo (int)$item['id']; ?>" <?php echo (int)$editing['industry_id'] === (int)$item['id'] ? 'selected' : ''; ?>><?php echo h($item['name']); ?></option>
+                                    <option value="<?php echo h($item['name']); ?>">
+                                <?php endforeach; ?>
+                            </datalist>
+                        </div>
+                        <div>
+                            <label class="small">Loại dịch vụ</label>
+                            <select class="form-control" name="service_type">
+                                <option value="">-- Không phân loại --</option>
+                                <?php
+                                $serviceTypeLabels = [
+                                    'marketing-tron-goi'  => 'Marketing trọn gói (Chiến lược xây kênh)',
+                                    'cham-soc-fanpage'    => 'Chăm sóc Fanpage',
+                                    'san-xuat-video'      => 'Sản xuất Video',
+                                    'to-chuc-su-kien'     => 'Tổ chức sự kiện',
+                                    'thiet-ke-website'    => 'Thiết kế Website chuẩn SEO',
+                                ];
+                                foreach ($serviceTypeLabels as $typeSlug => $typeName): ?>
+                                    <option value="<?php echo h($typeSlug); ?>" <?php echo (($editing['service_type'] ?? '') === $typeSlug) ? 'selected' : ''; ?>><?php echo h($typeName); ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
@@ -289,9 +325,9 @@ admin_header('Dịch vụ', 'Quản lý các dịch vụ', $admin, 'services');
 
         var titleInput = document.getElementById('serviceTitleInput');
         var slugInput = document.getElementById('serviceSlugInput');
-        var industrySelect = document.getElementById('industrySelect');
+        var industryInput = document.getElementById('industrySelect');
 
-        if (!titleInput || !slugInput || !industrySelect) return;
+        if (!titleInput || !slugInput || !industryInput) return;
 
         function slugify(text) {
             return String(text || '')
@@ -307,13 +343,9 @@ admin_header('Dịch vụ', 'Quản lý các dịch vụ', $admin, 'services');
 
             var title = titleInput.value.trim();
 
-            var industry = '';
+            var industry = industryInput.value.trim();
 
-            if (industrySelect.selectedIndex > 0) {
-
-                industry =
-                    industrySelect.options[industrySelect.selectedIndex].text;
-
+            if (industry) {
                 var match = industry.match(/cho\s+(.+)$/i);
 
                 if (match) {
@@ -331,7 +363,7 @@ admin_header('Dịch vụ', 'Quản lý các dịch vụ', $admin, 'services');
         }
 
         titleInput.addEventListener('input', updateSlug);
-        industrySelect.addEventListener('change', updateSlug);
+        industryInput.addEventListener('input', updateSlug);
 
         updateSlug();
 

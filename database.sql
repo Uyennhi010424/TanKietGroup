@@ -107,6 +107,7 @@ CREATE TABLE services (
     image VARCHAR(255),
     icon VARCHAR(100),
     industry_id INT,
+    service_type VARCHAR(100),
     sort_order INT DEFAULT 0,
     status TINYINT(1) DEFAULT 1,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,

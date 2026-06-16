@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../includes/site.php';
+require_once __DIR__ . '/../includes/security.php';
 
 $site = site_settings();
 $rows = [];
@@ -57,26 +58,34 @@ try {
 
                         <form class="apply-form" id="apply-form-<?php echo (int)$r['id']; ?>" style="display:none;" enctype="multipart/form-data" onsubmit="submitApply(event, <?php echo (int)$r['id']; ?>)">
                             <input type="hidden" name="job_id" value="<?php echo (int)$r['id']; ?>">
+                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8'); ?>">
                             <div class="form-grid">
                                 <div>
-                                    <input class="input" type="text" name="apply_name" placeholder="Họ và tên *" required>
+                                    <label for="apply-name-<?php echo (int)$r['id']; ?>" class="sr-only">Họ và tên</label>
+                                    <input class="input" id="apply-name-<?php echo (int)$r['id']; ?>" type="text" name="apply_name" placeholder="Họ và tên *" required>
                                 </div>
                                 <div>
-                                    <input class="input" type="email" name="apply_email" placeholder="Email *" required>
+                                    <label for="apply-email-<?php echo (int)$r['id']; ?>" class="sr-only">Email</label>
+                                    <input class="input" id="apply-email-<?php echo (int)$r['id']; ?>" type="email" name="apply_email" placeholder="Email *" required>
                                 </div>
                             </div>
                             <div class="form-grid" style="margin-top:12px;">
                                 <div>
-                                    <input class="input" type="tel" name="apply_phone" placeholder="Số điện thoại *" required pattern="[0-9]{10,11}" title="Vui lòng nhập 10-11 chữ số">
+                                    <label for="apply-phone-<?php echo (int)$r['id']; ?>" class="sr-only">Số điện thoại</label>
+                                    <input class="input" id="apply-phone-<?php echo (int)$r['id']; ?>" type="tel" name="apply_phone" placeholder="Số điện thoại *" required pattern="[0-9]{10,11}" title="Vui lòng nhập 10-11 chữ số">
                                 </div>
                                 <div>
-                                    <input class="input" type="text" name="apply_position" placeholder="Vị trí ứng tuyển" value="<?php echo htmlspecialchars($r['title'], ENT_QUOTES, 'UTF-8'); ?>">
+                                    <label for="apply-position-<?php echo (int)$r['id']; ?>" class="sr-only">Vị trí ứng tuyển</label>
+                                    <input class="input" id="apply-position-<?php echo (int)$r['id']; ?>" type="text" name="apply_position" placeholder="Vị trí ứng tuyển" value="<?php echo htmlspecialchars($r['title'], ENT_QUOTES, 'UTF-8'); ?>">
                                 </div>
                             </div>
-                            <textarea class="textarea" name="apply_message" style="margin-top:12px;" placeholder="Giới thiệu ngắn về bản thân và lý do bạn quan tâm" rows="3"></textarea>
                             <div style="margin-top:12px;">
-                                <label style="display:block;margin-bottom:6px;font-size:0.9rem;color:var(--muted);">Đính kèm CV (PDF, DOC, DOCX, JPG, PNG - tối đa 10MB)</label>
-                                <input class="input" type="file" name="cv_file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" style="padding:8px;">
+                                <label for="apply-message-<?php echo (int)$r['id']; ?>" class="sr-only">Giới thiệu</label>
+                                <textarea class="textarea" id="apply-message-<?php echo (int)$r['id']; ?>" name="apply_message" placeholder="Giới thiệu ngắn về bản thân và lý do bạn quan tâm" rows="3"></textarea>
+                            </div>
+                            <div style="margin-top:12px;">
+                                <label for="apply-cv-<?php echo (int)$r['id']; ?>" style="display:block;margin-bottom:6px;font-size:0.9rem;color:var(--muted);">Đính kèm CV (PDF, DOC, DOCX, JPG, PNG - tối đa 10MB)</label>
+                                <input class="input" id="apply-cv-<?php echo (int)$r['id']; ?>" type="file" name="cv_file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" style="padding:8px;">
                             </div>
                             <button class="btn btn-primary" type="submit" style="margin-top:16px;">Gửi đơn ứng tuyển</button>
                             <div class="apply-message" id="apply-msg-<?php echo (int)$r['id']; ?>" style="display:none;"></div>

@@ -180,6 +180,7 @@ function login_rate_limit_reset(): void
 /**
  * Simple session-based rate limiter for form submissions.
  * Returns true if the submission is allowed, false if too soon.
+ * @deprecated Use ip_rate_limit_check() instead for better security.
  */
 function api_rate_limit_check(string $action, int $minIntervalSeconds = 30): bool
 {
@@ -189,8 +190,104 @@ function api_rate_limit_check(string $action, int $minIntervalSeconds = 30): boo
     return (time() - $lastSubmit) >= $minIntervalSeconds;
 }
 
+/**
+ * @deprecated Use ip_rate_limit_record() instead for better security.
+ */
 function api_rate_limit_record(string $action): void
 {
     ensure_session_started();
     $_SESSION['rate_limit_' . $action] = time();
+}
+
+/**
+ * Get client IP address (handles proxied requests).
+ */
+function get_client_ip(): string
+{
+    $ip = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+    if (str_contains($ip, ',')) {
+        $ip = trim(explode(',', $ip, 2)[0]);
+    }
+    return filter_var($ip, FILTER_VALIDATE_IP) ?: '127.0.0.1';
+}
+
+/**
+ * IP-based rate limiter using file storage.
+ * Returns seconds to wait, or 0 if allowed.
+ */
+function ip_rate_limit_check(string $action, int $maxAttempts = 5, int $windowSeconds = 300): int
+{
+    $ip = get_client_ip();
+    $dir = sys_get_temp_dir() . '/tkg_rate_' . $action;
+    if (!is_dir($dir)) {
+        @mkdir($dir, 0700, true);
+    }
+
+    $file = $dir . '/' . md5($ip) . '.json';
+    $data = ['attempts' => 0, 'first_attempt' => 0, 'last_attempt' => 0];
+
+    if (is_file($file)) {
+        $stored = @json_decode((string)file_get_contents($file), true);
+        if (is_array($stored)) {
+            $data = $stored;
+        }
+    }
+
+    $now = time();
+
+    // Reset if window expired
+    if (($now - (int)($data['first_attempt'] ?? 0)) > $windowSeconds) {
+        $data = ['attempts' => 0, 'first_attempt' => $now, 'last_attempt' => 0];
+    }
+
+    if ((int)($data['attempts'] ?? 0) >= $maxAttempts) {
+        $waitTime = min(300, 30 * pow(2, (int)($data['attempts'] ?? 0) - $maxAttempts));
+        $elapsed = $now - (int)($data['last_attempt'] ?? 0);
+        if ($elapsed < $waitTime) {
+            return (int)ceil($waitTime - $elapsed);
+        }
+        // Reset after cooldown
+        $data = ['attempts' => 0, 'first_attempt' => $now, 'last_attempt' => 0];
+    }
+
+    return 0;
+}
+
+/**
+ * Record a rate-limited event for the current IP.
+ */
+function ip_rate_limit_record(string $action): void
+{
+    $ip = get_client_ip();
+    $dir = sys_get_temp_dir() . '/tkg_rate_' . $action;
+    if (!is_dir($dir)) {
+        @mkdir($dir, 0700, true);
+    }
+
+    $file = $dir . '/' . md5($ip) . '.json';
+    $data = ['attempts' => 0, 'first_attempt' => time(), 'last_attempt' => 0];
+
+    if (is_file($file)) {
+        $stored = @json_decode((string)file_get_contents($file), true);
+        if (is_array($stored)) {
+            $data = $stored;
+        }
+    }
+
+    $data['attempts'] = ((int)($data['attempts'] ?? 0)) + 1;
+    $data['last_attempt'] = time();
+
+    file_put_contents($file, json_encode($data), LOCK_EX);
+}
+
+/**
+ * Reset rate limit for current IP.
+ */
+function ip_rate_limit_reset(string $action): void
+{
+    $ip = get_client_ip();
+    $file = sys_get_temp_dir() . '/tkg_rate_' . $action . '/' . md5($ip) . '.json';
+    if (is_file($file)) {
+        @unlink($file);
+    }
 }

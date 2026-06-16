@@ -9,38 +9,33 @@ if ($relativePath === '' || preg_match('#^(https?:)?//#i', $relativePath)) {
     exit;
 }
 
-$relativePath = ltrim(str_replace(['..', '\\'], ['', '/'], $relativePath), '/');
+// Reject path traversal attempts BEFORE any normalization
+if (str_contains($relativePath, '..') || str_contains($relativePath, "\0")) {
+    http_response_code(400);
+    header('Content-Type: text/plain; charset=utf-8');
+    echo 'Invalid path';
+    exit;
+}
+
+// Normalize slashes
+$relativePath = ltrim(str_replace('\\', '/', $relativePath), '/');
+
 $baseDir = realpath(__DIR__ . '/../uploads');
-$filePath = $baseDir !== false ? realpath(__DIR__ . '/../' . $relativePath) : false;
-// Fallback when realpath() fails (e.g., Windows with Unicode path characters)
-if ($filePath === false && $baseDir === false) {
-    $candidate = __DIR__ . '/../uploads/' . $relativePath;
-    if (is_file($candidate)) {
-        $baseDir = __DIR__ . '/../uploads';
-        $filePath = $candidate;
-    }
-} elseif ($filePath === false && $baseDir !== false) {
-    $candidate = __DIR__ . '/../' . $relativePath;
-    if (is_file($candidate)) {
-        $filePath = $candidate;
-    }
-}
-
 if ($baseDir === false) {
-    http_response_code(404);
-    header('Content-Type: text/plain; charset=utf-8');
-    echo 'File not found';
-    exit;
+    $baseDir = __DIR__ . '/../uploads';
 }
 
-$checkPath = $filePath ?: $baseDir . '/' . $relativePath;
-if (!str_starts_with(str_replace('\\', '/', $checkPath), str_replace('\\', '/', $baseDir))) {
-    http_response_code(404);
-    header('Content-Type: text/plain; charset=utf-8');
-    echo 'File not found';
-    exit;
+$filePath = realpath($baseDir . '/' . $relativePath);
+
+// Fallback for Windows Unicode paths
+if ($filePath === false) {
+    $candidate = $baseDir . '/' . $relativePath;
+    if (is_file($candidate)) {
+        $filePath = $candidate;
+    }
 }
 
+// Verify path is within uploads directory
 if ($filePath === false || !is_file($filePath)) {
     // Serve a 1x1 transparent placeholder instead of 404
     header('Content-Type: image/gif');
@@ -49,6 +44,16 @@ if ($filePath === false || !is_file($filePath)) {
     exit;
 }
 
+$normalizedBase = str_replace('\\', '/', $baseDir);
+$normalizedFile = str_replace('\\', '/', $filePath);
+if (!str_starts_with($normalizedFile, $normalizedBase . '/')) {
+    http_response_code(403);
+    header('Content-Type: text/plain; charset=utf-8');
+    echo 'Forbidden';
+    exit;
+}
+
+// Detect MIME type from file content
 $mime = 'application/octet-stream';
 if (function_exists('finfo_open')) {
     $finfo = finfo_open(FILEINFO_MIME_TYPE);
@@ -60,9 +65,9 @@ if (function_exists('finfo_open')) {
     }
 }
 
-// Allow images and document files — block PHP, HTML, and other executable types
+// Allow images and documents — block executables, HTML, and SVG (XSS risk)
 $allowedMimes = [
-    'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml',
+    'image/jpeg', 'image/png', 'image/gif', 'image/webp',
     'application/pdf',
     'application/msword',
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
@@ -77,4 +82,5 @@ if (!in_array($mime, $allowedMimes, true)) {
 header('Content-Type: ' . $mime);
 header('Content-Length: ' . filesize($filePath));
 header('Cache-Control: public, max-age=86400');
+header('X-Content-Type-Options: nosniff');
 readfile($filePath);

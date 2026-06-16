@@ -36,7 +36,30 @@ if (!$service) {
     echo '<section class="section"><div class="container"><div class="card"><h3>Chưa có dịch vụ</h3><p class="muted">Thêm dịch vụ trong admin để trang này hiển thị.</p></div></div></section>';
     return;
 }
+
+// Dynamic SEO
+$pageTitle = $service['title'] . ' - Dịch vụ';
+$metaDescOverride = $service['short_desc'] ?: ($service['meta_description'] ?? '');
+$ogImageOverride = site_image_url($service['image'] ?? '', '/img/hero.jpg');
+$breadcrumbJsonLd = json_encode([
+    '@context' => 'https://schema.org',
+    '@type' => 'BreadcrumbList',
+    'itemListElement' => [
+        ['@type' => 'ListItem', 'position' => 1, 'name' => 'Trang chủ', 'item' => site_page_url('home')],
+        ['@type' => 'ListItem', 'position' => 2, 'name' => 'Dịch vụ', 'item' => site_page_url('services')],
+        ['@type' => 'ListItem', 'position' => 3, 'name' => $service['title']],
+    ]
+], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 ?>
+<nav class="breadcrumb" aria-label="Đường dẫn">
+	<div class="container">
+		<a href="<?php echo htmlspecialchars(site_page_url('home'), ENT_QUOTES, 'UTF-8'); ?>">Trang chủ</a>
+		<span class="separator" aria-hidden="true">›</span>
+		<a href="<?php echo htmlspecialchars(site_page_url('services'), ENT_QUOTES, 'UTF-8'); ?>">Dịch vụ</a>
+		<span class="separator" aria-hidden="true">›</span>
+		<span class="current"><?php echo htmlspecialchars($service['title'], ENT_QUOTES, 'UTF-8'); ?></span>
+	</div>
+</nav>
 <section class="hero" style="--hero-banner: url('<?php echo htmlspecialchars(site_image_url($service['image'] ?? '', '/img/hero.jpg'), ENT_QUOTES, 'UTF-8'); ?>');">
 	<div class="container reveal">
 		<span class="tag"><?php echo htmlspecialchars($service['industry_name'] ?? 'Dịch vụ', ENT_QUOTES, 'UTF-8'); ?></span>

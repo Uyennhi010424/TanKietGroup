@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /config/
+Disallow: /includes/
+Disallow: /controllers/
+Disallow: /models/
+Disallow: /scripts/
+Disallow: /*.php$
+
+Sitemap: /sitemap.xml

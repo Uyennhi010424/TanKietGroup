@@ -1,4 +1,9 @@
 <?php
+// Security headers
+header('X-Content-Type-Options: nosniff');
+header('X-Frame-Options: SAMEORIGIN');
+header('Referrer-Policy: strict-origin-when-cross-origin');
+
 $uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
 $file = realpath(__DIR__ . $uri);
 
@@ -13,6 +18,11 @@ if ($file && is_file($file) && strtolower(pathinfo($file, PATHINFO_EXTENSION)) !
     ];
     header('Content-Type: ' . ($mimes[$ext] ?? 'application/octet-stream'));
     header('Content-Length: ' . filesize($file));
+    // Force download SVG files to prevent embedded script execution
+    if ($ext === 'svg') {
+        header('Content-Disposition: attachment; filename="' . basename($file) . '"');
+        header('X-Content-Type-Options: nosniff');
+    }
     readfile($file);
     return true;
 }

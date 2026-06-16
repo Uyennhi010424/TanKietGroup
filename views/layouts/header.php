@@ -9,6 +9,17 @@
     $metaTitle = trim((string)($site['meta_title'] ?? ''));
     $metaDescription = trim((string)($site['meta_description'] ?? ''));
     $resolvedTitle = $pageTitle ?? ($metaTitle !== '' ? $metaTitle : APP_NAME);
+    $siteName = $site['site_name'] ?? APP_NAME;
+    $fullTitle = $resolvedTitle . ' | ' . $siteName;
+
+    // Per-page meta description (set by detail views via $metaDescOverride)
+    $pageDescription = $metaDescOverride ?? ($metaDescription !== '' ? $metaDescription : 'TanKiet Group - Giải pháp Marketing tăng trưởng toàn diện cho doanh nghiệp hiện đại.');
+
+    // Per-page OG image (set by detail views via $ogImageOverride)
+    $ogImage = $ogImageOverride ?? site_base_path() . '/img/hero.jpg';
+
+    // Canonical URL
+    $canonicalUrl = $canonicalUrlOverride ?? ((isset($_SERVER['REQUEST_URI']) ? strtok((string)$_SERVER['REQUEST_URI'], '?') : '/'));
 
     /**
      * Dịch vụ chính — slug phải khớp với cột service_type trong bảng services
@@ -38,17 +49,71 @@
     ?>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title><?php echo htmlspecialchars($resolvedTitle . ' | ' . ($site['site_name'] ?? APP_NAME), ENT_QUOTES, 'UTF-8'); ?></title>
-    <meta name="description" content="<?php echo htmlspecialchars($metaDescription !== '' ? $metaDescription : 'TanKiet Group - Giải pháp Marketing tăng trưởng toàn diện cho doanh nghiệp hiện đại.', ENT_QUOTES, 'UTF-8'); ?>">
+    <title><?php echo htmlspecialchars($fullTitle, ENT_QUOTES, 'UTF-8'); ?></title>
+    <meta name="description" content="<?php echo htmlspecialchars($pageDescription, ENT_QUOTES, 'UTF-8'); ?>">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="<?php echo htmlspecialchars($canonicalUrl, ENT_QUOTES, 'UTF-8'); ?>">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="<?php echo htmlspecialchars($siteName, ENT_QUOTES, 'UTF-8'); ?>">
+    <meta property="og:title" content="<?php echo htmlspecialchars($fullTitle, ENT_QUOTES, 'UTF-8'); ?>">
+    <meta property="og:description" content="<?php echo htmlspecialchars($pageDescription, ENT_QUOTES, 'UTF-8'); ?>">
+    <meta property="og:url" content="<?php echo htmlspecialchars($canonicalUrl, ENT_QUOTES, 'UTF-8'); ?>">
+    <meta property="og:image" content="<?php echo htmlspecialchars($ogImage, ENT_QUOTES, 'UTF-8'); ?>">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="<?php echo htmlspecialchars($fullTitle, ENT_QUOTES, 'UTF-8'); ?>">
+    <meta name="twitter:description" content="<?php echo htmlspecialchars($pageDescription, ENT_QUOTES, 'UTF-8'); ?>">
+    <meta name="twitter:image" content="<?php echo htmlspecialchars($ogImage, ENT_QUOTES, 'UTF-8'); ?>">
+
+    <!-- Google Fonts (non-blocking) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="<?php echo site_base_path() . '/assets/css/style.css'; ?>">
+    <?php if (!empty($loadSwiper)): ?>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css">
+    <?php endif; ?>
     <?php require_once __DIR__ . '/../../includes/favicon_links.php'; ?>
+
+    <!-- Structured Data: Organization -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": <?php echo json_encode($siteName, JSON_UNESCAPED_UNICODE); ?>,
+        "url": <?php echo json_encode($canonicalUrl, JSON_UNESCAPED_UNICODE); ?>,
+        "logo": <?php echo json_encode($logoUrl, JSON_UNESCAPED_UNICODE); ?>,
+        "description": <?php echo json_encode($pageDescription, JSON_UNESCAPED_UNICODE); ?>
+        <?php if (!empty($site['hotline'])): ?>,
+        "telephone": <?php echo json_encode($site['hotline'], JSON_UNESCAPED_UNICODE); ?>
+        <?php endif; ?>
+        <?php if (!empty($site['email'])): ?>,
+        "email": <?php echo json_encode($site['email'], JSON_UNESCAPED_UNICODE); ?>
+        <?php endif; ?>
+        <?php if (!empty($site['address'])): ?>,
+        "address": {
+            "@type": "PostalAddress",
+            "addressLocality": <?php echo json_encode($site['address'], JSON_UNESCAPED_UNICODE); ?>
+        }
+        <?php endif; ?>
+    }
+    </script>
+
+    <?php if (!empty($breadcrumbJsonLd)): ?>
+    <!-- Structured Data: BreadcrumbList -->
+    <script type="application/ld+json">
+    <?php echo $breadcrumbJsonLd; ?>
+    </script>
+    <?php endif; ?>
 </head>
 
 <body>
+    <a class="skip-link" href="#main-content">Chuyển đến nội dung chính</a>
     <header class="site-header">
         <div class="container header-inner">
 

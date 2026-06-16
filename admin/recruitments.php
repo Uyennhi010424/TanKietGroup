@@ -69,7 +69,7 @@ if ($db && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $location = trim($_POST['location'] ?? '');
             $salary = trim($_POST['salary'] ?? '');
             $deadline = trim($_POST['deadline'] ?? '');
-            $description = trim($_POST['description'] ?? '');
+            $description = sanitize_html(trim($_POST['description'] ?? ''));
             $status = (int)($_POST['status'] ?? 1);
 
             if ($title === '') {

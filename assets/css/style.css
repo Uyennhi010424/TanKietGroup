@@ -1033,7 +1033,7 @@ article.service-card:hover .service-card__thumb img {
 }
 
 .services-swiper .swiper-slide {
-  width: 340px !important;
+  width: 340px;
   height: auto;
   display: flex;
   transition: all 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
@@ -1041,6 +1041,18 @@ article.service-card:hover .service-card__thumb img {
   opacity: 0.75;
   filter: blur(0.8px);
   z-index: 1;
+}
+
+@media (max-width: 740px) {
+  .services-swiper .swiper-slide {
+    width: 280px;
+  }
+}
+
+@media (max-width: 480px) {
+  .services-swiper .swiper-slide {
+    width: 240px;
+  }
 }
 
 .services-swiper .swiper-slide-active {
@@ -2376,15 +2388,18 @@ label {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 10px;
-  padding: 20px 24px;
+  padding: 20px 20px;
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(134, 215, 223, 0.08);
   transition: all 0.35s ease;
-  min-width: 140px;
+  width: 180px;
+  height: 100px;
   text-decoration: none;
   color: inherit;
+  box-sizing: border-box;
 }
 
 .client-item:hover {
@@ -2411,8 +2426,12 @@ label {
   color: var(--muted);
   text-align: center;
   transition: color 0.3s ease;
-  max-width: 140px;
+  max-width: 100%;
   line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
 }
 
 .client-item:hover .client-name {
@@ -2426,12 +2445,102 @@ label {
   }
 
   .client-item {
-    min-width: 110px;
-    padding: 14px 16px;
+    width: 150px;
+    height: 90px;
+    padding: 14px 14px;
   }
 
   .client-logo {
     width: 100px;
     height: 60px;
   }
+}
+
+/* ============================================================
+   SKIP-TO-CONTENT LINK
+   ============================================================ */
+
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 16px;
+  z-index: 10000;
+  padding: 12px 24px;
+  background: var(--primary);
+  color: var(--bg);
+  font-weight: 700;
+  border-radius: 0 0 var(--radius) var(--radius);
+  text-decoration: none;
+  transition: top 0.2s ease;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+
+  .services-swiper .swiper-slide {
+    transition: none !important;
+    transform: scale(1) !important;
+    opacity: 1 !important;
+    filter: none !important;
+  }
+
+  .services-swiper .swiper-slide-active {
+    transform: scale(1) !important;
+  }
+
+  .projects-swiper .swiper-slide {
+    transition: none !important;
+  }
+}
+
+/* ============================================================
+   VISUAL BREADCRUMB
+   ============================================================ */
+
+.breadcrumb {
+  padding: 16px 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.breadcrumb a {
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.breadcrumb a:hover {
+  color: var(--primary);
+}
+
+.breadcrumb .separator {
+  margin: 0 8px;
+  opacity: 0.5;
+}
+
+.breadcrumb .current {
+  color: var(--text);
+  font-weight: 500;
+}
 }

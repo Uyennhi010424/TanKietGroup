@@ -1,0 +1,82 @@
+# Local config with credentials
+config/database.local.php
+
+# Debug/test files
+debug_*.php
+test_flow.php
+info.php
+tmp_render_login.php
+admin/test.php
+
+# Cookie jars
+cookiejar*.txt
+cookies.txt
+
+# Debug docs
+CSRF_DEBUG_GUIDE.md
+SETUP_MULTI_MACHINE.md
+
+# Temp/unknown files
+first.txt
+second.txt
+views.rar
+
+# ====================
+# Environment
+# ====================
+.env
+
+# ====================
+# Executables
+# ====================
+*.exe
+
+# ====================
+# IDE / OS
+# ====================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# ====================
+# Logs
+# ====================
+*.log
+logs/
+
+# ====================
+# User Uploads (không track file user upload)
+# ====================
+uploads/*
+!uploads/.gitkeep
+!uploads/clients/.gitkeep
+!uploads/courses/.gitkeep
+!uploads/cv/.gitkeep
+!uploads/projects/.gitkeep
+!uploads/services/.gitkeep
+!uploads/settings/.gitkeep
+
+# ====================
+# Temporary files
+# ====================
+tmp/
+*.tmp
+*.bak
+*.cache
+
+# ====================
+# Composer / Node
+# ====================
+vendor/
+node_modules/
+
+# ====================
+# Sensitive
+# ====================
+*.pem
+*.key

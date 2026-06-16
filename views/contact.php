@@ -28,22 +28,33 @@ $site = site_settings();
 			<form id="consultationForm" method="POST" action="/api/save_consultation.php">
 				<input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8'); ?>">
 				<div class="form-grid">
-					<input class="input" type="text" name="name" placeholder="Họ và tên" required>
-					<input class="input" type="tel" name="phone" placeholder="Số điện thoại" required>
+					<div>
+						<label for="contact-name" class="sr-only">Họ và tên</label>
+						<input class="input" id="contact-name" type="text" name="name" placeholder="Họ và tên" required>
+					</div>
+					<div>
+						<label for="contact-phone" class="sr-only">Số điện thoại</label>
+						<input class="input" id="contact-phone" type="tel" name="phone" placeholder="Số điện thoại" required>
+					</div>
 				</div>
-				<p></p>
-				<input class="input" type="email" name="email" placeholder="Email">
-				<p></p>
-				<select class="select" name="goal">
-					<option>Mục tiêu của bạn</option>
-					<option>Tăng lead</option>
-					<option>Tăng doanh thu</option>
-					<option>Mở rộng nhận diện thương hiệu</option>
-				</select>
-				<p></p>
-				<textarea class="textarea" name="message" placeholder="Chia sẻ ngắn gọn về doanh nghiệp và nhu cầu"></textarea>
-				<p></p>
-				<button class="btn btn-primary" type="submit">Đăng ký tư vấn miễn phí</button>
+				<div style="margin-top:12px;">
+					<label for="contact-email" class="sr-only">Email</label>
+					<input class="input" id="contact-email" type="email" name="email" placeholder="Email">
+				</div>
+				<div style="margin-top:12px;">
+					<label for="contact-goal" class="sr-only">Mục tiêu</label>
+					<select class="select" id="contact-goal" name="goal">
+						<option value="" disabled selected>Mục tiêu của bạn</option>
+						<option>Tăng lead</option>
+						<option>Tăng doanh thu</option>
+						<option>Mở rộng nhận diện thương hiệu</option>
+					</select>
+				</div>
+				<div style="margin-top:12px;">
+					<label for="contact-message" class="sr-only">Nội dung</label>
+					<textarea class="textarea" id="contact-message" name="message" placeholder="Chia sẻ ngắn gọn về doanh nghiệp và nhu cầu"></textarea>
+				</div>
+				<button class="btn btn-primary" type="submit" style="margin-top:16px;">Đăng ký tư vấn miễn phí</button>
 				<div id="formMessage" style="margin-top:12px;display:none;padding:12px;border-radius:8px;"></div>
 			</form>
 		</article>

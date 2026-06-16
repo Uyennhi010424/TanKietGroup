@@ -19,8 +19,9 @@ if (!csrf_validate((string)($_POST['csrf_token'] ?? ''))) {
     exit;
 }
 
-// Rate limiting — max 1 submission per 30 seconds
-if (!api_rate_limit_check('consultation', 30)) {
+// Rate limiting — max 3 submissions per 30 seconds (IP-based)
+$rateWait = ip_rate_limit_check('consultation', 3, 30);
+if ($rateWait > 0) {
     http_response_code(429);
     echo json_encode(['success' => false, 'message' => 'Bạn gửi quá nhanh, vui lòng đợi vài giây rồi thử lại']);
     exit;
@@ -65,7 +66,7 @@ try {
         ':created_at' => $created_at
     ]);
 
-    api_rate_limit_record('consultation');
+    ip_rate_limit_record('consultation');
     http_response_code(200);
     echo json_encode(['success' => true, 'message' => 'Yêu cầu tư vấn của bạn đã được gửi thành công']);
 } catch (Exception $e) {

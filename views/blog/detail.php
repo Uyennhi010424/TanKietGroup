@@ -38,7 +38,31 @@ if (!$post) {
     echo '<section class="section"><div class="container"><div class="card"><h3>Chưa có bài viết</h3><p class="muted">Thêm bài viết trong admin để trang này hiển thị.</p></div></div></section>';
     return;
 }
+
+// Dynamic SEO
+$pageTitle = $post['title'] . ' - Blog';
+$contentPreview = mb_substr(strip_tags((string)($post['content'] ?? '')), 0, 155);
+$metaDescOverride = $contentPreview !== '' ? $contentPreview . '...' : ($post['meta_title'] ?? 'Bài viết từ TanKiet Group');
+$ogImageOverride = site_image_url($post['thumbnail'] ?? '', '/img/hero.jpg');
+$breadcrumbJsonLd = json_encode([
+    '@context' => 'https://schema.org',
+    '@type' => 'BreadcrumbList',
+    'itemListElement' => [
+        ['@type' => 'ListItem', 'position' => 1, 'name' => 'Trang chủ', 'item' => site_page_url('home')],
+        ['@type' => 'ListItem', 'position' => 2, 'name' => 'Blog', 'item' => site_page_url('blog')],
+        ['@type' => 'ListItem', 'position' => 3, 'name' => $post['title']],
+    ]
+], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 ?>
+<nav class="breadcrumb" aria-label="Đường dẫn">
+	<div class="container">
+		<a href="<?php echo htmlspecialchars(site_page_url('home'), ENT_QUOTES, 'UTF-8'); ?>">Trang chủ</a>
+		<span class="separator" aria-hidden="true">›</span>
+		<a href="<?php echo htmlspecialchars(site_page_url('blog'), ENT_QUOTES, 'UTF-8'); ?>">Blog</a>
+		<span class="separator" aria-hidden="true">›</span>
+		<span class="current"><?php echo htmlspecialchars($post['title'], ENT_QUOTES, 'UTF-8'); ?></span>
+	</div>
+</nav>
 <section class="hero" style="--hero-banner: url('<?php echo htmlspecialchars(site_image_url($post['thumbnail'] ?? '', '/img/hero.jpg'), ENT_QUOTES, 'UTF-8'); ?>');">
 	<div class="container reveal">
 		<span class="tag"><?php echo htmlspecialchars($post['category_name'] ?: 'Blog', ENT_QUOTES, 'UTF-8'); ?></span>

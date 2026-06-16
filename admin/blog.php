@@ -46,7 +46,7 @@ if ($db && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $categoryName = trim($_POST['category_name'] ?? '');
             $status = trim($_POST['status'] ?? 'draft');
             $isFeatured = (int)($_POST['is_featured'] ?? 0) === 1 ? 1 : 0;
-            $content = trim($_POST['content'] ?? '');
+            $content = sanitize_html(trim($_POST['content'] ?? ''));
 
             if ($title === '') {
                 throw new RuntimeException('Tieu de bai viet khong duoc de trong');

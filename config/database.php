@@ -1,6 +1,9 @@
 <?php
 // Database connection settings
-// Priority: defaults < database.local.php < environment variables
+// Priority: defaults < database.local.php < .env < environment variables
+
+// Load .env helper (reads .env file into environment)
+require_once __DIR__ . '/../includes/env.php';
 
 $config = [
     'host' => 'localhost',
@@ -9,6 +12,7 @@ $config = [
     'pass' => '',
 ];
 
+// Legacy: database.local.php override (for backward compatibility)
 $localConfigPath = __DIR__ . '/database.local.php';
 if (is_file($localConfigPath)) {
     $local = require $localConfigPath;
@@ -17,6 +21,7 @@ if (is_file($localConfigPath)) {
     }
 }
 
+// Environment variables override (from .env or system env)
 $envMap = [
     'host' => ['DB_HOST', 'MYSQL_HOST'],
     'dbname' => ['DB_NAME', 'MYSQL_DATABASE'],

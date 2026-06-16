@@ -51,7 +51,13 @@ try {
         ]);
     }
 
-    $pdo->exec("\n        CREATE TABLE IF NOT EXISTS services (\n            id INT PRIMARY KEY AUTO_INCREMENT,\n            title VARCHAR(255) NOT NULL,\n            slug VARCHAR(255) UNIQUE NOT NULL,\n            short_desc TEXT,\n            content LONGTEXT,\n            image VARCHAR(255),\n            icon VARCHAR(100),\n            industry_id INT,\n            sort_order INT DEFAULT 0,\n            status TINYINT(1) DEFAULT 1,\n            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,\n            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n            FOREIGN KEY (industry_id) REFERENCES industries(id) ON DELETE SET NULL\n        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci\n    ");
+    $pdo->exec("\n        CREATE TABLE IF NOT EXISTS services (\n            id INT PRIMARY KEY AUTO_INCREMENT,\n            title VARCHAR(255) NOT NULL,\n            slug VARCHAR(255) UNIQUE NOT NULL,\n            short_desc TEXT,\n            content LONGTEXT,\n            image VARCHAR(255),\n            icon VARCHAR(100),\n            industry_id INT,\n            service_type VARCHAR(100),\n            sort_order INT DEFAULT 0,\n            status TINYINT(1) DEFAULT 1,\n            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,\n            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n            FOREIGN KEY (industry_id) REFERENCES industries(id) ON DELETE SET NULL\n        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci\n    ");
+
+    // Auto-migration: add service_type column if missing
+    $col = $pdo->query("SHOW COLUMNS FROM services LIKE 'service_type'")->fetch();
+    if (!$col) {
+        $pdo->exec("ALTER TABLE services ADD COLUMN service_type VARCHAR(100) AFTER industry_id");
+    }
 
     $pdo->exec("\n        CREATE TABLE IF NOT EXISTS projects (\n            id INT PRIMARY KEY AUTO_INCREMENT,\n            title VARCHAR(255) NOT NULL,\n            slug VARCHAR(255) UNIQUE NOT NULL,\n            industry_id INT,\n            service_id INT,\n            client_name VARCHAR(100),\n            short_desc TEXT,\n            content LONGTEXT,\n            thumbnail VARCHAR(255),\n            images TEXT,\n            video_url VARCHAR(255),\n            result_metrics TEXT,\n            start_date DATE,\n            end_date DATE,\n            status TINYINT(1) DEFAULT 1,\n            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,\n            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n            FOREIGN KEY (industry_id) REFERENCES industries(id) ON DELETE SET NULL,\n            FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE SET NULL\n        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci\n    ");
 
@@ -64,6 +70,48 @@ try {
     $pdo->exec("\n        CREATE TABLE IF NOT EXISTS consultations (\n            id INT PRIMARY KEY AUTO_INCREMENT,\n            name VARCHAR(100) NOT NULL,\n            email VARCHAR(100) NOT NULL,\n            phone VARCHAR(20) NOT NULL,\n            service VARCHAR(255),\n            message TEXT,\n            status ENUM('new','processing','done') DEFAULT 'new',\n            created_at DATETIME DEFAULT CURRENT_TIMESTAMP\n        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci\n    ");
 
     $pdo->exec("\n        CREATE TABLE IF NOT EXISTS clients (\n            id INT PRIMARY KEY AUTO_INCREMENT,\n            name VARCHAR(255) NOT NULL,\n            logo VARCHAR(255),\n            website_url VARCHAR(255),\n            sort_order INT DEFAULT 0,\n            status TINYINT(1) DEFAULT 1,\n            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,\n            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP\n        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci\n    ");
+
+    // Tuyển dụng
+    $pdo->exec("\n        CREATE TABLE IF NOT EXISTS recruitments (\n            id INT PRIMARY KEY AUTO_INCREMENT,\n            title VARCHAR(255) NOT NULL,\n            slug VARCHAR(255) UNIQUE NOT NULL,\n            location VARCHAR(150),\n            salary VARCHAR(150),\n            deadline DATE,\n            description TEXT,\n            status TINYINT(1) DEFAULT 1,\n            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,\n            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP\n        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci\n    ");
+
+    // Đơn ứng tuyển
+    $pdo->exec("\n        CREATE TABLE IF NOT EXISTS job_applications (\n            id INT PRIMARY KEY AUTO_INCREMENT,\n            recruitment_id INT NOT NULL,\n            name VARCHAR(255) NOT NULL,\n            email VARCHAR(255) NOT NULL,\n            phone VARCHAR(50) NOT NULL,\n            position VARCHAR(255),\n            message TEXT,\n            cv_file VARCHAR(500),\n            status VARCHAR(20) DEFAULT 'new',\n            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,\n            INDEX idx_recruitment (recruitment_id),\n            INDEX idx_status (status)\n        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci\n    ");
+
+    // Đăng ký khoá học
+    $pdo->exec("\n        CREATE TABLE IF NOT EXISTS course_enrollments (\n            id INT PRIMARY KEY AUTO_INCREMENT,\n            course_id INT,\n            user_id INT,\n            full_name VARCHAR(100),\n            phone VARCHAR(20),\n            email VARCHAR(100),\n            status ENUM('pending','confirmed','completed','cancelled') DEFAULT 'pending',\n            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,\n            FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE,\n            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL\n        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci\n    ");
+
+    // Đội ngũ nhân sự
+    $pdo->exec("\n        CREATE TABLE IF NOT EXISTS team_members (\n            id INT PRIMARY KEY AUTO_INCREMENT,\n            full_name VARCHAR(100),\n            position VARCHAR(100),\n            bio TEXT,\n            image VARCHAR(255),\n            facebook VARCHAR(255),\n            sort_order INT DEFAULT 0,\n            status TINYINT(1) DEFAULT 1\n        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci\n    ");
+
+    // Đánh giá khách hàng
+    $pdo->exec("\n        CREATE TABLE IF NOT EXISTS testimonials (\n            id INT PRIMARY KEY AUTO_INCREMENT,\n            client_name VARCHAR(100),\n            position VARCHAR(100),\n            content TEXT,\n            image VARCHAR(255),\n            rating TINYINT DEFAULT 5,\n            sort_order INT DEFAULT 0,\n            status TINYINT(1) DEFAULT 1\n        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci\n    ");
+
+    // Gallery chung
+    $pdo->exec("\n        CREATE TABLE IF NOT EXISTS gallery (\n            id INT PRIMARY KEY AUTO_INCREMENT,\n            title VARCHAR(150),\n            image VARCHAR(255) NOT NULL,\n            type ENUM('project','team','banner','course') DEFAULT 'project',\n            sort_order INT DEFAULT 0,\n            created_at DATETIME DEFAULT CURRENT_TIMESTAMP\n        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci\n    ");
+
+    // Tạo index để tối ưu tốc độ
+    $indexes = [
+        'CREATE INDEX IF NOT EXISTS idx_slug_services ON services(slug)',
+        'CREATE INDEX IF NOT EXISTS idx_slug_projects ON projects(slug)',
+        'CREATE INDEX IF NOT EXISTS idx_slug_blog_posts ON blog_posts(slug)',
+        'CREATE INDEX IF NOT EXISTS idx_slug_courses ON courses(slug)',
+        'CREATE INDEX IF NOT EXISTS idx_status_services ON services(status)',
+        'CREATE INDEX IF NOT EXISTS idx_status_projects ON projects(status)',
+        'CREATE INDEX IF NOT EXISTS idx_status_blog_posts ON blog_posts(status)',
+        'CREATE INDEX IF NOT EXISTS idx_status_courses ON courses(status)',
+        'CREATE INDEX IF NOT EXISTS idx_industry ON projects(industry_id)',
+        'CREATE INDEX IF NOT EXISTS idx_category ON blog_posts(category_id)',
+        'CREATE INDEX IF NOT EXISTS idx_views ON blog_posts(views DESC)',
+        'CREATE INDEX IF NOT EXISTS idx_featured ON blog_posts(is_featured)',
+    ];
+
+    foreach ($indexes as $idxSql) {
+        try {
+            $pdo->exec($idxSql);
+        } catch (PDOException $e) {
+            // Index có thể đã tồn tại, bỏ qua
+        }
+    }
 
     echo 'Database tables created successfully!';
 } catch (PDOException $e) {

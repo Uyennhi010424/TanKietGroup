@@ -10,6 +10,12 @@ function site_app_config(): array
         return $config;
     }
 
+    // Ensure env helper is loaded (for env() function in config)
+    $envHelper = __DIR__ . '/env.php';
+    if (is_file($envHelper)) {
+        require_once $envHelper;
+    }
+
     $configFile = __DIR__ . '/../config/config.php';
     if (is_file($configFile)) {
         $loaded = require $configFile;
@@ -103,6 +109,32 @@ function site_image_url(?string $path, string $fallback = ''): string
     return site_base_path() . '/' . ltrim($path, '/');
 }
 
+/**
+ * Get image URL, preferring WebP version if it exists on disk.
+ * Falls back to original if WebP not found.
+ */
+function site_image_url_webp(?string $path, string $fallback = ''): string
+{
+    $url = site_image_url($path, $fallback);
+
+    // Only check for WebP for local files (not external URLs)
+    if (preg_match('#^(https?:)?//#i', $url)) {
+        return $url;
+    }
+
+    // Check if a WebP version exists on disk
+    $relPath = trim((string)$path);
+    if ($relPath !== '' && !preg_match('#^(https?:)?//#i', $relPath)) {
+        $webpPath = preg_replace('/\.(jpg|jpeg|png)$/i', '.webp', $relPath);
+        $fullPath = __DIR__ . '/../' . ltrim($webpPath, '/');
+        if (is_file($fullPath)) {
+            return site_image_url($webpPath, $fallback);
+        }
+    }
+
+    return $url;
+}
+
 function site_logo_url(string $fallback = '/img/logo.jpg'): string
 {
     $site = site_settings();
@@ -186,6 +218,12 @@ function site_parse_json(?string $value, array $default = []): array
 
 function site_slugify(string $text): string
 {
+    // Delegate to make_slug() if available (defined in admin_helpers.php)
+    if (function_exists('make_slug')) {
+        return make_slug($text);
+    }
+
+    // Fallback when admin_helpers.php is not loaded
     $text = mb_strtolower(trim($text), 'UTF-8');
     $map = [
         'à' => 'a', 'á' => 'a', 'ạ' => 'a', 'ả' => 'a', 'ã' => 'a', 'â' => 'a', 'ă' => 'a', 'đ' => 'd',

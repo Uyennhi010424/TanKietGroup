@@ -91,9 +91,15 @@ function sanitize_html(?string $html): string
 
     $html = strip_tags($html, $allowed);
 
-    // Remove dangerous attributes: event handlers (on*), javascript: URIs
+    // Remove event handlers (on*) - quoted and unquoted
     $html = preg_replace('#\s+on\w+\s*=\s*(?:"[^"]*"|\'[^\']*\'|[^\s>]*)#i', '', $html);
-    $html = preg_replace('#(href|src|action)\s*=\s*(?:"javascript:[^"]*"|\'javascript:[^\']*\')#i', '', $html);
+
+    // Remove javascript:/vbscript:/data: URIs in href/src/action (quoted and unquoted)
+    $html = preg_replace('#(href|src|action)\s*=\s*(?:"(?:javascript|vbscript|data):[^"]*"|\'(?:javascript|vbscript|data):[^\']*\')#i', '', $html);
+    $html = preg_replace('#(href|src|action)\s*=\s*(?:javascript|vbscript|data):[^\s>]*#i', '', $html);
+
+    // Remove style attributes with dangerous content (expression, url, behavior)
+    $html = preg_replace('#\s+style\s*=\s*(?:"[^"]*(?:expression|url|behavior)[^"]*"|\'[^\']*(?:expression|url|behavior)[^\']*\')#i', '', $html);
 
     return $html;
 }

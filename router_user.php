@@ -2,6 +2,11 @@
 // Router for USER-FACING pages only (port 8000)
 define('APP_MODE', 'user');
 
+// Security headers
+header('X-Content-Type-Options: nosniff');
+header('X-Frame-Options: SAMEORIGIN');
+header('Referrer-Policy: strict-origin-when-cross-origin');
+
 $uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
 
 // Serve static files (CSS, JS, images)

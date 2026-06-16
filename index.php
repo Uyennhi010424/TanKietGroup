@@ -1,11 +1,36 @@
 <?php
 require_once __DIR__ . '/config/constants.php';
 
+// Global error handler & logging
+require_once __DIR__ . '/includes/error_handler.php';
+
+// Security headers
+header('X-Content-Type-Options: nosniff');
+header('X-Frame-Options: SAMEORIGIN');
+header('Referrer-Policy: strict-origin-when-cross-origin');
+header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data: https:; connect-src 'self' https://www.google-analytics.com https://cdn.jsdelivr.net;");
+
 // Mode-based routing: separate user (8000) and admin (8001) ports
 $reqPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
 $isAdminPage = str_starts_with($_GET['page'] ?? '', 'admin_');
 $isApiRoute = str_starts_with($reqPath, '/api/');
 $serverPort = (string)($_SERVER['SERVER_PORT'] ?? '');
+
+// Serve robots.txt
+if ($reqPath === '/robots.txt') {
+	$file = __DIR__ . '/robots.txt';
+	if (is_file($file)) {
+		header('Content-Type: text/plain; charset=utf-8');
+		readfile($file);
+		exit;
+	}
+}
+
+// Serve dynamic sitemap.xml
+if ($reqPath === '/sitemap.xml') {
+	require_once __DIR__ . '/api/generate_sitemap.php';
+	exit;
+}
 
 // Serve static files FIRST (works on ALL ports)
 // uploads/
@@ -30,6 +55,11 @@ if (preg_match('#^/uploads/(.*)$#', $reqPath, $m)) {
 		];
 		header('Content-Type: ' . ($mimes[$ext] ?? 'application/octet-stream'));
 		header('Content-Length: ' . filesize($file));
+		// Force download SVG files to prevent embedded script execution
+		if ($ext === 'svg') {
+			header('Content-Disposition: attachment; filename="' . basename($file) . '"');
+			header('X-Content-Type-Options: nosniff');
+		}
 		readfile($file);
 		exit;
 	}
@@ -62,6 +92,11 @@ if (preg_match('#^/(admin/)?(assets|img)/(.*)$#', $reqPath, $m)) {
 		header('X-Accel-Buffered-Response: no');
 		header('Content-Type: ' . ($mimes[$ext] ?? 'application/octet-stream'));
 		header('Content-Length: ' . filesize($file));
+		// Force download SVG files to prevent embedded script execution
+		if ($ext === 'svg') {
+			header('Content-Disposition: attachment; filename="' . basename($file) . '"');
+			header('X-Content-Type-Options: nosniff');
+		}
 		readfile($file);
 		exit;
 	}

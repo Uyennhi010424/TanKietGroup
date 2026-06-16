@@ -13,8 +13,16 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-// Rate limiting
-if (!api_rate_limit_check('apply_job', 30)) {
+// CSRF validation
+if (!csrf_validate((string)($_POST['csrf_token'] ?? ''))) {
+    http_response_code(403);
+    echo json_encode(['success' => false, 'message' => 'Phiên làm việc không hợp lệ, vui lòng tải lại trang']);
+    exit;
+}
+
+// Rate limiting (IP-based)
+$rateWait = ip_rate_limit_check('apply_job', 3, 30);
+if ($rateWait > 0) {
     http_response_code(429);
     echo json_encode(['success' => false, 'message' => 'Bạn gửi quá nhanh, vui lòng đợi vài giây rồi thử lại']);
     exit;
@@ -70,6 +78,25 @@ try {
             exit;
         }
 
+        // MIME type validation via file content
+        if (function_exists('finfo_open')) {
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            if ($finfo) {
+                $detectedMime = finfo_file($finfo, $file['tmp_name']);
+                $allowedMimes = [
+                    'application/pdf',
+                    'application/msword',
+                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                    'image/jpeg', 'image/png',
+                ];
+                if (!is_string($detectedMime) || !in_array($detectedMime, $allowedMimes, true)) {
+                    http_response_code(400);
+                    echo json_encode(['success' => false, 'message' => 'Nội dung file không hợp lệ']);
+                    exit;
+                }
+            }
+        }
+
         $targetDir = rtrim(__DIR__ . '/../uploads/cv', '/\\');
         if (!is_dir($targetDir) && !mkdir($targetDir, 0755, true)) {
             throw new RuntimeException('Không tạo được thư mục upload');
@@ -109,7 +136,7 @@ try {
         ':cv' => $cvFile,
     ]);
 
-    api_rate_limit_record('apply_job');
+    ip_rate_limit_record('apply_job');
     echo json_encode(['success' => true, 'message' => 'Đã gửi đơn ứng tuyển thành công! Chúng tôi sẽ liên hệ với bạn sớm.']);
 
 } catch (Exception $e) {

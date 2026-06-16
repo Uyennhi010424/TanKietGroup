@@ -1,6 +1,9 @@
 <?php
 require_once __DIR__ . '/../includes/site.php';
 
+// Load Swiper CSS/JS only on home page
+$loadSwiper = true;
+
 $site = site_settings();
 $heroBanner = site_image_url($site['banner'] ?? '', '/img/hero.jpg');
 $clients = site_fetch_all(
@@ -99,7 +102,6 @@ $posts = site_fetch_all(
 						alt="<?php echo htmlspecialchars($client['name'], ENT_QUOTES, 'UTF-8'); ?>"
 						class="client-logo"
 						loading="lazy">
-					<span class="client-name"><?php echo htmlspecialchars($client['name'], ENT_QUOTES, 'UTF-8'); ?></span>
 				<?php if (!empty($client['website_url'])): ?>
 					</a>
 				<?php else: ?>
@@ -178,7 +180,7 @@ $posts = site_fetch_all(
 						<div class="swiper-slide">
 							<article class="card project-card reveal">
 								<div class="card-media">
-									<img src="<?php echo htmlspecialchars(site_image_url($project['thumbnail'] ?? '', '/img/du_an3.jpg'), ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($project['title'], ENT_QUOTES, 'UTF-8'); ?>">
+									<img src="<?php echo htmlspecialchars(site_image_url($project['thumbnail'] ?? '', '/img/du_an3.jpg'), ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($project['title'], ENT_QUOTES, 'UTF-8'); ?>" loading="lazy">
 									<a href="/du-an/<?php echo htmlspecialchars($project['slug'], ENT_QUOTES, 'UTF-8'); ?>"
 										class="project-overlay swiper-no-swiping">
 										Xem chi tiết
