@@ -78,29 +78,51 @@ function admin_current_user(): ?array
 
 function admin_is_logged_in(): bool
 {
-    return admin_current_user() !== null;
+    ensure_session_started();
+
+    // Check session timeout (30 minutes)
+    $timeout = 30 * 60; // 30 minutes in seconds
+    $lastActivity = $_SESSION['admin_last_activity'] ?? 0;
+
+    if ($lastActivity > 0 && (time() - $lastActivity) > $timeout) {
+        // Session expired - destroy it
+        unset($_SESSION['admin_user'], $_SESSION['admin_last_activity']);
+        return false;
+    }
+
+    $user = $_SESSION['admin_user'] ?? null;
+    if ($user !== null) {
+        // Update last activity time
+        $_SESSION['admin_last_activity'] = time();
+        return true;
+    }
+
+    return false;
 }
 
 function admin_login_user(array $user): void
 {
     ensure_session_started();
-    
+
     // Preserve CSRF token during session regeneration
     $csrfToken = $_SESSION['csrf_token'] ?? null;
-    
+
     session_regenerate_id(true);
-    
+
     // Restore CSRF token after regeneration
     if ($csrfToken !== null) {
         $_SESSION['csrf_token'] = $csrfToken;
     }
-    
+
     $_SESSION['admin_user'] = [
         'id' => (int)($user['id'] ?? 0),
         'username' => (string)($user['username'] ?? ''),
         'full_name' => (string)($user['full_name'] ?? ''),
         'role' => (string)($user['role'] ?? 'user'),
     ];
+
+    // Set session timeout
+    $_SESSION['admin_last_activity'] = time();
 }
 
 function admin_logout_user(): void

@@ -84,8 +84,40 @@ if ($db && $_SERVER['REQUEST_METHOD'] === 'POST') {
                 $thumbnail = $uploadedThumbnail;
             }
 
+            // Handle multiple image uploads
+            $images = [];
+            if (!empty($_POST['existing_images'])) {
+                $images = array_values(array_filter((array)$_POST['existing_images']));
+            }
+            if (!empty($_FILES['project_images']['name'][0])) {
+                foreach ($_FILES['project_images']['name'] as $i => $name) {
+                    if ($_FILES['project_images']['error'][$i] === UPLOAD_ERR_OK) {
+                        $tmpFile = $_FILES['project_images']['tmp_name'][$i];
+                        $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
+                        $allowed = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+                        if (in_array($ext, $allowed, true)) {
+                            $newName = date('YmdHis') . '_' . bin2hex(random_bytes(6)) . '.' . $ext;
+                            $targetDir = __DIR__ . '/../uploads/projects';
+                            if (!is_dir($targetDir)) { mkdir($targetDir, 0755, true); }
+                            if (move_uploaded_file($tmpFile, $targetDir . '/' . $newName)) {
+                                $images[] = 'uploads/projects/' . $newName;
+                            }
+                        }
+                    }
+                }
+            }
+            $imagesJson = json_encode(array_values($images), JSON_UNESCAPED_SLASHES);
+
+            // Set cover image
+            $coverImage = trim($_POST['cover_image'] ?? '');
+            if ($coverImage !== '' && in_array($coverImage, $images, true)) {
+                $thumbnail = $coverImage;
+            } elseif (empty($thumbnail) && !empty($images)) {
+                $thumbnail = $images[0];
+            }
+
             if ($id > 0) {
-                $stmt = $db->prepare('UPDATE projects SET title = :title, slug = :slug, client_name = :client_name, industry_id = :industry_id, service_id = :service_id, short_desc = :short_desc, content = :content, result_metrics = :result_metrics, thumbnail = :thumbnail, status = :status WHERE id = :id');
+                $stmt = $db->prepare('UPDATE projects SET title = :title, slug = :slug, client_name = :client_name, industry_id = :industry_id, service_id = :service_id, short_desc = :short_desc, content = :content, result_metrics = :result_metrics, thumbnail = :thumbnail, images = :images, status = :status WHERE id = :id');
                 $stmt->execute([
                     'id' => $id,
                     'title' => $title,
@@ -97,12 +129,13 @@ if ($db && $_SERVER['REQUEST_METHOD'] === 'POST') {
                     'content' => $content,
                     'result_metrics' => $resultMetrics,
                     'thumbnail' => $thumbnail,
+                    'images' => $imagesJson,
                     'status' => $status,
                 ]);
                 header('Location: ' . with_query($adminRoutes['projects'], ['msg' => 'Đã cập nhật dự án']));
                 exit;
             }
-            $stmt = $db->prepare('INSERT INTO projects (title, slug, client_name, industry_id, service_id, short_desc, content, result_metrics, thumbnail, status) VALUES (:title, :slug, :client_name, :industry_id, :service_id, :short_desc, :content, :result_metrics, :thumbnail, :status)');
+            $stmt = $db->prepare('INSERT INTO projects (title, slug, client_name, industry_id, service_id, short_desc, content, result_metrics, thumbnail, images, status) VALUES (:title, :slug, :client_name, :industry_id, :service_id, :short_desc, :content, :result_metrics, :thumbnail, :images, :status)');
             $stmt->execute([
                 'title' => $title,
                 'slug' => $slug,
@@ -113,6 +146,7 @@ if ($db && $_SERVER['REQUEST_METHOD'] === 'POST') {
                 'content' => $content,
                 'result_metrics' => $resultMetrics,
                 'thumbnail' => $thumbnail,
+                'images' => $imagesJson,
                 'status' => $status,
             ]);
             header('Location: ' . with_query($adminRoutes['projects'], ['msg' => 'Đã thêm dự án']));
@@ -135,13 +169,14 @@ $editing = [
     'content' => '',
     'result_metrics' => '',
     'thumbnail' => '',
+    'images' => '[]',
     'status' => 1,
 ];
 
 if ($db && isset($_GET['edit'])) {
     $editId = (int)$_GET['edit'];
     if ($editId > 0) {
-        $stmt = $db->prepare('SELECT p.id, p.title, p.slug, p.client_name, p.industry_id, p.service_id, p.short_desc, p.content, p.result_metrics, p.thumbnail, p.status, i.name AS industry_name FROM projects p LEFT JOIN industries i ON i.id = p.industry_id WHERE p.id = :id LIMIT 1');
+        $stmt = $db->prepare('SELECT p.id, p.title, p.slug, p.client_name, p.industry_id, p.service_id, p.short_desc, p.content, p.result_metrics, p.thumbnail, p.images, p.status, i.name AS industry_name FROM projects p LEFT JOIN industries i ON i.id = p.industry_id WHERE p.id = :id LIMIT 1');
         $stmt->execute(['id' => $editId]);
         $row = $stmt->fetch();
         if ($row) {
@@ -238,11 +273,32 @@ admin_header('Dự án', 'Quản lý các dự án', $admin, 'projects');
                         </div>
 
                         <div style="grid-column:1 / -1;">
-                            <label class="small">Hình ảnh dự án</label>
+                            <label class="small">Ảnh bìa (thumbnail)</label>
                             <input class="form-control" type="file" name="thumbnail_file" accept="image/*">
                             <?php if (!empty($editing['thumbnail'])): ?>
-                                <div class="small" style="margin-top:8px;">Ảnh hiện tại: <?php echo h($editing['thumbnail']); ?></div>
+                                <div class="small" style="margin-top:8px;">Ảnh bìa hiện tại: <?php echo h($editing['thumbnail']); ?></div>
                                 <img src="<?php echo h($mediaRoute . rawurlencode($editing['thumbnail'])); ?>" alt="Project thumbnail" style="margin-top:8px;max-height:80px;border-radius:8px;border:1px solid rgba(255,255,255,0.08);">
+                            <?php endif; ?>
+                        </div>
+
+                        <div style="grid-column:1 / -1;">
+                            <label class="small">Thư viện ảnh (nhiều ảnh)</label>
+                            <input class="form-control" type="file" name="project_images[]" accept="image/*" multiple>
+                            <?php
+                            $projectImages = json_decode($editing['images'] ?? '[]', true) ?: [];
+                            if (!empty($projectImages)):
+                            ?>
+                                <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:10px;">
+                                    <?php foreach ($projectImages as $idx => $img): ?>
+                                        <div style="position:relative;display:inline-block;">
+                                            <img src="<?php echo h($mediaRoute . rawurlencode($img)); ?>" alt="Image <?php echo $idx + 1; ?>" style="max-height:80px;border-radius:8px;border:2px solid <?php echo ($img === ($editing['thumbnail'] ?? '')) ? 'var(--ak-primary)' : 'rgba(255,255,255,0.08)'; ?>;">
+                                            <label style="display:block;text-align:center;font-size:0.7rem;margin-top:2px;cursor:pointer;">
+                                                <input type="radio" name="cover_image" value="<?php echo h($img); ?>" <?php echo ($img === ($editing['thumbnail'] ?? '')) ? 'checked' : ''; ?>> Bìa
+                                            </label>
+                                            <input type="hidden" name="existing_images[]" value="<?php echo h($img); ?>">
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
                             <?php endif; ?>
                         </div>
 

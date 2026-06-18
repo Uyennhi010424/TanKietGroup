@@ -61,6 +61,9 @@ $breadcrumbJsonLd = json_encode([
         ['@type' => 'ListItem', 'position' => 3, 'name' => $post['title']],
     ]
 ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+$thumbUrl = site_image_url($post['thumbnail'] ?? '', '/img/hero.jpg');
+function bl_h($v) { return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8'); }
 ?>
 
 <!-- Breadcrumb -->
@@ -70,68 +73,55 @@ $breadcrumbJsonLd = json_encode([
 		<span class="separator" aria-hidden="true">›</span>
 		<a href="<?php echo htmlspecialchars(site_page_url('blog'), ENT_QUOTES, 'UTF-8'); ?>">Blog</a>
 		<span class="separator" aria-hidden="true">›</span>
-		<span class="current"><?php echo htmlspecialchars($post['title'], ENT_QUOTES, 'UTF-8'); ?></span>
+		<span class="current"><?php echo bl_h($post['title']); ?></span>
 	</div>
 </nav>
 
-<!-- Hero Banner + Title -->
-<section class="vintage-hero" style="--hero-banner: url('<?php echo htmlspecialchars(site_image_url($post['thumbnail'] ?? '', '/img/hero.jpg'), ENT_QUOTES, 'UTF-8'); ?>');">
-    <div class="container reveal">
-        <span class="vintage-hero__category"><?php echo htmlspecialchars($post['category_name'] ?: 'Blog', ENT_QUOTES, 'UTF-8'); ?></span>
-        <h1 class="vintage-hero__title"><?php echo htmlspecialchars($post['title'], ENT_QUOTES, 'UTF-8'); ?></h1>
-        <div class="vintage-hero__meta">
-            <span class="vintage-hero__author">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                <?php echo htmlspecialchars($post['author_name'] ?: 'TanKiet Group', ENT_QUOTES, 'UTF-8'); ?>
-            </span>
-            <?php if ($publishedDate): ?>
-            <span class="vintage-hero__date">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                <?php echo $publishedDate; ?>
-            </span>
-            <?php endif; ?>
-        </div>
-    </div>
+<!-- Hero -->
+<section class="bl-hero">
+	<div class="container bl-hero__inner reveal">
+		<div class="bl-hero__content">
+			<?php if (!empty($post['category_name'])): ?>
+				<span class="bl-hero__tag"><?php echo bl_h($post['category_name']); ?></span>
+			<?php endif; ?>
+			<h1 class="bl-hero__title"><?php echo bl_h($post['title']); ?></h1>
+			<div class="bl-hero__meta">
+				<?php if (!empty($post['author_name'])): ?>
+					<span class="bl-meta__item"><?php echo bl_h($post['author_name']); ?></span>
+				<?php endif; ?>
+				<?php if ($publishedDate): ?>
+					<span class="bl-meta__item bl-meta__item--date"><?php echo $publishedDate; ?></span>
+				<?php endif; ?>
+			</div>
+		</div>
+	</div>
 </section>
 
-<!-- Article Content -->
-<section class="vintage-article">
-    <div class="container">
-        <div class="vintage-article__layout">
-            <article class="vintage-article__content reveal">
-                <div class="vintage-prose">
-                    <?php echo $post['content'] ? sanitize_html($post['content']) : '<p>Nội dung bài viết chưa được cập nhật.</p>'; ?>
-                </div>
-            </article>
+<!-- Thumbnail -->
+<?php if (!empty($post['thumbnail'])): ?>
+<section class="bl-thumb reveal">
+	<div class="container">
+		<div class="bl-thumb__wrap">
+			<img src="<?php echo htmlspecialchars($thumbUrl, ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo bl_h($post['title']); ?>">
+		</div>
+	</div>
+</section>
+<?php endif; ?>
 
-            <aside class="vintage-article__sidebar reveal">
-                <div class="vintage-sidebar-card">
-                    <div class="vintage-sidebar-card__header">
-                        <span>✦</span> Thông tin bài viết
-                    </div>
-                    <ul class="vintage-sidebar-card__list">
-                        <li>
-                            <span class="vintage-sidebar-card__label">Danh mục</span>
-                            <span class="vintage-sidebar-card__value"><?php echo htmlspecialchars($post['category_name'] ?: '-', ENT_QUOTES, 'UTF-8'); ?></span>
-                        </li>
-                        <li>
-                            <span class="vintage-sidebar-card__label">Tác giả</span>
-                            <span class="vintage-sidebar-card__value"><?php echo htmlspecialchars($post['author_name'] ?: '-', ENT_QUOTES, 'UTF-8'); ?></span>
-                        </li>
-                        <?php if ($publishedDate): ?>
-                        <li>
-                            <span class="vintage-sidebar-card__label">Ngày đăng</span>
-                            <span class="vintage-sidebar-card__value"><?php echo $publishedDate; ?></span>
-                        </li>
-                        <?php endif; ?>
-                    </ul>
-                    <div class="vintage-sidebar-card__footer">
-                        <a href="<?php echo htmlspecialchars(site_page_url('blog'), ENT_QUOTES, 'UTF-8'); ?>" class="vintage-btn-back">
-                            ← Quay lại Blog
-                        </a>
-                    </div>
-                </div>
-            </aside>
-        </div>
-    </div>
+<!-- Content -->
+<section class="bl-body">
+	<div class="container">
+		<article class="bl-content reveal">
+			<?php echo $post['content'] ? sanitize_html($post['content']) : '<p>Nội dung bài viết chưa được cập nhật.</p>'; ?>
+		</article>
+	</div>
+</section>
+
+<!-- Back to Blog -->
+<section class="bl-footer reveal">
+	<div class="container">
+		<a href="<?php echo htmlspecialchars(site_page_url('blog'), ENT_QUOTES, 'UTF-8'); ?>" class="bl-back">
+			← Quay lại tất cả bài viết
+		</a>
+	</div>
 </section>
