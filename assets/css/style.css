@@ -2682,36 +2682,352 @@ label {
 
 .vintage-prose {
   font-family: inherit;
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   font-weight: 400;
-  line-height: 1.9;
+  line-height: 2;
   color: var(--text);
   text-align: justify;
+  max-width: 700px;
+}
+
+/* Feature list - danh sách tính năng chuyên nghiệp */
+.vintage-feature-list {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0 36px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 10px;
+}
+
+.vintage-feature-list li {
+  padding: 14px 16px 14px 42px;
+  background: rgba(134, 215, 223, 0.03);
+  border: 1px solid rgba(134, 215, 223, 0.06);
+  border-radius: 8px;
+  position: relative;
+  color: rgba(229, 241, 242, 0.92);
+  font-size: 0.93rem;
+  line-height: 1.5;
+  transition: all 0.25s ease;
+  cursor: default;
+}
+
+.vintage-feature-list li::before {
+  content: "";
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  background: rgba(134, 215, 223, 0.1);
+  border: 1.5px solid rgba(134, 215, 223, 0.3);
+  border-radius: 4px;
+  transition: all 0.25s ease;
+}
+
+.vintage-feature-list li::after {
+  content: "✓";
+  position: absolute;
+  left: 17px;
+  top: 50%;
+  transform: translateY(-50%) scale(0.8);
+  font-size: 0.6rem;
+  font-weight: 800;
+  color: var(--primary);
+  opacity: 0.6;
+  transition: all 0.25s ease;
+}
+
+.vintage-feature-list li:hover {
+  background: rgba(134, 215, 223, 0.07);
+  border-color: rgba(134, 215, 223, 0.15);
+  transform: translateX(4px);
+}
+
+.vintage-feature-list li:hover::before {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+.vintage-feature-list li:hover::after {
+  color: #0a2328;
+  opacity: 1;
+  transform: translateY(-50%) scale(1);
+}
+
+/* Entrance animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.vintage-feature-list li {
+  animation: fadeInUp 0.4s ease forwards;
+  opacity: 0;
+}
+
+.vintage-feature-list li:nth-child(1) { animation-delay: 0.05s; }
+.vintage-feature-list li:nth-child(2) { animation-delay: 0.1s; }
+.vintage-feature-list li:nth-child(3) { animation-delay: 0.15s; }
+.vintage-feature-list li:nth-child(4) { animation-delay: 0.2s; }
+.vintage-feature-list li:nth-child(5) { animation-delay: 0.25s; }
+.vintage-feature-list li:nth-child(6) { animation-delay: 0.3s; }
+.vintage-feature-list li:nth-child(7) { animation-delay: 0.35s; }
+.vintage-feature-list li:nth-child(8) { animation-delay: 0.4s; }
+.vintage-feature-list li:nth-child(9) { animation-delay: 0.45s; }
+.vintage-feature-list li:nth-child(10) { animation-delay: 0.5s; }
+
+@media (max-width: 600px) {
+  .vintage-feature-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Section headers in content */
+.vintage-prose h3 {
+  font-family: inherit;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 36px 0 12px;
+  padding-left: 14px;
+  border-left: 2px solid rgba(134, 215, 223, 0.25);
+  letter-spacing: 0.3px;
+}
+
+/* Intro paragraph */
+.vintage-prose > p:first-of-type {
+  font-size: 1.05rem;
+  line-height: 1.9;
+  color: rgba(229, 241, 242, 0.95);
+}
+
+/* Closing statement - last paragraph */
+.vintage-prose > p:last-of-type {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(134, 215, 223, 0.06);
+  font-style: italic;
+  color: rgba(229, 241, 242, 0.8);
+  font-size: 0.98rem;
+}
+
+/* Checklist style cho nội dung */
+.vintage-prose ul,
+.vintage-checklist {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.vintage-prose ul li,
+.vintage-checklist li {
+  padding: 16px 20px 16px 52px;
+  background: linear-gradient(135deg, rgba(24, 38, 41, 0.8), rgba(20, 29, 31, 0.6));
+  border: 1px solid rgba(134, 215, 223, 0.08);
+  border-radius: 10px;
+  position: relative;
+  color: rgba(229, 241, 242, 0.95);
+  font-size: 0.98rem;
+  line-height: 1.6;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.vintage-prose ul li::before,
+.vintage-checklist li::before {
+  content: "";
+  position: absolute;
+  left: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  background: linear-gradient(135deg, rgba(134, 215, 223, 0.2), rgba(134, 215, 223, 0.05));
+  border: 2px solid rgba(134, 215, 223, 0.4);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.vintage-prose ul li::after,
+.vintage-checklist li::after {
+  content: "✓";
+  position: absolute;
+  left: 22px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: var(--primary);
+  opacity: 0.8;
+  transition: all 0.3s ease;
+}
+
+.vintage-prose ul li:hover,
+.vintage-checklist li:hover {
+  background: linear-gradient(135deg, rgba(134, 215, 223, 0.08), rgba(24, 38, 41, 0.9));
+  border-color: rgba(134, 215, 223, 0.2);
+  transform: translateX(6px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2), -4px 0 0 var(--primary);
+}
+
+.vintage-prose ul li:hover::before,
+.vintage-checklist li:hover::before {
+  background: linear-gradient(135deg, var(--primary), rgba(134, 215, 223, 0.8));
+  border-color: var(--primary);
+}
+
+.vintage-prose ul li:hover::after,
+.vintage-checklist li:hover::after {
+  color: #0a2328;
+  opacity: 1;
+}
+
+/* Nested list */
+.vintage-prose ul li ul,
+.vintage-prose ul li ol,
+.vintage-checklist li ul,
+.vintage-checklist li ol {
+  margin: 10px 0 0;
+  padding: 0;
+  gap: 6px;
+}
+
+.vintage-prose ul li li,
+.vintage-checklist li li {
+  background: transparent;
+  border: none;
+  padding: 6px 0 6px 24px;
+  margin-bottom: 0;
+  font-size: 0.92rem;
+  color: rgba(229, 241, 242, 0.8);
+}
+
+.vintage-prose ul li li::before,
+.vintage-checklist li li::before {
+  content: "";
+  position: static;
+  width: 6px;
+  height: 6px;
+  background: var(--primary);
+  border: none;
+  border-radius: 50%;
+  transform: none;
+  display: inline-block;
+  margin-right: 10px;
+  vertical-align: middle;
+}
+
+.vintage-prose ul li li::after,
+.vintage-checklist li li::after {
+  display: none;
+}
+
+.vintage-prose ul li li:hover,
+.vintage-checklist li li:hover {
+  background: transparent;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Paragraph styling */
+.vintage-prose p {
+  margin: 0 0 28px;
+  color: rgba(229, 241, 242, 0.88);
+  position: relative;
+  padding-left: 0;
+}
+
+/* Intro paragraph - first paragraph gets special treatment */
+.vintage-prose > p:first-of-type {
+  font-size: 1.1rem;
+  color: rgba(229, 241, 242, 0.95);
+  line-height: 2;
+  padding-bottom: 24px;
+  border-bottom: 1px solid rgba(134, 215, 223, 0.06);
+  margin-bottom: 32px;
+}
+
+/* Section dividers */
+.vintage-prose h2 {
+  margin-top: 48px;
+  padding-top: 32px;
+  border-top: 1px solid rgba(134, 215, 223, 0.06);
+}
+
+.vintage-prose h2:first-of-type {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+
+/* Drop cap cho đoạn đầu tiên */
+.vintage-prose > p:first-of-type::first-letter {
+  float: left;
+  font-size: 3.2rem;
+  font-weight: 700;
+  line-height: 1;
+  margin: 4px 12px 0 0;
+  color: var(--primary);
 }
 
 .vintage-prose h2 {
   font-family: inherit;
-  font-size: 1.6rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: var(--text);
-  margin: 48px 0 20px;
-  padding-bottom: 12px;
+  margin: 56px 0 20px;
+  padding-bottom: 14px;
   border-bottom: 1px solid rgba(134, 215, 223, 0.1);
   text-align: left;
+  letter-spacing: 0.5px;
+  position: relative;
+}
+
+.vintage-prose h2::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 60px;
+  height: 2px;
+  background: var(--primary);
 }
 
 .vintage-prose h3 {
   font-family: inherit;
-  font-size: 1.3rem;
-  font-weight: 700;
+  font-size: 1.2rem;
+  font-weight: 600;
   color: var(--text);
-  margin: 36px 0 16px;
+  margin: 40px 0 16px;
   text-align: left;
+  padding-left: 16px;
+  border-left: 3px solid rgba(134, 215, 223, 0.2);
 }
 
 .vintage-prose p {
-  margin: 0 0 24px;
-  color: rgba(229, 241, 242, 0.9);
+  margin: 0 0 28px;
+  color: rgba(229, 241, 242, 0.88);
+}
+
+/* Separator giữa các section lớn */
+.vintage-prose h2 + p,
+.vintage-prose h3 + p {
+  margin-top: 0;
 }
 
 .vintage-prose a {
@@ -2727,13 +3043,14 @@ label {
 }
 
 .vintage-prose blockquote {
-  margin: 32px 0;
+  margin: 36px 0;
   padding: 24px 28px;
   border-left: 3px solid var(--primary);
   background: rgba(134, 215, 223, 0.04);
   border-radius: 0 8px 8px 0;
   font-style: italic;
   color: rgba(229, 241, 242, 0.85);
+  text-align: left;
   text-align: left;
 }
 
@@ -2743,13 +3060,30 @@ label {
 
 .vintage-prose ul,
 .vintage-prose ol {
-  margin: 0 0 24px;
-  padding-left: 24px;
+  margin: 0 0 28px;
+  padding-left: 28px;
 }
 
 .vintage-prose li {
-  margin-bottom: 8px;
-  color: rgba(229, 241, 242, 0.9);
+  margin-bottom: 12px;
+  color: rgba(229, 241, 242, 0.88);
+  line-height: 1.7;
+}
+
+.vintage-prose li::marker {
+  color: var(--primary);
+}
+
+/* Nested lists */
+.vintage-prose li ul,
+.vintage-prose li ol {
+  margin: 8px 0 0;
+  padding-left: 20px;
+}
+
+.vintage-prose li li {
+  margin-bottom: 6px;
+  font-size: 0.95rem;
 }
 
 .vintage-prose li::marker {
@@ -2791,31 +3125,58 @@ label {
 .vintage-prose hr {
   border: none;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(134, 215, 223, 0.2), transparent);
-  margin: 40px 0;
+  background: linear-gradient(90deg, transparent, rgba(134, 215, 223, 0.25), transparent);
+  margin: 48px auto;
+  max-width: 200px;
+  position: relative;
+}
+
+.vintage-prose hr::after {
+  content: "✦";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--bg);
+  padding: 0 12px;
+  color: var(--primary);
+  font-size: 0.8rem;
+  opacity: 0.5;
 }
 
 .vintage-prose table {
   width: 100%;
   border-collapse: collapse;
-  margin: 24px 0;
+  margin: 32px 0;
   font-family: inherit;
   font-size: 0.95rem;
+  border: 1px solid rgba(134, 215, 223, 0.08);
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 .vintage-prose th,
 .vintage-prose td {
-  padding: 12px 16px;
+  padding: 14px 18px;
   text-align: left;
-  border-bottom: 1px solid rgba(134, 215, 223, 0.08);
+  border-bottom: 1px solid rgba(134, 215, 223, 0.06);
 }
 
 .vintage-prose th {
   font-weight: 600;
   color: var(--primary);
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 1px;
+  background: rgba(134, 215, 223, 0.04);
+}
+
+.vintage-prose tr:last-child td {
+  border-bottom: none;
+}
+
+.vintage-prose tr:hover td {
+  background: rgba(134, 215, 223, 0.02);
 }
 
 /* Sidebar */
@@ -2926,5 +3287,142 @@ label {
 
   .vintage-prose {
     font-size: 1rem;
+  }
+}
+
+/* ============================================================
+   VINTAGE PRICING PACKAGES
+   ============================================================ */
+
+.vintage-packages {
+  padding: 60px 0 80px;
+  text-align: center;
+}
+
+.vintage-packages__title {
+  font-family: inherit;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 8px;
+}
+
+.vintage-packages__subtitle {
+  font-size: 1rem;
+  color: var(--muted);
+  margin: 0 0 40px;
+}
+
+.vintage-packages__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.vintage-package-card {
+  background: linear-gradient(155deg, rgba(24, 38, 41, 0.9), rgba(20, 29, 31, 0.72));
+  border: 1px solid rgba(134, 215, 223, 0.1);
+  border-radius: 12px;
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.vintage-package-card:hover {
+  border-color: rgba(134, 215, 223, 0.25);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+}
+
+.vintage-package-card--highlighted {
+  border-color: rgba(134, 215, 223, 0.3);
+  background: linear-gradient(155deg, rgba(134, 215, 223, 0.08), rgba(20, 29, 31, 0.9));
+  box-shadow: 0 8px 24px rgba(134, 215, 223, 0.1);
+}
+
+.vintage-package-card__badge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--primary);
+  color: #0a2328;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 16px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.vintage-package-card__header {
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(134, 215, 223, 0.08);
+}
+
+.vintage-package-card__name {
+  font-family: inherit;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 12px;
+}
+
+.vintage-package-card__price {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 4px;
+}
+
+.vintage-package-card__amount {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.vintage-package-card__unit {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.vintage-package-card__features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 24px;
+  text-align: left;
+  flex: 1;
+}
+
+.vintage-package-card__features li {
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(134, 215, 223, 0.04);
+  font-size: 0.9rem;
+  color: rgba(229, 241, 242, 0.85);
+  position: relative;
+  padding-left: 20px;
+}
+
+.vintage-package-card__features li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.vintage-package-card__features li:last-child {
+  border-bottom: none;
+}
+
+@media (max-width: 740px) {
+  .vintage-packages__grid {
+    grid-template-columns: 1fr;
+    max-width: 400px;
   }
 }

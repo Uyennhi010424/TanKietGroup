@@ -12,6 +12,13 @@ header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-i
 
 // Mode-based routing: separate user (8000) and admin (8001) ports
 $reqPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+
+// Serve media.php directly (for uploads with Unicode paths)
+if ($reqPath === '/media.php') {
+    require __DIR__ . '/media.php';
+    exit;
+}
+
 $isAdminPage = str_starts_with($_GET['page'] ?? '', 'admin_');
 $isApiRoute = str_starts_with($reqPath, '/api/');
 $serverPort = (string)($_SERVER['SERVER_PORT'] ?? '');
@@ -115,8 +122,9 @@ if (preg_match('#^/api/([a-z_]+)\.php$#', $reqPath, $m)) {
 }
 
 // Port restriction AFTER static files
-// Port 8000 = user only (block admin pages)
-if ($serverPort === '8000' && $isAdminPage) {
+// Port 8000 = user only (block admin pages, except admin_media which serves images)
+$currentPage = $_GET['page'] ?? 'home';
+if ($serverPort === '8000' && $isAdminPage && $currentPage !== 'admin_media') {
     http_response_code(404);
     echo 'Not found';
     exit;

@@ -15,7 +15,7 @@ if (is_file($adminCssFile)) {
 $loginSite = site_settings();
 $loginLogo = trim((string)($loginSite['logo'] ?? ''));
 if ($loginLogo !== '' && str_starts_with($loginLogo, 'uploads/')) {
-    $logoSrc = site_page_url('admin_media') . '&path=' . rawurlencode($loginLogo);
+    $logoSrc = '/media.php?path=' . rawurlencode($loginLogo);
 } else {
     $logoSrc = site_logo_url('/img/logo.jpg');
 }

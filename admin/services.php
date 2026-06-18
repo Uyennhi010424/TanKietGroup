@@ -7,7 +7,7 @@ $admin = admin_init();
 $adminRoutes = $admin['routes'];
 $isEditor = $admin['isEditor'];
 $csrfToken = csrf_token();
-$mediaRoute = site_page_url('admin_media') . '&path=';
+$mediaRoute = '/media.php?path=';
 
 $servicePresets = [
     'Marketing trọn gói (Chiến lược xây kênh)',
@@ -109,6 +109,14 @@ if ($db && $_SERVER['REQUEST_METHOD'] === 'POST') {
                 $image = $uploaded;
             }
 
+            // Save packages
+            $packageNames = $_POST['pkg_name'] ?? [];
+            $packagePrices = $_POST['pkg_price'] ?? [];
+            $packageUnits = $_POST['pkg_unit'] ?? [];
+            $packageFeatures = $_POST['pkg_features'] ?? [];
+            $packageHighlight = $_POST['pkg_highlight'] ?? [];
+            ensure_service_packages_table($db);
+
             if ($id > 0) {
                 $stmt = $db->prepare('UPDATE services SET title = :title, slug = :slug, industry_id = :industry_id, service_type = :service_type, short_desc = :short_desc, content = :content, image = :image, status = :status WHERE id = :id');
                 $stmt->execute([
@@ -122,6 +130,24 @@ if ($db && $_SERVER['REQUEST_METHOD'] === 'POST') {
                     'image' => $image,
                     'status' => $status,
                 ]);
+
+                // Delete old packages and re-insert
+                $db->prepare('DELETE FROM service_packages WHERE service_id = :sid')->execute(['sid' => $id]);
+                $insPkg = $db->prepare('INSERT INTO service_packages (service_id, name, price, price_unit, features, is_highlighted, sort_order) VALUES (:sid, :name, :price, :unit, :features, :hl, :ord)');
+                for ($i = 0; $i < count($packageNames); $i++) {
+                    $pkgName = trim((string)($packageNames[$i] ?? ''));
+                    if ($pkgName === '') continue;
+                    $insPkg->execute([
+                        'sid' => $id,
+                        'name' => $pkgName,
+                        'price' => trim((string)($packagePrices[$i] ?? '')),
+                        'unit' => trim((string)($packageUnits[$i] ?? '')),
+                        'features' => trim((string)($packageFeatures[$i] ?? '')),
+                        'hl' => in_array($i, $packageHighlight, true) ? 1 : 0,
+                        'ord' => $i,
+                    ]);
+                }
+
                 header('Location: ' . with_query($adminRoutes['services'], ['msg' => 'Đã cập nhật dịch vụ']));
                 exit;
             }
@@ -137,6 +163,26 @@ if ($db && $_SERVER['REQUEST_METHOD'] === 'POST') {
                 'image' => $image,
                 'status' => $status,
             ]);
+
+            $newId = (int)$db->lastInsertId();
+
+            // Save packages for new service
+            if ($newId > 0) {
+                $insPkg = $db->prepare('INSERT INTO service_packages (service_id, name, price, price_unit, features, is_highlighted, sort_order) VALUES (:sid, :name, :price, :unit, :features, :hl, :ord)');
+                for ($i = 0; $i < count($packageNames); $i++) {
+                    $pkgName = trim((string)($packageNames[$i] ?? ''));
+                    if ($pkgName === '') continue;
+                    $insPkg->execute([
+                        'sid' => $newId,
+                        'name' => $pkgName,
+                        'price' => trim((string)($packagePrices[$i] ?? '')),
+                        'unit' => trim((string)($packageUnits[$i] ?? '')),
+                        'features' => trim((string)($packageFeatures[$i] ?? '')),
+                        'hl' => in_array($i, $packageHighlight, true) ? 1 : 0,
+                        'ord' => $i,
+                    ]);
+                }
+            }
 
             header('Location: ' . with_query($adminRoutes['services'], ['msg' => 'Đã thêm dịch vụ']));
             exit;
@@ -168,6 +214,19 @@ if ($db && isset($_GET['edit'])) {
         if ($row) {
             $editing = $row;
         }
+    }
+}
+
+// Load packages for editing
+$packages = [];
+if ($db && (int)$editing['id'] > 0) {
+    try {
+        ensure_service_packages_table($db);
+        $packages = $db->prepare('SELECT * FROM service_packages WHERE service_id = :sid ORDER BY sort_order ASC, id ASC');
+        $packages->execute(['sid' => (int)$editing['id']]);
+        $packages = $packages->fetchAll();
+    } catch (Throwable $e) {
+        $packages = [];
     }
 }
 
@@ -265,6 +324,44 @@ admin_header('Dịch vụ', 'Quản lý các dịch vụ', $admin, 'services');
                             <label class="small">Nội dung chi tiết</label>
                             <textarea class="form-control" name="content" rows="6"><?php echo h($editing['content']); ?></textarea>
                         </div>
+
+                        <!-- Packages Section -->
+                        <div style="grid-column:1 / -1;">
+                            <label class="small" style="font-weight:700;font-size:0.95rem;">Gói giá dịch vụ</label>
+                            <div class="small" style="color:var(--ak-muted);margin-bottom:10px;">Thêm các gói giá để hiển thị cho khách hàng</div>
+                            <div id="packagesList" style="display:flex;flex-direction:column;gap:12px;">
+                                <?php if (!empty($packages)): ?>
+                                    <?php foreach ($packages as $i => $pkg): ?>
+                                    <div class="pkg-row" style="display:grid;grid-template-columns:1fr 120px 80px 1fr auto;gap:8px;align-items:start;padding:12px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:8px;">
+                                        <div>
+                                            <label class="small">Tên gói</label>
+                                            <input class="form-control" type="text" name="pkg_name[]" value="<?php echo h($pkg['name']); ?>" placeholder="VD: Gói Cơ bản">
+                                        </div>
+                                        <div>
+                                            <label class="small">Giá</label>
+                                            <input class="form-control" type="text" name="pkg_price[]" value="<?php echo h($pkg['price']); ?>" placeholder="2.000.000">
+                                        </div>
+                                        <div>
+                                            <label class="small">Đơn vị</label>
+                                            <input class="form-control" type="text" name="pkg_unit[]" value="<?php echo h($pkg['price_unit']); ?>" placeholder="/tháng">
+                                        </div>
+                                        <div>
+                                            <label class="small">Tính năng (mỗi dòng 1 tính năng)</label>
+                                            <textarea class="form-control" name="pkg_features[]" rows="3" placeholder="Quản lý fanpage&#10;Đăng 20 bài/tháng&#10;Thiết kế banner"><?php echo h($pkg['features']); ?></textarea>
+                                        </div>
+                                        <div style="display:flex;flex-direction:column;gap:4px;padding-top:20px;">
+                                            <label style="font-size:0.75rem;display:flex;align-items:center;gap:4px;cursor:pointer;">
+                                                <input type="checkbox" name="pkg_highlight[]" value="<?php echo $i; ?>" <?php echo (int)$pkg['is_highlighted'] ? 'checked' : ''; ?>> Nổi bật
+                                            </label>
+                                            <button type="button" onclick="this.closest('.pkg-row').remove()" style="background:#ff8c8c;color:#3d1111;border:none;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:0.75rem;">Xóa</button>
+                                        </div>
+                                    </div>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </div>
+                            <button type="button" onclick="addPackage()" class="btn-admin" style="margin-top:10px;background:rgba(146,221,214,0.15);color:var(--ak-primary);">+ Thêm gói giá</button>
+                        </div>
+
                         <div style="grid-column:1 / -1;display:flex;gap:10px;">
                             <button class="btn-admin" type="submit"><?php echo (int)$editing['id'] > 0 ? 'Cập nhật' : 'Thêm mới'; ?></button>
                             <?php if ((int)$editing['id'] > 0): ?>
@@ -368,4 +465,19 @@ admin_header('Dịch vụ', 'Quản lý các dịch vụ', $admin, 'services');
         updateSlug();
 
     })();
+</script>
+<script>
+function addPackage() {
+    var list = document.getElementById('packagesList');
+    var idx = list.children.length;
+    var div = document.createElement('div');
+    div.className = 'pkg-row';
+    div.style.cssText = 'display:grid;grid-template-columns:1fr 120px 80px 1fr auto;gap:8px;align-items:start;padding:12px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:8px;';
+    div.innerHTML = '<div><label class="small">Tên gói</label><input class="form-control" type="text" name="pkg_name[]" placeholder="VD: Gói Cơ bản"></div>' +
+        '<div><label class="small">Giá</label><input class="form-control" type="text" name="pkg_price[]" placeholder="2.000.000"></div>' +
+        '<div><label class="small">Đơn vị</label><input class="form-control" type="text" name="pkg_unit[]" placeholder="/tháng"></div>' +
+        '<div><label class="small">Tính năng (mỗi dòng 1)</label><textarea class="form-control" name="pkg_features[]" rows="3" placeholder="Quản lý fanpage\\nĐăng 20 bài/tháng"></textarea></div>' +
+        '<div style="display:flex;flex-direction:column;gap:4px;padding-top:20px;"><label style="font-size:0.75rem;display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="checkbox" name="pkg_highlight[]" value="' + idx + '"> Nổi bật</label><button type="button" onclick="this.closest(\'.pkg-row\').remove()" style="background:#ff8c8c;color:#3d1111;border:none;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:0.75rem;">Xóa</button></div>';
+    list.appendChild(div);
+}
 </script>

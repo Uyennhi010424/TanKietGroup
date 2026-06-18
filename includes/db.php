@@ -23,3 +23,31 @@ function get_db_connection(): PDO
         throw new RuntimeException('Database connection failed: ' . $e->getMessage() . $hint);
     }
 }
+
+/**
+ * Ensure the service_packages table exists (auto-migration).
+ */
+function ensure_service_packages_table(PDO $pdo): void
+{
+    static $checked = false;
+    if ($checked) return;
+    $checked = true;
+
+    try {
+        $pdo->exec("CREATE TABLE IF NOT EXISTS service_packages (
+            id INT PRIMARY KEY AUTO_INCREMENT,
+            service_id INT NOT NULL,
+            name VARCHAR(255) NOT NULL,
+            price VARCHAR(100) NOT NULL,
+            price_unit VARCHAR(50) DEFAULT '',
+            features TEXT,
+            is_highlighted TINYINT(1) DEFAULT 0,
+            sort_order INT DEFAULT 0,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            INDEX idx_service (service_id),
+            FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+    } catch (Throwable $e) {
+        // Silently ignore if already exists or FK issue
+    }
+}

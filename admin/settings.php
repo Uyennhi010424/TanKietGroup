@@ -8,7 +8,7 @@ $adminRoutes = $admin['routes'];
 $isEditor = $admin['isEditor'];
 
 $csrfToken = csrf_token();
-$mediaRoute = site_page_url('admin_media') . '&path=';
+$mediaRoute = '/media.php?path=';
 
 function ensure_settings_schema(PDO $db): void
 {

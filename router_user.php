@@ -9,6 +9,12 @@ header('Referrer-Policy: strict-origin-when-cross-origin');
 
 $uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
 
+// Serve media.php directly (for uploads with Unicode paths)
+if ($uri === '/media.php' || str_starts_with($uri, '/media.php?')) {
+    require __DIR__ . '/media.php';
+    exit;
+}
+
 // Serve static files (CSS, JS, images)
 $file = realpath(__DIR__ . $uri);
 if ($file && is_file($file) && strtolower(pathinfo($file, PATHINFO_EXTENSION)) !== 'php') {

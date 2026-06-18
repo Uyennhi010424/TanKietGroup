@@ -59,6 +59,21 @@ try {
         $pdo->exec("ALTER TABLE services ADD COLUMN service_type VARCHAR(100) AFTER industry_id");
     }
 
+    // Service packages (pricing)
+    $pdo->exec("CREATE TABLE IF NOT EXISTS service_packages (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        service_id INT NOT NULL,
+        name VARCHAR(255) NOT NULL,
+        price VARCHAR(100) NOT NULL,
+        price_unit VARCHAR(50) DEFAULT '',
+        features TEXT,
+        is_highlighted TINYINT(1) DEFAULT 0,
+        sort_order INT DEFAULT 0,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        INDEX idx_service (service_id),
+        FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
     $pdo->exec("\n        CREATE TABLE IF NOT EXISTS projects (\n            id INT PRIMARY KEY AUTO_INCREMENT,\n            title VARCHAR(255) NOT NULL,\n            slug VARCHAR(255) UNIQUE NOT NULL,\n            industry_id INT,\n            service_id INT,\n            client_name VARCHAR(100),\n            short_desc TEXT,\n            content LONGTEXT,\n            thumbnail VARCHAR(255),\n            images TEXT,\n            video_url VARCHAR(255),\n            result_metrics TEXT,\n            start_date DATE,\n            end_date DATE,\n            status TINYINT(1) DEFAULT 1,\n            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,\n            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n            FOREIGN KEY (industry_id) REFERENCES industries(id) ON DELETE SET NULL,\n            FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE SET NULL\n        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci\n    ");
 
     $pdo->exec("\n        CREATE TABLE IF NOT EXISTS blog_categories (\n            id INT PRIMARY KEY AUTO_INCREMENT,\n            name VARCHAR(100) NOT NULL,\n            slug VARCHAR(100) UNIQUE NOT NULL,\n            sort_order INT DEFAULT 0\n        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci\n    ");

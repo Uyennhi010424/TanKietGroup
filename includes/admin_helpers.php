@@ -91,11 +91,11 @@ function admin_init(array $options = []): array
     $user = admin_current_user() ?? [];
     $role = (string)($user['role'] ?? 'editor');
 
-    // Use media proxy for uploads paths (avoids realpath() issues on Windows with Unicode paths)
+    // Use simple media endpoint for uploads paths (avoids realpath() issues on Windows with Unicode paths)
     $site = site_settings();
     $logoSetting = trim((string)($site['logo'] ?? ''));
     if ($logoSetting !== '' && str_starts_with($logoSetting, 'uploads/')) {
-        $logoUrl = site_page_url('admin_media') . '&path=' . rawurlencode($logoSetting);
+        $logoUrl = '/media.php?path=' . rawurlencode($logoSetting);
     } else {
         $logoUrl = site_logo_url('/img/logo.jpg');
     }
@@ -105,7 +105,7 @@ function admin_init(array $options = []): array
         $favSetting = $logoSetting;
     }
     if ($favSetting !== '' && str_starts_with($favSetting, 'uploads/')) {
-        $faviconUrl = site_page_url('admin_media') . '&path=' . rawurlencode($favSetting);
+        $faviconUrl = '/media.php?path=' . rawurlencode($favSetting);
     } else {
         $faviconUrl = site_favicon_url('/img/favicon.ico');
     }

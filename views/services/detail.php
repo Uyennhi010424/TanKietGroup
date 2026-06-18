@@ -37,6 +37,15 @@ if (!$service) {
     return;
 }
 
+// Load packages
+$packages = [];
+try {
+    ensure_service_packages_table(site_db());
+    $packages = site_fetch_all('SELECT * FROM service_packages WHERE service_id = :sid ORDER BY sort_order ASC, id ASC', ['sid' => (int)$service['id']]);
+} catch (Throwable $e) {
+    $packages = [];
+}
+
 // Dynamic SEO
 $pageTitle = $service['title'] . ' - Dịch vụ';
 $metaDescOverride = $service['short_desc'] ?: ($service['meta_description'] ?? '');
@@ -80,7 +89,51 @@ $breadcrumbJsonLd = json_encode([
         <div class="vintage-article__layout">
             <article class="vintage-article__content reveal">
                 <div class="vintage-prose">
-                    <?php echo $service['content'] ? sanitize_html($service['content']) : '<p>Nội dung chi tiết chưa được cập nhật.</p>'; ?>
+                    <?php
+                    $content = trim((string)($service['content'] ?? ''));
+                    if ($content === '') {
+                        echo '<p>Nội dung chi tiết chưa được cập nhật.</p>';
+                    } elseif (str_contains($content, '<')) {
+                        echo sanitize_html($content);
+                    } else {
+                        // Parse plain text to structured HTML
+                        $lines = explode("\n", $content);
+                        $inList = false;
+                        foreach ($lines as $line):
+                            $line = trim($line);
+                            if ($line === ''):
+                                if ($inList): echo '</ul>'; $inList = false; endif;
+                                continue;
+                            endif;
+
+                            // Bullet point (starts with • or -)
+                            if (str_starts_with($line, '•') || str_starts_with($line, '-')):
+                                if (!$inList): echo '<ul class="vintage-feature-list">'; $inList = true; endif;
+                                $text = ltrim($line, '•- ');
+                                ?><li><?php echo htmlspecialchars($text, ENT_QUOTES, 'UTF-8'); ?></li><?php
+                                continue;
+                            endif;
+
+                            if ($inList): echo '</ul>'; $inList = false; endif;
+
+                            // Section header (ends with :)
+                            if (str_ends_with($line, ':')):
+                                ?><h3><?php echo htmlspecialchars(rtrim($line, ':'), ENT_QUOTES, 'UTF-8'); ?></h3><?php
+                                continue;
+                            endif;
+
+                            // Title detection (ALL CAPS or first meaningful line with special chars)
+                            if (mb_strtoupper($line) === $line && mb_strlen($line) > 10):
+                                ?><h2><?php echo htmlspecialchars($line, ENT_QUOTES, 'UTF-8'); ?></h2><?php
+                                continue;
+                            endif;
+
+                            // Regular paragraph
+                            ?><p><?php echo htmlspecialchars($line, ENT_QUOTES, 'UTF-8'); ?></p><?php
+                        endforeach;
+                        if ($inList): echo '</ul>'; endif;
+                    }
+                    ?>
                 </div>
             </article>
 
@@ -124,3 +177,44 @@ $breadcrumbJsonLd = json_encode([
         </div>
     </div>
 </section>
+
+<!-- Pricing Packages -->
+<?php if (!empty($packages)): ?>
+<section class="vintage-packages">
+    <div class="container">
+        <h2 class="vintage-packages__title">Bảng giá dịch vụ</h2>
+        <p class="vintage-packages__subtitle">Lựa chọn gói phù hợp với nhu cầu của bạn</p>
+        <div class="vintage-packages__grid">
+            <?php foreach ($packages as $pkg): ?>
+            <div class="vintage-package-card <?php echo (int)$pkg['is_highlighted'] ? 'vintage-package-card--highlighted' : ''; ?>">
+                <?php if ((int)$pkg['is_highlighted']): ?>
+                <div class="vintage-package-card__badge">Phổ biến nhất</div>
+                <?php endif; ?>
+                <div class="vintage-package-card__header">
+                    <h3 class="vintage-package-card__name"><?php echo htmlspecialchars($pkg['name'], ENT_QUOTES, 'UTF-8'); ?></h3>
+                    <div class="vintage-package-card__price">
+                        <span class="vintage-package-card__amount"><?php echo htmlspecialchars($pkg['price'], ENT_QUOTES, 'UTF-8'); ?></span>
+                        <?php if (!empty($pkg['price_unit'])): ?>
+                        <span class="vintage-package-card__unit"><?php echo htmlspecialchars($pkg['price_unit'], ENT_QUOTES, 'UTF-8'); ?></span>
+                        <?php endif; ?>
+                    </div>
+                </div>
+                <?php
+                $features = array_filter(array_map('trim', explode("\n", (string)($pkg['features'] ?? ''))));
+                if (!empty($features)):
+                ?>
+                <ul class="vintage-package-card__features">
+                    <?php foreach ($features as $feat): ?>
+                    <li><?php echo htmlspecialchars($feat, ENT_QUOTES, 'UTF-8'); ?></li>
+                    <?php endforeach; ?>
+                </ul>
+                <?php endif; ?>
+                <a href="<?php echo htmlspecialchars(site_page_url('consultations'), ENT_QUOTES, 'UTF-8'); ?>" class="btn <?php echo (int)$pkg['is_highlighted'] ? 'btn-primary' : 'btn-outline'; ?>" style="width:100%;text-align:center;margin-top:auto;">
+                    Liên hệ tư vấn
+                </a>
+            </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</section>
+<?php endif; ?>

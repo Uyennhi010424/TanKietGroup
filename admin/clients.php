@@ -11,7 +11,7 @@ $db = null;
 $dbError = '';
 $flash = $_GET['msg'] ?? '';
 $csrfToken = csrf_token();
-$mediaRoute = site_page_url('admin_media') . '&path=';
+$mediaRoute = '/media.php?path=';
 
 try {
     $db = get_db_connection();

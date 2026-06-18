@@ -82,7 +82,12 @@ function site_public_media_url(string $path): string
         return $path;
     }
 
-    // Serve uploads directly as static files (no PHP routing)
+    // Use simple media endpoint for uploads (avoids realpath() issues on Windows with Unicode paths)
+    if (str_starts_with($path, 'uploads/')) {
+        return '/media.php?path=' . rawurlencode($path);
+    }
+
+    // Serve other files directly
     return site_base_path() . '/' . ltrim($path, '/');
 }
 

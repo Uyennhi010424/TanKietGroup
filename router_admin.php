@@ -8,6 +8,13 @@ header('X-Frame-Options: SAMEORIGIN');
 header('Referrer-Policy: strict-origin-when-cross-origin');
 
 $uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+$query = $_SERVER['QUERY_STRING'] ?? '';
+
+// Redirect root to admin dashboard
+if ($uri === '/' && $query === '') {
+    header('Location: /?page=admin_index');
+    exit;
+}
 
 // Serve admin static files (CSS, JS)
 if (preg_match('#^/admin/assets/(css|js)/(.+)$#', $uri, $m)) {
@@ -29,6 +36,12 @@ if (preg_match('#^/api/([a-z_]+)\.php$#', $uri, $m)) {
         require $apiFile;
         exit;
     }
+}
+
+// Serve media.php directly
+if ($uri === '/media.php' || str_starts_with($uri, '/media.php?')) {
+    require __DIR__ . '/media.php';
+    exit;
 }
 
 // Serve upload files (for media endpoint)
