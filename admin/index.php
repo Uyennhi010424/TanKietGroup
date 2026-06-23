@@ -1,15 +1,36 @@
 <?php
 
-require_once __DIR__ . '/../includes/site.php';
-require_once __DIR__ . '/../includes/db.php';
-require_once __DIR__ . '/../includes/security.php';
+// Serve static files from project root (assets/, img/) when running from admin/
+$staticUri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+if (preg_match('#^/(assets|img)/(.+)$#', $staticUri, $sm)) {
+    $staticFile = realpath(__DIR__ . '/../' . $sm[1] . '/' . $sm[2]);
+    if ($staticFile && is_file($staticFile)) {
+        $ext = strtolower(pathinfo($staticFile, PATHINFO_EXTENSION));
+        $mimes = [
+            'css' => 'text/css', 'js' => 'application/javascript',
+            'jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg',
+            'png' => 'image/png', 'webp' => 'image/webp',
+            'gif' => 'image/gif', 'svg' => 'image/svg+xml',
+            'ico' => 'image/x-icon', 'woff' => 'font/woff', 'woff2' => 'font/woff2',
+        ];
+        header('Content-Type: ' . ($mimes[$ext] ?? 'application/octet-stream'));
+        header('Content-Length: ' . filesize($staticFile));
+        readfile($staticFile);
+        exit;
+    }
+}
 
 $page = $_GET['page'] ?? 'admin_index';
 
-// Nếu chưa đăng nhập và không phải trang login → chuyển đến login
-if ($page !== 'admin_login' && !admin_is_logged_in()) {
-    header('Location: /login.php');
-    exit;
+// Chỉ kiểm tra đăng nhập cho trang admin, không chặn trang public
+if (str_starts_with($page, 'admin_') && $page !== 'admin_login') {
+    require_once __DIR__ . '/../includes/site.php';
+    require_once __DIR__ . '/../includes/db.php';
+    require_once __DIR__ . '/../includes/security.php';
+    if (!admin_is_logged_in()) {
+        header('Location: /login.php');
+        exit;
+    }
 }
 
 $adminViewMap = [
@@ -30,6 +51,17 @@ $adminViewMap = [
 
 if (isset($adminViewMap[$page])) {
     require $adminViewMap[$page];
+    exit;
+}
+
+// Public page view map — render through index.php in project root
+$publicViewMap = [
+    'home', 'about', 'services', 'service_detail', 'services_by_type',
+    'industry_detail', 'courses', 'course_detail', 'projects', 'project_detail',
+    'blog', 'blog_detail', 'contact', 'consultations', 'recruitments',
+];
+if (in_array($page, $publicViewMap, true)) {
+    require __DIR__ . '/../index.php';
     exit;
 }
 

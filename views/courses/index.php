@@ -1,6 +1,9 @@
 <?php
 require_once __DIR__ . '/../../includes/site.php';
 
+$site = site_settings();
+$heroBanner = site_image_url($site['banner'] ?? '', '/img/hero.jpg');
+
 $courses = site_fetch_all(
 	'SELECT id, title, slug, short_desc, thumbnail, price, discount_price, duration, form_type
      FROM courses
@@ -9,6 +12,7 @@ $courses = site_fetch_all(
 );
 ?>
 <section class="hero">
+	<div class="hero-bg" style="background-image:url('<?php echo htmlspecialchars($heroBanner, ENT_QUOTES, 'UTF-8'); ?>');"></div>
 	<div class="container reveal">
 		<span class="tag">Khóa học</span>
 		<h1>Khóa học</h1>

@@ -61,9 +61,9 @@ $breadcrumbJsonLd = json_encode([
 </section>
 
 <!-- Content -->
+<?php if ($industryContent !== ''): ?>
 <section class="section">
     <div class="container">
-        <?php if ($industryContent !== ''): ?>
             <article class="card reveal" style="max-width:860px;margin:0 auto;">
                 <div class="vintage-prose">
                     <?php
@@ -96,15 +96,60 @@ $breadcrumbJsonLd = json_encode([
                     ?>
                 </div>
             </article>
-        <?php else: ?>
-            <div class="card reveal" style="text-align:center;padding:60px 24px;max-width:600px;margin:0 auto;">
-                <h3>Nội dung đang được cập nhật</h3>
-                <p class="muted">Bài viết chi tiết về <?php echo htmlspecialchars($industryName, ENT_QUOTES, 'UTF-8'); ?> sẽ sớm được xuất bản.</p>
-                <a href="<?php echo htmlspecialchars(site_page_url('consultations'), ENT_QUOTES, 'UTF-8'); ?>" class="btn btn-primary" style="margin-top:16px;">Liên hệ tư vấn</a>
-            </div>
-        <?php endif; ?>
     </div>
 </section>
+<?php endif; ?>
+
+<?php
+// Fetch blog posts related to this industry (match by category name)
+$industryPosts = [];
+try {
+    $industryPosts = site_fetch_all(
+        "SELECT bp.id, bp.title, bp.slug, bp.thumbnail, bp.published_at, bp.views,
+                COALESCE(bc.name, '') AS category_name
+         FROM blog_posts bp
+         LEFT JOIN blog_categories bc ON bc.id = bp.category_id
+         WHERE bp.status = 'published'
+           AND (bc.name LIKE :name1 OR bc.name LIKE :name2 OR bc.name LIKE :name3)
+         ORDER BY bp.is_featured DESC, bp.published_at DESC
+         LIMIT 6",
+        [
+            'name1' => '%' . $industryName . '%',
+            'name2' => '%xây dựng%',
+            'name3' => '%marketing%',
+        ]
+    );
+} catch (Throwable $e) {
+    $industryPosts = [];
+}
+?>
+
+<?php if ($industryPosts): ?>
+<!-- Blog Posts -->
+<section class="section">
+    <div class="container">
+        <h2 class="section-title reveal">Bài viết liên quan</h2>
+        <div class="grid-3" style="margin-top:24px;">
+            <?php foreach ($industryPosts as $post): ?>
+                <a href="<?php echo htmlspecialchars(site_page_url('blog_detail', ['slug' => $post['slug']]), ENT_QUOTES, 'UTF-8'); ?>" class="card card-link reveal">
+                    <?php if ($post['thumbnail']): ?>
+                        <div class="card-img">
+                            <img src="<?php echo htmlspecialchars(site_image_url($post['thumbnail']), ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($post['title'], ENT_QUOTES, 'UTF-8'); ?>" loading="lazy">
+                        </div>
+                    <?php endif; ?>
+                    <div class="card-body">
+                        <?php if ($post['category_name']): ?>
+                            <span class="tag"><?php echo htmlspecialchars($post['category_name'], ENT_QUOTES, 'UTF-8'); ?></span>
+                        <?php endif; ?>
+                        <h3><?php echo htmlspecialchars($post['title'], ENT_QUOTES, 'UTF-8'); ?></h3>
+                        <span class="btn btn-outline" style="margin-top:auto;">Xem chi tiết</span>
+                    </div>
+                </a>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</section>
+<?php endif; ?>
 
 <!-- CTA -->
 <section class="section section-muted">

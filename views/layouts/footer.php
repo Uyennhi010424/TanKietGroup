@@ -23,7 +23,7 @@ $footerLogo = site_logo_url('/img/logo1.jpg');
                 <li><a href="<?php echo htmlspecialchars(site_page_url('contact'), ENT_QUOTES, 'UTF-8'); ?>">Liên hệ</a></li>
             </ul>
         </div>
-        <div>
+        <div class="footer-hide-mobile">
             <h4 class="footer-title">Dịch vụ</h4>
             <ul class="footer-links">
                 <li><a href="<?php echo htmlspecialchars(site_page_url('services_by_type') . '&slug=marketing-tron-goi', ENT_QUOTES, 'UTF-8'); ?>">Marketing tổng thể</a></li>

@@ -1,6 +1,9 @@
 <?php
 require_once __DIR__ . '/../../includes/site.php';
 
+$site = site_settings();
+$heroBanner = site_image_url($site['banner'] ?? '', '/img/hero.jpg');
+
 $projects = site_fetch_all(
     'SELECT id, title, slug, short_desc, thumbnail, client_name, is_featured
      FROM projects
@@ -9,6 +12,7 @@ $projects = site_fetch_all(
 );
 ?>
 <section class="hero">
+	<div class="hero-bg" style="background-image:url('<?php echo htmlspecialchars($heroBanner, ENT_QUOTES, 'UTF-8'); ?>');"></div>
 	<div class="container reveal">
 		<span class="tag">Dự án</span>
 		<h1>Dự án tiêu biểu</h1>

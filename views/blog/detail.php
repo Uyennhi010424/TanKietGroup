@@ -112,7 +112,60 @@ function bl_h($v) { return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8'); }
 <section class="bl-body">
 	<div class="container">
 		<article class="bl-content reveal">
-			<?php echo $post['content'] ? sanitize_html($post['content']) : '<p>Nội dung bài viết chưa được cập nhật.</p>'; ?>
+			<?php
+			$rawContent = trim((string)($post['content'] ?? ''));
+			if ($rawContent === '') {
+				echo '<p>Nội dung bài viết chưa được cập nhật.</p>';
+			} elseif (str_contains($rawContent, '<')) {
+				// Content has HTML tags — render as sanitized HTML
+				echo sanitize_html($rawContent);
+			} else {
+				// Plain text / Markdown — parse into HTML
+				$lines = preg_split('/\r\n|\r|\n/', $rawContent);
+				$inList = false;
+				foreach ($lines as $line) {
+					$line = trim($line);
+					if ($line === '') {
+						if ($inList) { echo '</ul>'; $inList = false; }
+						continue;
+					}
+					// ## Heading 2
+					if (str_starts_with($line, '## ')) {
+						if ($inList) { echo '</ul>'; $inList = false; }
+						echo '<h2>' . htmlspecialchars(trim(substr($line, 3)), ENT_QUOTES, 'UTF-8') . '</h2>';
+						continue;
+					}
+					// # Heading 1
+					if (str_starts_with($line, '# ')) {
+						if ($inList) { echo '</ul>'; $inList = false; }
+						echo '<h2>' . htmlspecialchars(trim(substr($line, 2)), ENT_QUOTES, 'UTF-8') . '</h2>';
+						continue;
+					}
+					// Bullet points: * or - or •
+					if (preg_match('/^[\*\-•]\s+/', $line)) {
+						if (!$inList) { echo '<ul>'; $inList = true; }
+						$text = preg_replace('/^[\*\-•]\s+/', '', $line);
+						echo '<li>' . htmlspecialchars($text, ENT_QUOTES, 'UTF-8') . '</li>';
+						continue;
+					}
+					// ✅ Checkmark lines
+					if (str_starts_with($line, '✅')) {
+						if (!$inList) { echo '<ul>'; $inList = true; }
+						$text = trim(substr($line, 3));
+						echo '<li>✅ ' . htmlspecialchars($text, ENT_QUOTES, 'UTF-8') . '</li>';
+						continue;
+					}
+					// ALL CAPS line → bold heading
+					if ($inList) { echo '</ul>'; $inList = false; }
+					if (preg_match('/^[A-ZÀ-ẠẢÃÁÂẦẤẬẨẪĂẰẮẶẲẴÈẸẺẼÉÊỀẾỆỂỄÌÍỊỈĨÒỌỎÕÓÔỒỐỘỔỖƠỜỚỢỞỠÙỤỦŨÚỪỨỰỬỮỲỴỶỸĐ\s\.\&\(\)\-:]+$/u', $line) && mb_strlen($line) > 3) {
+						echo '<h3>' . htmlspecialchars($line, ENT_QUOTES, 'UTF-8') . '</h3>';
+					} else {
+						echo '<p>' . htmlspecialchars($line, ENT_QUOTES, 'UTF-8') . '</p>';
+					}
+				}
+				if ($inList) { echo '</ul>'; }
+			}
+			?>
 		</article>
 	</div>
 </section>

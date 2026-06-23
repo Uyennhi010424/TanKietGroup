@@ -2,11 +2,21 @@ const menuButton = document.querySelector("[data-menu-toggle]");
 const nav = document.querySelector("[data-main-nav]");
 
 if (menuButton && nav) {
+  // Close mobile menu helper
+  function closeMobileMenu() {
+    nav.classList.remove("open");
+    menuButton.classList.remove("open");
+    menuButton.setAttribute("aria-expanded", "false");
+    document.body.classList.remove("menu-open");
+  }
+
   menuButton.addEventListener("click", () => {
     const isOpen = nav.classList.toggle("open");
     menuButton.setAttribute("aria-expanded", String(isOpen));
     // animate hamburger
     menuButton.classList.toggle('open', isOpen);
+    // body scroll lock
+    document.body.classList.toggle('menu-open', isOpen);
     // when opening mobile menu, close any open mega-dropdowns so menu shows full list
     if (isOpen) {
       document.querySelectorAll('.has-dropdown.open').forEach(el => {
@@ -17,10 +27,14 @@ if (menuButton && nav) {
     }
   });
 
+  // Close menu when clicking a nav link
+  nav.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', closeMobileMenu);
+  });
+
   window.addEventListener("resize", () => {
     if (window.innerWidth > 980) {
-      nav.classList.remove("open");
-      menuButton.setAttribute("aria-expanded", "false");
+      closeMobileMenu();
     }
   });
 }
@@ -250,67 +264,45 @@ if (document.readyState === 'loading') {
   function initSwipers() {
     if (typeof Swiper !== 'function') return;
 
-    // ================== SERVICES SWIPER ==================
-    const servicesEl = document.querySelector('.services-swiper');
-    if (servicesEl && !servicesEl.dataset.swiperInit) {
-      new Swiper(servicesEl, {
-        loop: true,
-        centeredSlides: true,           // Quan trọng: giữ card giữa
-        speed: 900,
-        slidesPerView: "auto",
-        spaceBetween: 30,
-        autoplay: {
-          delay: 2800,
-          disableOnInteraction: false,
-        },
-        pagination: {
-          el: '.services-swiper .swiper-pagination',
-          clickable: true,
-        },
-        navigation: {
-          nextEl: '.services-swiper .swiper-button-next',
-          prevEl: '.services-swiper .swiper-button-prev',
-        },
-        breakpoints: {
-          640: {
-            slidesPerView: 2,
-            centeredSlides: true,
-          },
-          1024: {
-            slidesPerView: 3,
-            centeredSlides: true,
-          }
-        }
-      });
-      servicesEl.dataset.swiperInit = '1';
-    }
+    // Unified Swiper config for all homepage carousels
+    var swiperDefaults = {
+      loop: true,
+      speed: 800,
+      slidesPerView: 1,
+      spaceBetween: 24,
+      autoplay: {
+        delay: 3000,
+        disableOnInteraction: false,
+      },
+      pagination: {
+        clickable: true,
+      },
+      navigation: true,
+      breakpoints: {
+        768: { slidesPerView: 2 },
+        1024: { slidesPerView: 3 }
+      }
+    };
 
-    // ================== PROJECTS SWIPER ==================
-    const projectsEl = document.querySelector('.projects-swiper');
-    if (projectsEl && !projectsEl.dataset.swiperInit) {
-      new Swiper(projectsEl, {
-        loop: true,
-        speed: 800,
-        slidesPerView: 1,
-        spaceBetween: 24,
-        autoplay: {
-          delay: 3500,
-          disableOnInteraction: false,
-        },
-        pagination: {
-          el: '.projects-swiper .swiper-pagination',
-          clickable: true,
-        },
-        navigation: {
-          nextEl: '.projects-swiper .swiper-button-next',
-          prevEl: '.projects-swiper .swiper-button-prev',
-        },
-        breakpoints: {
-          768: { slidesPerView: 2 }
-        }
-      });
-      projectsEl.dataset.swiperInit = '1';
-    }
+    var swiperNames = ['services', 'projects', 'courses', 'blog'];
+
+    swiperNames.forEach(function(name) {
+      var el = document.querySelector('.' + name + '-swiper');
+      if (el && !el.dataset.swiperInit) {
+        var config = Object.assign({}, swiperDefaults, {
+          pagination: {
+            el: '.' + name + '-swiper .swiper-pagination',
+            clickable: true,
+          },
+          navigation: {
+            nextEl: '.' + name + '-swiper .swiper-button-next',
+            prevEl: '.' + name + '-swiper .swiper-button-prev',
+          }
+        });
+        new Swiper(el, config);
+        el.dataset.swiperInit = '1';
+      }
+    });
   }
 
   if (document.readyState === 'loading') {

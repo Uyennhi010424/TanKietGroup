@@ -42,7 +42,8 @@ $posts = site_fetch_all(
      LIMIT 4'
 );
 ?>
-<section class="hero" style="--hero-banner: url('<?php echo htmlspecialchars($heroBanner, ENT_QUOTES, 'UTF-8'); ?>');">
+<section class="hero">
+	<div class="hero-bg" style="background-image:url('<?php echo htmlspecialchars($heroBanner, ENT_QUOTES, 'UTF-8'); ?>');"></div>
 	<div class="container reveal">
 		<h1><?php echo htmlspecialchars($site['meta_title'] ?: 'Chiến lược Marketing toàn diện cho doanh nghiệp hiện đại', ENT_QUOTES, 'UTF-8'); ?></h1>
 		<p class="lead"><?php echo htmlspecialchars($site['meta_description'] ?: 'TanKiet Group kết hợp dữ liệu, sáng tạo và công nghệ để giúp doanh nghiệp gia tăng doanh thu bền vững trên đa kênh.', ENT_QUOTES, 'UTF-8'); ?></p>
@@ -53,35 +54,41 @@ $posts = site_fetch_all(
 	</div>
 </section>
 
-<section class="section section-muted">
-	<div class="container grid grid-4">
-		<article class="card stats reveal">
-			<div class="stat-number">
-				<strong class="count" data-target="99" data-suffix="+">0</strong>
+<section class="stats-section">
+	<div class="container">
+		<div class="stats-grid">
+			<div class="stat-card reveal">
+				<div class="stat-number-wrap">
+					<div class="stat-number count" data-target="100">0</div>
+					<span class="plus">+</span>
+				</div>
+				<div class="stat-label">Khách hàng</div>
 			</div>
-			<span class="muted">Khách hàng</span>
-		</article>
 
-		<article class="card stats reveal">
-			<div class="stat-number">
-				<strong class="count" data-target="2" data-suffix=" tỷ +">0</strong>
+			<div class="stat-card reveal">
+				<div class="stat-number-wrap">
+					<div class="stat-number count" data-target="2">2</div>
+					<span class="plus"> Tỷ+</span>
+				</div>
+				<div class="stat-label">Ngân sách quản lý</div>
 			</div>
-			<span class="muted">Ngân sách quản lý</span>
-		</article>
 
-		<article class="card stats reveal">
-			<div class="stat-number">
-				<strong class="count" data-target="5" data-suffix=" năm+">0</strong>
+			<div class="stat-card reveal">
+				<div class="stat-number-wrap">
+					<div class="stat-number count" data-target="5">5</div>
+					<span class="plus"> năm+</span>
+				</div>
+				<div class="stat-label">Kinh nghiệm</div>
 			</div>
-			<span class="muted">Kinh nghiệm</span>
-		</article>
 
-		<article class="card stats reveal">
-			<div class="stat-number">
-				<strong class="count" data-target="89.79" data-suffix="%">0</strong>
+			<div class="stat-card reveal">
+				<div class="stat-number-wrap">
+					<div class="stat-number count" data-target="89.79">0</div>
+					<span class="percent">%</span>
+				</div>
+				<div class="stat-label">Khách hàng gia hạn HĐ</div>
 			</div>
-			<span class="muted">Khách hàng gia hạn hợp đồng</span>
-		</article>
+		</div>
 	</div>
 </section>
 
@@ -90,24 +97,33 @@ $posts = site_fetch_all(
 	<div class="container">
 		<h2 class="reveal" style="text-align:center;">Khách Hàng Tiêu Biểu</h2>
 		<p class="muted reveal" style="text-align:center;margin-top:8px;">Những doanh nghiệp đã tin tưởng và hợp tác cùng chúng tôi</p>
-		<div class="clients-grid reveal">
-			<?php foreach ($clients as $client): ?>
-				<?php if (!empty($client['website_url'])): ?>
-					<a href="<?php echo htmlspecialchars($client['website_url'], ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener" class="client-item">
-				<?php else: ?>
-					<div class="client-item">
-				<?php endif; ?>
-					<img
-						src="<?php echo htmlspecialchars(site_image_url($client['logo'] ?? '', '/img/logo.jpg'), ENT_QUOTES, 'UTF-8'); ?>"
-						alt="<?php echo htmlspecialchars($client['name'], ENT_QUOTES, 'UTF-8'); ?>"
-						class="client-logo"
-						loading="lazy">
-				<?php if (!empty($client['website_url'])): ?>
-					</a>
-				<?php else: ?>
-					</div>
-				<?php endif; ?>
-			<?php endforeach; ?>
+		<div class="clients-marquee reveal">
+			<div class="clients-track">
+				<?php
+				// Render logos twice for infinite scroll effect
+				for ($i = 0; $i < 2; $i++):
+					foreach ($clients as $client):
+				?>
+					<?php if (!empty($client['website_url'])): ?>
+						<a href="<?php echo htmlspecialchars($client['website_url'], ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener" class="client-item">
+					<?php else: ?>
+						<div class="client-item">
+					<?php endif; ?>
+						<img
+							src="<?php echo htmlspecialchars(site_image_url($client['logo'] ?? '', '/img/logo.jpg'), ENT_QUOTES, 'UTF-8'); ?>"
+							alt="<?php echo htmlspecialchars($client['name'], ENT_QUOTES, 'UTF-8'); ?>"
+							class="client-logo"
+							loading="lazy">
+					<?php if (!empty($client['website_url'])): ?>
+						</a>
+					<?php else: ?>
+						</div>
+					<?php endif; ?>
+				<?php
+					endforeach;
+				endfor;
+				?>
+			</div>
 		</div>
 	</div>
 </section>
@@ -205,31 +221,40 @@ $posts = site_fetch_all(
 <section class="section">
 	<div class="container">
 		<h2 class="reveal">Khóa học mới</h2>
-		<div class="grid grid-4" style="margin-top:24px;">
-			<?php if (!$courses): ?>
-				<article class="card reveal">
-					<h3>Chưa có khóa học</h3>
-					<p class="muted">Thêm khóa học trong admin để hiển thị tại đây.</p>
-				</article>
-			<?php else: ?>
-				<?php foreach ($courses as $course): ?>
-					<article class="card reveal course-card">
-						<div class="card-media service-overlay-wrap">
-							<img src="<?php echo htmlspecialchars(site_image_url($course['thumbnail'] ?? '', '/img/du_an.jpg'), ENT_QUOTES, 'UTF-8'); ?>"
-								alt="<?php echo htmlspecialchars($course['title'], ENT_QUOTES, 'UTF-8'); ?>"
-								loading="lazy">
-							<a href="/khoa-hoc/<?php echo htmlspecialchars($course['slug'], ENT_QUOTES, 'UTF-8'); ?>"
-								class="service-overlay">
-								Xem chi tiết
-							</a>
+		<div class="swiper courses-swiper" style="margin-top:24px;">
+			<div class="swiper-wrapper">
+				<?php if (!$courses): ?>
+					<div class="swiper-slide">
+						<article class="card reveal">
+							<h3>Chưa có khóa học</h3>
+							<p class="muted">Thêm khóa học trong admin để hiển thị tại đây.</p>
+						</article>
+					</div>
+				<?php else: ?>
+					<?php foreach ($courses as $course): ?>
+						<div class="swiper-slide">
+							<article class="card reveal course-card">
+								<div class="card-media service-overlay-wrap">
+									<img src="<?php echo htmlspecialchars(site_image_url($course['thumbnail'] ?? '', '/img/du_an.jpg'), ENT_QUOTES, 'UTF-8'); ?>"
+										alt="<?php echo htmlspecialchars($course['title'], ENT_QUOTES, 'UTF-8'); ?>"
+										loading="lazy">
+									<a href="/khoa-hoc/<?php echo htmlspecialchars($course['slug'], ENT_QUOTES, 'UTF-8'); ?>"
+										class="service-overlay">
+										Xem chi tiết
+									</a>
+								</div>
+								<div class="card-content">
+									<h3><?php echo htmlspecialchars($course['title'], ENT_QUOTES, 'UTF-8'); ?></h3>
+									<p class="muted"><?php echo htmlspecialchars(($course['duration'] ?? '') . ($course['form_type'] ? ' · ' . $course['form_type'] : ''), ENT_QUOTES, 'UTF-8'); ?></p>
+								</div>
+							</article>
 						</div>
-						<div class="card-content">
-							<h3><?php echo htmlspecialchars($course['title'], ENT_QUOTES, 'UTF-8'); ?></h3>
-							<p class="muted"><?php echo htmlspecialchars(($course['duration'] ?? '') . ($course['form_type'] ? ' · ' . $course['form_type'] : ''), ENT_QUOTES, 'UTF-8'); ?></p>
-						</div>
-					</article>
-				<?php endforeach; ?>
-			<?php endif; ?>
+					<?php endforeach; ?>
+				<?php endif; ?>
+			</div>
+			<div class="swiper-button-prev"></div>
+			<div class="swiper-button-next"></div>
+			<div class="swiper-pagination"></div>
 		</div>
 	</div>
 </section>
@@ -237,31 +262,40 @@ $posts = site_fetch_all(
 <section class="section section-muted">
 	<div class="container">
 		<h2 class="reveal">Tin mới từ blog</h2>
-		<div class="grid grid-4" style="margin-top:24px;">
-			<?php if (!$posts): ?>
-				<article class="card reveal">
-					<h3>Chưa có bài viết</h3>
-					<p class="muted">Thêm blog post trong admin để hiển thị tại đây.</p>
-				</article>
-			<?php else: ?>
-				<?php foreach ($posts as $post): ?>
-					<article class="card reveal">
-						<div class="card-media service-overlay-wrap">
-							<img src="<?php echo htmlspecialchars(site_image_url($post['thumbnail'] ?? '', '/img/du_an4.jpg'), ENT_QUOTES, 'UTF-8'); ?>"
-								alt="<?php echo htmlspecialchars($post['title'], ENT_QUOTES, 'UTF-8'); ?>"
-								loading="lazy">
-							<a href="/blog/<?php echo htmlspecialchars($post['slug'], ENT_QUOTES, 'UTF-8'); ?>"
-								class="service-overlay">
-								Đọc bài viết
-							</a>
+		<div class="swiper blog-swiper" style="margin-top:24px;">
+			<div class="swiper-wrapper">
+				<?php if (!$posts): ?>
+					<div class="swiper-slide">
+						<article class="card reveal">
+							<h3>Chưa có bài viết</h3>
+							<p class="muted">Thêm blog post trong admin để hiển thị tại đây.</p>
+						</article>
+					</div>
+				<?php else: ?>
+					<?php foreach ($posts as $post): ?>
+						<div class="swiper-slide">
+							<article class="card reveal">
+								<div class="card-media service-overlay-wrap">
+									<img src="<?php echo htmlspecialchars(site_image_url($post['thumbnail'] ?? '', '/img/du_an4.jpg'), ENT_QUOTES, 'UTF-8'); ?>"
+										alt="<?php echo htmlspecialchars($post['title'], ENT_QUOTES, 'UTF-8'); ?>"
+										loading="lazy">
+									<a href="/blog/<?php echo htmlspecialchars($post['slug'], ENT_QUOTES, 'UTF-8'); ?>"
+										class="service-overlay">
+										Đọc bài viết
+									</a>
+								</div>
+								<div class="card-content">
+									<h3><?php echo htmlspecialchars($post['title'], ENT_QUOTES, 'UTF-8'); ?></h3>
+									<p class="muted"><?php echo htmlspecialchars($post['category_name'] ?: 'Blog', ENT_QUOTES, 'UTF-8'); ?></p>
+								</div>
+							</article>
 						</div>
-						<div class="card-content">
-							<h3><?php echo htmlspecialchars($post['title'], ENT_QUOTES, 'UTF-8'); ?></h3>
-							<p class="muted"><?php echo htmlspecialchars($post['category_name'] ?: 'Blog', ENT_QUOTES, 'UTF-8'); ?></p>
-						</div>
-					</article>
-				<?php endforeach; ?>
-			<?php endif; ?>
+					<?php endforeach; ?>
+				<?php endif; ?>
+			</div>
+			<div class="swiper-button-prev"></div>
+			<div class="swiper-button-next"></div>
+			<div class="swiper-pagination"></div>
 		</div>
 	</div>
 </section>

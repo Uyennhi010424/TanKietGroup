@@ -73,7 +73,8 @@ $breadcrumbJsonLd = json_encode([
 </nav>
 
 <!-- Hero Banner + Title -->
-<section class="vintage-hero" style="--hero-banner: url('<?php echo htmlspecialchars(site_image_url($service['image'] ?? '', '/img/hero.jpg'), ENT_QUOTES, 'UTF-8'); ?>');">
+<section class="vintage-hero">
+    <div class="hero-bg" style="background-image:url('<?php echo htmlspecialchars(site_image_url($service['image'] ?? '', '/img/hero.jpg'), ENT_QUOTES, 'UTF-8'); ?>');"></div>
     <div class="container reveal">
         <span class="vintage-hero__category"><?php echo htmlspecialchars($service['industry_name'] ?? 'Dịch vụ', ENT_QUOTES, 'UTF-8'); ?></span>
         <h1 class="vintage-hero__title"><?php echo htmlspecialchars($service['title'], ENT_QUOTES, 'UTF-8'); ?></h1>

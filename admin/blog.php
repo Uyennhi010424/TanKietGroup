@@ -217,11 +217,11 @@ if ($db) {
 
                         <div>
                             <label class="small">Tiêu đề</label>
-                            <input class="form-control" type="text" name="title" required value="<?php echo h($editing['title']); ?>">
+                            <input class="form-control" type="text" name="title" id="blog-title" required value="<?php echo h($editing['title']); ?>">
                         </div>
                         <div>
                             <label class="small">Slug</label>
-                            <input class="form-control" type="text" name="slug" value="<?php echo h($editing['slug']); ?>">
+                            <input class="form-control" type="text" name="slug" id="blog-slug" value="<?php echo h($editing['slug']); ?>" placeholder="Tự tạo từ tiêu đề">
                         </div>
                         <div>
                             <label class="small">Trạng thái</label>
@@ -334,4 +334,53 @@ if ($db) {
                 </div>
             </section>
 
+<script>
+(function() {
+    var titleInput = document.getElementById('blog-title');
+    var slugInput = document.getElementById('blog-slug');
+    if (!titleInput || !slugInput) return;
+
+    // Vietnamese diacritics map
+    var map = {
+        'à':'a','á':'a','ả':'a','ã':'a','ạ':'a',
+        'ă':'a','ằ':'a','ắ':'a','ẳ':'a','ẵ':'a','ặ':'a',
+        'â':'a','ầ':'a','ấ':'a','ẩ':'a','ẫ':'a','ậ':'a',
+        'đ':'d',
+        'è':'e','é':'e','ẻ':'e','ẽ':'e','ẹ':'e',
+        'ê':'e','ề':'e','ế':'e','ể':'e','ễ':'e','ệ':'e',
+        'ì':'i','í':'i','ỉ':'i','ĩ':'i','ị':'i',
+        'ò':'o','ó':'o','ỏ':'o','õ':'o','ọ':'o',
+        'ô':'o','ồ':'o','ố':'o','ổ':'o','ỗ':'o','ộ':'o',
+        'ơ':'o','ờ':'o','ớ':'o','ở':'o','ỡ':'o','ợ':'o',
+        'ù':'u','ú':'u','ủ':'u','ũ':'u','ụ':'u',
+        'ư':'u','ừ':'u','ứ':'u','ử':'u','ữ':'u','ự':'u',
+        'ỳ':'y','ý':'y','ỷ':'y','ỹ':'y','ỵ':'y'
+    };
+
+    function toSlug(str) {
+        str = str.toLowerCase();
+        var result = '';
+        for (var i = 0; i < str.length; i++) {
+            result += map[str[i]] || str[i];
+        }
+        result = result.replace(/[^a-z0-9\s-]/g, '');
+        result = result.replace(/\s+/g, '-');
+        result = result.replace(/-+/g, '-');
+        result = result.replace(/^-|-$/g, '');
+        return result;
+    }
+
+    var userEditedSlug = slugInput.value.trim() !== '';
+
+    titleInput.addEventListener('input', function() {
+        if (!userEditedSlug) {
+            slugInput.value = toSlug(titleInput.value);
+        }
+    });
+
+    slugInput.addEventListener('input', function() {
+        userEditedSlug = slugInput.value.trim() !== '';
+    });
+})();
+</script>
 <?php admin_footer(); ?>

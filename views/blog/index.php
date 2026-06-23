@@ -1,6 +1,9 @@
 <?php
 require_once __DIR__ . '/../../includes/site.php';
 
+$site = site_settings();
+$heroBanner = site_image_url($site['banner'] ?? '', '/img/hero.jpg');
+
 $posts = site_fetch_all(
     'SELECT p.id, p.title, p.slug, p.thumbnail, p.meta_title, p.published_at, u.full_name AS author_name, c.name AS category_name
      FROM blog_posts p
@@ -11,6 +14,7 @@ $posts = site_fetch_all(
 );
 ?>
 <section class="hero">
+	<div class="hero-bg" style="background-image:url('<?php echo htmlspecialchars($heroBanner, ENT_QUOTES, 'UTF-8'); ?>');"></div>
 	<div class="container reveal">
 		<span class="tag">Blog</span>
 		<h1>Blog & Kiến thức</h1>

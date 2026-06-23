@@ -3,8 +3,10 @@ require_once __DIR__ . '/../includes/site.php';
 require_once __DIR__ . '/../includes/security.php';
 
 $site = site_settings();
+$heroBanner = site_image_url($site['banner'] ?? '', '/img/hero.jpg');
 ?>
 <section class="hero">
+	<div class="hero-bg" style="background-image:url('<?php echo htmlspecialchars($heroBanner, ENT_QUOTES, 'UTF-8'); ?>');"></div>
 	<div class="container reveal">
 		<span class="tag">Tư vấn</span>
 		<h1>Tư vấn chiến lược theo dữ liệu thực</h1>

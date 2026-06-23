@@ -111,9 +111,10 @@ if ($selectedService) {
 ?>
 
 <!-- HERO -->
-<section class="vintage-hero" style="--hero-banner: url('<?php echo $selectedService ? htmlspecialchars(site_image_url($selectedService['image'] ?? '', '/img/hero.jpg'), ENT_QUOTES, 'UTF-8') : '/img/hero.jpg'; ?>');">
+<section class="vintage-hero">
+    <div class="hero-bg" style="background-image:url('<?php echo $selectedService ? htmlspecialchars(site_image_url($selectedService['image'] ?? '', '/img/hero.jpg'), ENT_QUOTES, 'UTF-8') : '/img/hero.jpg'; ?>');"></div>
     <div class="container reveal">
-        <nav class="breadcrumb" style="margin-bottom:16px;">
+        <nav class="breadcrumb" aria-label="Đường dẫn">
             <a href="<?php echo htmlspecialchars(site_page_url('home'), ENT_QUOTES, 'UTF-8'); ?>">Trang chủ</a>
             <span aria-hidden="true">›</span>
             <a href="<?php echo htmlspecialchars(site_page_url('services'), ENT_QUOTES, 'UTF-8'); ?>">Dịch vụ</a>

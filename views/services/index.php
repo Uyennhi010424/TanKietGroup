@@ -2,6 +2,8 @@
 require_once __DIR__ . '/../../includes/site.php';
 
 $site = site_settings();
+$heroBanner = site_image_url($site['banner'] ?? '', '/img/hero.jpg');
+
 $services = site_fetch_all(
 	'SELECT s.id, s.title, s.slug, s.short_desc, s.content, s.image, s.is_featured, i.name AS industry_name
 	 FROM services s
@@ -12,6 +14,7 @@ $services = site_fetch_all(
 $industries = site_fetch_all('SELECT id, name, slug, description FROM industries ORDER BY sort_order ASC, id ASC');
 ?>
 <section class="hero">
+	<div class="hero-bg" style="background-image:url('<?php echo htmlspecialchars($heroBanner, ENT_QUOTES, 'UTF-8'); ?>');"></div>
 	<div class="container reveal">
 		<span class="tag">Dịch vụ</span>
 		<h1>Dịch vụ của chúng tôi</h1>
@@ -23,7 +26,7 @@ $industries = site_fetch_all('SELECT id, name, slug, description FROM industries
 	<div class="container">
 		<h2 class="reveal">Danh sách dịch vụ</h2>
 
-		<div style="display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-top:18px;align-items:start;">
+		<div class="services-layout" style="display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-top:18px;align-items:start;">
 			<div>
 				<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
 					<div><strong><?php echo count($services); ?></strong> dịch vụ đang hiển thị</div>
@@ -82,7 +85,7 @@ $industries = site_fetch_all('SELECT id, name, slug, description FROM industries
 				<?php endif; ?>
 			</div>
 
-			<aside>
+			<aside class="services-sidebar">
 				<div class="card">
 					<h3>Các ngành Marketing</h3>
 					<ul style="margin:0;padding:0;list-style:none;">

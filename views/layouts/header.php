@@ -202,21 +202,6 @@
 
                         <div class="mega-dropdown" data-dropdown>
                             <div class="dropdown-grid container">
-
-                                <!-- CỘT 1: Blog chung -->
-                                <div class="dropdown-column">
-                                    <h4>Blog</h4>
-                                    <ul>
-                                        <li>
-                                            <a href="<?php echo htmlspecialchars(site_page_url('blog'), ENT_QUOTES, 'UTF-8'); ?>"
-                                               class="<?php echo (($currentPage ?? '') === 'blog') ? 'active' : ''; ?>">
-                                                Tất cả bài viết
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-
-                                <!-- CỘT 2: Kiến thức Marketing theo ngành -->
                                 <div class="dropdown-column">
                                     <h4>Kiến thức Marketing theo ngành</h4>
                                     <ul>
@@ -231,9 +216,15 @@
                                                 </a>
                                             </li>
                                         <?php endforeach; ?>
+                                        <li>
+                                            <a href="<?php echo htmlspecialchars(site_page_url('blog'), ENT_QUOTES, 'UTF-8'); ?>"
+                                               class="<?php echo (($currentPage ?? '') === 'blog') ? 'active' : ''; ?>"
+                                               style="border-top:1px solid rgba(255,255,255,0.06);margin-top:6px;padding-top:10px;font-weight:700;">
+                                                Tất cả bài viết →
+                                            </a>
+                                        </li>
                                     </ul>
                                 </div>
-
                             </div>
                         </div>
                     </li>
