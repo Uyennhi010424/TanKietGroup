@@ -32,7 +32,7 @@ if ($db && $_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt = $db->prepare('DELETE FROM users WHERE id = :id');
                 $stmt->execute(['id' => $id]);
             }
-            header('Location: ' . with_query($adminRoutes['users'], ['msg' => 'Da xoa nguoi dung']));
+            header('Location: ' . with_query($adminRoutes['users'], ['msg' => 'Đã xóa người dùng']));
             exit;
         }
 
@@ -47,11 +47,11 @@ if ($db && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $password = trim($_POST['password'] ?? '');
 
             if ($username === '' || $email === '') {
-                throw new RuntimeException('Username va email khong duoc de trong');
+                throw new RuntimeException('Username và email không được để trống');
             }
 
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                throw new RuntimeException('Email khong dung dinh dang');
+                throw new RuntimeException('Email không đúng định dạng');
             }
 
             if (!in_array($role, ['admin', 'editor', 'user'], true)) {
@@ -64,7 +64,7 @@ if ($db && $_SERVER['REQUEST_METHOD'] === 'POST') {
                 'id' => $id,
             ]);
             if ((int)$userNameCheck->fetchColumn() > 0) {
-                throw new RuntimeException('Username da ton tai');
+                throw new RuntimeException('Username đã tồn tại');
             }
 
             $emailCheck = $db->prepare('SELECT COUNT(*) FROM users WHERE email = :email AND id <> :id');
@@ -73,7 +73,7 @@ if ($db && $_SERVER['REQUEST_METHOD'] === 'POST') {
                 'id' => $id,
             ]);
             if ((int)$emailCheck->fetchColumn() > 0) {
-                throw new RuntimeException('Email da ton tai');
+                throw new RuntimeException('Email đã tồn tại');
             }
 
             if ($id > 0) {

@@ -81,6 +81,7 @@ if ($db && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $content = sanitize_html(trim($_POST['content'] ?? ''));
             $image = trim($_POST['current_image'] ?? '');
             $status = (int)($_POST['status'] ?? 1);
+            $isFeatured = (int)($_POST['is_featured'] ?? 0);
 
             if ($title === '') {
                 throw new RuntimeException('Tên dịch vụ không được để trống');
@@ -118,7 +119,7 @@ if ($db && $_SERVER['REQUEST_METHOD'] === 'POST') {
             ensure_service_packages_table($db);
 
             if ($id > 0) {
-                $stmt = $db->prepare('UPDATE services SET title = :title, slug = :slug, industry_id = :industry_id, service_type = :service_type, short_desc = :short_desc, content = :content, image = :image, status = :status WHERE id = :id');
+                $stmt = $db->prepare('UPDATE services SET title = :title, slug = :slug, industry_id = :industry_id, service_type = :service_type, short_desc = :short_desc, content = :content, image = :image, status = :status, is_featured = :is_featured WHERE id = :id');
                 $stmt->execute([
                     'id' => $id,
                     'title' => $title,
@@ -129,6 +130,7 @@ if ($db && $_SERVER['REQUEST_METHOD'] === 'POST') {
                     'content' => $content,
                     'image' => $image,
                     'status' => $status,
+                    'is_featured' => $isFeatured,
                 ]);
 
                 // Delete old packages and re-insert
@@ -152,7 +154,7 @@ if ($db && $_SERVER['REQUEST_METHOD'] === 'POST') {
                 exit;
             }
 
-            $stmt = $db->prepare('INSERT INTO services (title, slug, industry_id, service_type, short_desc, content, image, status) VALUES (:title, :slug, :industry_id, :service_type, :short_desc, :content, :image, :status)');
+            $stmt = $db->prepare('INSERT INTO services (title, slug, industry_id, service_type, short_desc, content, image, status, is_featured) VALUES (:title, :slug, :industry_id, :service_type, :short_desc, :content, :image, :status, :is_featured)');
             $stmt->execute([
                 'title' => $title,
                 'slug' => $slug,
@@ -162,6 +164,7 @@ if ($db && $_SERVER['REQUEST_METHOD'] === 'POST') {
                 'content' => $content,
                 'image' => $image,
                 'status' => $status,
+                'is_featured' => $isFeatured,
             ]);
 
             $newId = (int)$db->lastInsertId();
@@ -203,12 +206,13 @@ $editing = [
     'content' => '',
     'image' => '',
     'status' => 1,
+    'is_featured' => 0,
 ];
 
 if ($db && isset($_GET['edit'])) {
     $editId = (int)$_GET['edit'];
     if ($editId > 0) {
-        $stmt = $db->prepare('SELECT s.id, s.title, s.slug, s.industry_id, s.service_type, s.short_desc, s.content, s.image, s.status, i.name AS industry_name FROM services s LEFT JOIN industries i ON i.id = s.industry_id WHERE s.id = :id LIMIT 1');
+        $stmt = $db->prepare('SELECT s.id, s.title, s.slug, s.industry_id, s.service_type, s.short_desc, s.content, s.image, s.status, s.is_featured, i.name AS industry_name FROM services s LEFT JOIN industries i ON i.id = s.industry_id WHERE s.id = :id LIMIT 1');
         $stmt->execute(['id' => $editId]);
         $row = $stmt->fetch();
         if ($row) {
@@ -234,7 +238,7 @@ $industries = [];
 $rows = [];
 if ($db) {
     $industries = $db->query('SELECT id, name FROM industries ORDER BY name ASC')->fetchAll();
-    $rows = $db->query('SELECT s.id, s.title, s.slug, s.status, COALESCE(i.name, "-") AS industry_name FROM services s LEFT JOIN industries i ON i.id = s.industry_id ORDER BY s.id DESC')->fetchAll();
+    $rows = $db->query('SELECT s.id, s.title, s.slug, s.status, s.is_featured, COALESCE(i.name, "-") AS industry_name FROM services s LEFT JOIN industries i ON i.id = s.industry_id ORDER BY s.is_featured DESC, s.id DESC')->fetchAll();
 }
 
 admin_header('Dịch vụ', 'Quản lý các dịch vụ', $admin, 'services');
@@ -305,6 +309,13 @@ admin_header('Dịch vụ', 'Quản lý các dịch vụ', $admin, 'services');
                             <select class="form-control" name="status">
                                 <option value="1" <?php echo (int)$editing['status'] === 1 ? 'selected' : ''; ?>>Active</option>
                                 <option value="0" <?php echo (int)$editing['status'] === 0 ? 'selected' : ''; ?>>Inactive</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="small">Tiêu biểu</label>
+                            <select class="form-control" name="is_featured">
+                                <option value="0" <?php echo (int)($editing['is_featured'] ?? 0) === 0 ? 'selected' : ''; ?>>Không</option>
+                                <option value="1" <?php echo (int)($editing['is_featured'] ?? 0) === 1 ? 'selected' : ''; ?>>Tiêu biểu</option>
                             </select>
                         </div>
                         <div style="grid-column:1 / -1;">
@@ -381,6 +392,7 @@ admin_header('Dịch vụ', 'Quản lý các dịch vụ', $admin, 'services');
                                     <th>Tên dịch vụ</th>
                                     <th>Ngành</th>
                                     <th>Slug</th>
+                                    <th>Tiêu biểu</th>
                                     <th>Trạng thái</th>
                                     <th></th>
                                 </tr>
@@ -388,7 +400,7 @@ admin_header('Dịch vụ', 'Quản lý các dịch vụ', $admin, 'services');
                             <tbody>
                                 <?php if (!$rows): ?>
                                     <tr>
-                                        <td colspan="6" style="text-align:center;color:var(--ak-muted);">Chưa có dữ liệu dịch vụ</td>
+                                        <td colspan="7" style="text-align:center;color:var(--ak-muted);">Chưa có dữ liệu dịch vụ</td>
                                     </tr>
                                 <?php else: ?>
                                     <?php foreach ($rows as $row): ?>
@@ -397,6 +409,7 @@ admin_header('Dịch vụ', 'Quản lý các dịch vụ', $admin, 'services');
                                             <td><?php echo h($row['title']); ?></td>
                                             <td><span class="badge"><?php echo h($row['industry_name']); ?></span></td>
                                             <td><?php echo h($row['slug']); ?></td>
+                                            <td><?php echo (int)($row['is_featured'] ?? 0) === 1 ? 'Tiêu biểu' : '-'; ?></td>
                                             <td><?php echo (int)$row['status'] === 1 ? 'Active' : 'Inactive'; ?></td>
                                             <td style="text-align:right;display:flex;gap:8px;justify-content:flex-end;">
                                                 <a class="btn-admin" style="text-decoration:none;" href="<?php echo h(with_query($adminRoutes['services'], ['edit' => (int)$row['id']])); ?>">Sửa</a>

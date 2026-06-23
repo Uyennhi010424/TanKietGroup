@@ -24,6 +24,7 @@ function admin_header(string $pageTitle, string $pageSubtitle, array $admin, str
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title><?php echo h($pageTitle); ?> - Trang quản trị</title>
     <link rel="icon" href="<?php echo h($admin['faviconUrl'] ?? site_favicon_url()); ?>">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
     <style><?php echo file_get_contents(__DIR__ . '/../../admin/assets/css/admin.css'); ?></style>
     <script><?php echo file_get_contents(__DIR__ . '/../../admin/assets/js/admin.js'); ?></script>
 </head>
@@ -42,6 +43,7 @@ function admin_header(string $pageTitle, string $pageSubtitle, array $admin, str
                     <li><a href="<?php echo $routes['courses']; ?>"<?php if ($currentPage === 'courses') echo ' class="active"'; ?>>Khóa học</a></li>
                     <li><a href="<?php echo $routes['projects']; ?>"<?php if ($currentPage === 'projects') echo ' class="active"'; ?>>Dự án</a></li>
                     <li><a href="<?php echo $routes['services']; ?>"<?php if ($currentPage === 'services') echo ' class="active"'; ?>>Dịch vụ</a></li>
+                    <li><a href="<?php echo $routes['industries']; ?>"<?php if ($currentPage === 'industries') echo ' class="active"'; ?>>Marketing theo ngành</a></li>
                     <li><a href="<?php echo $routes['clients']; ?>"<?php if ($currentPage === 'clients') echo ' class="active"'; ?>>Khách hàng</a></li>
                     <li><a href="<?php echo $routes['users']; ?>"<?php if ($currentPage === 'users') echo ' class="active"'; ?>>Người dùng</a></li>
                     <li><a href="<?php echo $routes['blog']; ?>"<?php if ($currentPage === 'blog') echo ' class="active"'; ?>>Blog</a></li>

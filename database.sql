@@ -110,6 +110,7 @@ CREATE TABLE services (
     service_type VARCHAR(100),
     sort_order INT DEFAULT 0,
     status TINYINT(1) DEFAULT 1,
+    is_featured TINYINT(1) DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (industry_id) REFERENCES industries(id) ON DELETE SET NULL
@@ -134,6 +135,7 @@ CREATE TABLE projects (
     start_date DATE,
     end_date DATE,
     status TINYINT(1) DEFAULT 1,
+    is_featured TINYINT(1) DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (industry_id) REFERENCES industries(id) ON DELETE SET NULL,

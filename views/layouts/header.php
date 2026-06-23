@@ -149,7 +149,7 @@
                     </li>
 
                     <!-- MEGA DROPDOWN: DỊCH VỤ -->
-                    <li class="has-dropdown <?php echo in_array($currentPage ?? '', ['services', 'service_detail', 'services_by_type', 'industry_detail'], true) ? 'active' : ''; ?>">
+                    <li class="has-dropdown <?php echo in_array($currentPage ?? '', ['services', 'service_detail', 'services_by_type'], true) ? 'active' : ''; ?>">
                         <button class="dropdown-toggle" data-dropdown-toggle aria-expanded="false">
                             Dịch vụ <span class="dropdown-arrow" aria-hidden="true">▾</span>
                         </button>
@@ -157,7 +157,7 @@
                         <div class="mega-dropdown" data-dropdown>
                             <div class="dropdown-grid container">
 
-                                <!-- CỘT 1: Dịch vụ theo loại -->
+                                <!-- Dịch vụ theo loại -->
                                 <div class="dropdown-column">
                                     <h4>Dịch vụ chính</h4>
                                     <ul>
@@ -169,24 +169,6 @@
                                                 ); ?>"
                                                    class="<?php echo (($currentPage ?? '') === 'services_by_type' && ($_GET['slug'] ?? '') === $typeSlug) ? 'active' : ''; ?>">
                                                     <?php echo htmlspecialchars($typeName, ENT_QUOTES, 'UTF-8'); ?>
-                                                </a>
-                                            </li>
-                                        <?php endforeach; ?>
-                                    </ul>
-                                </div>
-
-                                <!-- CỘT 2: Dịch vụ theo ngành -->
-                                <div class="dropdown-column">
-                                    <h4>Marketing theo ngành</h4>
-                                    <ul>
-                                        <?php foreach ($industries as $industrySlug => $industryName): ?>
-                                            <li>
-                                                <a href="<?php echo htmlspecialchars(
-                                                    site_page_url('industry_detail') . '&slug=' . rawurlencode($industrySlug),
-                                                    ENT_QUOTES, 'UTF-8'
-                                                ); ?>"
-                                                   class="<?php echo (($currentPage ?? '') === 'industry_detail' && ($_GET['slug'] ?? '') === $industrySlug) ? 'active' : ''; ?>">
-                                                    Marketing cho <?php echo htmlspecialchars($industryName, ENT_QUOTES, 'UTF-8'); ?>
                                                 </a>
                                             </li>
                                         <?php endforeach; ?>
@@ -212,13 +194,50 @@
                             Dự án
                         </a>
                     </li>
-                    <li>
-                        <a
-                            class="<?php echo in_array($currentPage ?? '', ['blog', 'blog_detail'], true) ? 'active' : ''; ?>"
-                            href="<?php echo htmlspecialchars(site_page_url('blog'), ENT_QUOTES, 'UTF-8'); ?>">
-                            Blog
-                        </a>
+                    <!-- MEGA DROPDOWN: BLOG -->
+                    <li class="has-dropdown <?php echo in_array($currentPage ?? '', ['blog', 'blog_detail', 'industry_detail'], true) ? 'active' : ''; ?>">
+                        <button class="dropdown-toggle" data-dropdown-toggle aria-expanded="false">
+                            Blog <span class="dropdown-arrow" aria-hidden="true">▾</span>
+                        </button>
+
+                        <div class="mega-dropdown" data-dropdown>
+                            <div class="dropdown-grid container">
+
+                                <!-- CỘT 1: Blog chung -->
+                                <div class="dropdown-column">
+                                    <h4>Blog</h4>
+                                    <ul>
+                                        <li>
+                                            <a href="<?php echo htmlspecialchars(site_page_url('blog'), ENT_QUOTES, 'UTF-8'); ?>"
+                                               class="<?php echo (($currentPage ?? '') === 'blog') ? 'active' : ''; ?>">
+                                                Tất cả bài viết
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <!-- CỘT 2: Kiến thức Marketing theo ngành -->
+                                <div class="dropdown-column">
+                                    <h4>Kiến thức Marketing theo ngành</h4>
+                                    <ul>
+                                        <?php foreach ($industries as $industrySlug => $industryName): ?>
+                                            <li>
+                                                <a href="<?php echo htmlspecialchars(
+                                                    site_page_url('industry_detail') . '&slug=' . rawurlencode($industrySlug),
+                                                    ENT_QUOTES, 'UTF-8'
+                                                ); ?>"
+                                                   class="<?php echo (($currentPage ?? '') === 'industry_detail' && ($_GET['slug'] ?? '') === $industrySlug) ? 'active' : ''; ?>">
+                                                    Marketing cho <?php echo htmlspecialchars($industryName, ENT_QUOTES, 'UTF-8'); ?>
+                                                </a>
+                                            </li>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                </div>
+
+                            </div>
+                        </div>
                     </li>
+                    <!-- /MEGA DROPDOWN -->
                     <li>
                         <a
                             class="<?php echo ($currentPage ?? '') === 'recruitments' ? 'active' : ''; ?>"

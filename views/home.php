@@ -16,14 +16,14 @@ $services = site_fetch_all(
 	'SELECT s.id, s.title, s.slug, s.short_desc, s.image, i.name AS industry_name
      FROM services s
      LEFT JOIN industries i ON i.id = s.industry_id
-     WHERE s.status = 1
+     WHERE s.status = 1 AND s.is_featured = 1
      ORDER BY s.sort_order ASC, s.id DESC
      LIMIT 6'
 );
 $projects = site_fetch_all(
 	'SELECT id, title, slug, short_desc, thumbnail
      FROM projects
-     WHERE status = 1
+     WHERE status = 1 AND is_featured = 1
      ORDER BY created_at DESC
      LIMIT 4'
 );

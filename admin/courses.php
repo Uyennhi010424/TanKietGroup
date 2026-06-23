@@ -159,11 +159,11 @@ admin_header('Khóa học', 'Quản lý các khóa học', $admin, 'courses');
 
             <div>
                 <label class="small">Tên khóa học</label>
-                <input class="form-control" type="text" name="title" required value="<?php echo h($editing['title']); ?>">
+                <input class="form-control" type="text" name="title" id="courseTitleInput" required value="<?php echo h($editing['title']); ?>">
             </div>
             <div>
                 <label class="small">Slug</label>
-                <input class="form-control" type="text" name="slug" value="<?php echo h($editing['slug']); ?>">
+                <input class="form-control" type="text" name="slug" id="courseSlugInput" value="<?php echo h($editing['slug']); ?>" placeholder="Tự tạo từ tên khóa học">
             </div>
             <div>
                 <label class="small">Thời lượng</label>
@@ -257,3 +257,31 @@ admin_header('Khóa học', 'Quản lý các khóa học', $admin, 'courses');
 </section>
 
 <?php admin_footer(); ?>
+<script>
+(function() {
+    var titleInput = document.getElementById('courseTitleInput');
+    var slugInput = document.getElementById('courseSlugInput');
+    if (!titleInput || !slugInput) return;
+
+    function slugify(text) {
+        return String(text || '')
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[̀-ͯ]/g, '')
+            .replace(/đ/g, 'd')
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-+|-+$/g, '');
+    }
+
+    function updateSlug() {
+        slugInput.value = slugify(titleInput.value.trim());
+    }
+
+    titleInput.addEventListener('input', updateSlug);
+
+    // Only auto-generate if slug is empty (new item)
+    if (slugInput.value.trim() === '') {
+        updateSlug();
+    }
+})();
+</script>

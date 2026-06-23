@@ -62,6 +62,7 @@ if ($db && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $resultMetrics = trim($_POST['result_metrics'] ?? '');
             $thumbnail = trim($_POST['current_thumbnail'] ?? '');
             $status = (int)($_POST['status'] ?? 1);
+            $isFeatured = (int)($_POST['is_featured'] ?? 0);
 
             if ($title === '') {
                 throw new RuntimeException('Tên dự án không được để trống');
@@ -117,7 +118,7 @@ if ($db && $_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             if ($id > 0) {
-                $stmt = $db->prepare('UPDATE projects SET title = :title, slug = :slug, client_name = :client_name, industry_id = :industry_id, service_id = :service_id, short_desc = :short_desc, content = :content, result_metrics = :result_metrics, thumbnail = :thumbnail, images = :images, status = :status WHERE id = :id');
+                $stmt = $db->prepare('UPDATE projects SET title = :title, slug = :slug, client_name = :client_name, industry_id = :industry_id, service_id = :service_id, short_desc = :short_desc, content = :content, result_metrics = :result_metrics, thumbnail = :thumbnail, images = :images, status = :status, is_featured = :is_featured WHERE id = :id');
                 $stmt->execute([
                     'id' => $id,
                     'title' => $title,
@@ -131,11 +132,12 @@ if ($db && $_SERVER['REQUEST_METHOD'] === 'POST') {
                     'thumbnail' => $thumbnail,
                     'images' => $imagesJson,
                     'status' => $status,
+                    'is_featured' => $isFeatured,
                 ]);
                 header('Location: ' . with_query($adminRoutes['projects'], ['msg' => 'Đã cập nhật dự án']));
                 exit;
             }
-            $stmt = $db->prepare('INSERT INTO projects (title, slug, client_name, industry_id, service_id, short_desc, content, result_metrics, thumbnail, images, status) VALUES (:title, :slug, :client_name, :industry_id, :service_id, :short_desc, :content, :result_metrics, :thumbnail, :images, :status)');
+            $stmt = $db->prepare('INSERT INTO projects (title, slug, client_name, industry_id, service_id, short_desc, content, result_metrics, thumbnail, images, status, is_featured) VALUES (:title, :slug, :client_name, :industry_id, :service_id, :short_desc, :content, :result_metrics, :thumbnail, :images, :status, :is_featured)');
             $stmt->execute([
                 'title' => $title,
                 'slug' => $slug,
@@ -148,6 +150,7 @@ if ($db && $_SERVER['REQUEST_METHOD'] === 'POST') {
                 'thumbnail' => $thumbnail,
                 'images' => $imagesJson,
                 'status' => $status,
+                'is_featured' => $isFeatured,
             ]);
             header('Location: ' . with_query($adminRoutes['projects'], ['msg' => 'Đã thêm dự án']));
             exit;
@@ -171,12 +174,13 @@ $editing = [
     'thumbnail' => '',
     'images' => '[]',
     'status' => 1,
+    'is_featured' => 0,
 ];
 
 if ($db && isset($_GET['edit'])) {
     $editId = (int)$_GET['edit'];
     if ($editId > 0) {
-        $stmt = $db->prepare('SELECT p.id, p.title, p.slug, p.client_name, p.industry_id, p.service_id, p.short_desc, p.content, p.result_metrics, p.thumbnail, p.images, p.status, i.name AS industry_name FROM projects p LEFT JOIN industries i ON i.id = p.industry_id WHERE p.id = :id LIMIT 1');
+        $stmt = $db->prepare('SELECT p.id, p.title, p.slug, p.client_name, p.industry_id, p.service_id, p.short_desc, p.content, p.result_metrics, p.thumbnail, p.images, p.status, p.is_featured, i.name AS industry_name FROM projects p LEFT JOIN industries i ON i.id = p.industry_id WHERE p.id = :id LIMIT 1');
         $stmt->execute(['id' => $editId]);
         $row = $stmt->fetch();
         if ($row) {
@@ -191,7 +195,7 @@ $rows = [];
 if ($db) {
     $industries = $db->query('SELECT id, name FROM industries ORDER BY name ASC')->fetchAll();
     $services = $db->query('SELECT s.id, s.title, s.industry_id, i.name AS industry_name FROM services s LEFT JOIN industries i ON i.id = s.industry_id ORDER BY s.title ASC')->fetchAll();
-    $rows = $db->query('SELECT p.id, p.title, p.slug, p.client_name, p.thumbnail, p.status, COALESCE(i.name, "-") AS industry_name FROM projects p LEFT JOIN industries i ON i.id = p.industry_id ORDER BY p.id DESC')->fetchAll();
+    $rows = $db->query('SELECT p.id, p.title, p.slug, p.client_name, p.thumbnail, p.status, p.is_featured, COALESCE(i.name, "-") AS industry_name FROM projects p LEFT JOIN industries i ON i.id = p.industry_id ORDER BY p.is_featured DESC, p.id DESC')->fetchAll();
 }
 
 admin_header('Dự án', 'Quản lý các dự án', $admin, 'projects');
@@ -254,6 +258,13 @@ admin_header('Dự án', 'Quản lý các dự án', $admin, 'projects');
                             <select class="form-control" name="status">
                                 <option value="1" <?php echo (int)$editing['status'] === 1 ? 'selected' : ''; ?>>Active</option>
                                 <option value="0" <?php echo (int)$editing['status'] === 0 ? 'selected' : ''; ?>>Inactive</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="small">Tiêu biểu</label>
+                            <select class="form-control" name="is_featured">
+                                <option value="0" <?php echo (int)($editing['is_featured'] ?? 0) === 0 ? 'selected' : ''; ?>>Không</option>
+                                <option value="1" <?php echo (int)($editing['is_featured'] ?? 0) === 1 ? 'selected' : ''; ?>>Tiêu biểu</option>
                             </select>
                         </div>
 
@@ -322,6 +333,7 @@ admin_header('Dự án', 'Quản lý các dự án', $admin, 'projects');
                                     <th>Khách hàng</th>
                                     <th>Ngành</th>
                                     <th>Slug</th>
+                                    <th>Tiêu biểu</th>
                                     <th>Ảnh</th>
                                     <th></th>
                                 </tr>
@@ -329,7 +341,7 @@ admin_header('Dự án', 'Quản lý các dự án', $admin, 'projects');
                             <tbody>
                                 <?php if (!$rows): ?>
                                     <tr>
-                                        <td colspan="7" style="text-align:center;color:var(--ak-muted);">Chưa có dữ liệu dự án</td>
+                                        <td colspan="8" style="text-align:center;color:var(--ak-muted);">Chưa có dữ liệu dự án</td>
                                     </tr>
                                 <?php else: ?>
                                     <?php foreach ($rows as $row): ?>
@@ -339,6 +351,7 @@ admin_header('Dự án', 'Quản lý các dự án', $admin, 'projects');
                                             <td><?php echo h($row['client_name'] ?: '-'); ?></td>
                                             <td><span class="badge"><?php echo h($row['industry_name']); ?></span></td>
                                             <td><?php echo h($row['slug']); ?></td>
+                                            <td><?php echo (int)($row['is_featured'] ?? 0) === 1 ? 'Tiêu biểu' : '-'; ?></td>
                                             <td>
                                                 <?php if (!empty($row['thumbnail'])): ?>
                                                     <img src="<?php echo h($mediaRoute . rawurlencode($row['thumbnail'])); ?>" alt="Thumbnail" style="max-height:44px;border-radius:8px;border:1px solid rgba(255,255,255,0.08);">

@@ -69,6 +69,7 @@ function admin_routes(): array
         'settings'       => site_page_url('admin_settings'),
         'consultations'  => site_page_url('admin_consultations'),
         'clients'        => site_page_url('admin_clients'),
+        'industries'     => site_page_url('admin_industries'),
     ];
 }
 

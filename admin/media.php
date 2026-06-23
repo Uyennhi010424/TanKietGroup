@@ -17,8 +17,11 @@ if (str_contains($relativePath, '..') || str_contains($relativePath, "\0")) {
     exit;
 }
 
-// Normalize slashes
+// Normalize slashes and remove 'uploads/' prefix since baseDir already points to uploads/
 $relativePath = ltrim(str_replace('\\', '/', $relativePath), '/');
+if (str_starts_with($relativePath, 'uploads/')) {
+    $relativePath = substr($relativePath, 8);
+}
 
 $baseDir = realpath(__DIR__ . '/../uploads');
 if ($baseDir === false) {

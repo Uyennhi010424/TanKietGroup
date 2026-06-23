@@ -49,16 +49,20 @@ if (!str_starts_with($normalizedFile, $normalizedBase . '/')) {
     exit;
 }
 
-// Detect MIME type
-$ext = strtolower(pathinfo($resolved, PATHINFO_EXTENSION));
-$mimes = [
-    'jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg',
-    'png' => 'image/png', 'webp' => 'image/webp',
-    'gif' => 'image/gif', 'svg' => 'image/svg+xml',
-    'pdf' => 'application/pdf',
-];
-
-$mime = $mimes[$ext] ?? 'application/octet-stream';
+// Detect MIME type (prefer finfo for accuracy, fallback to extension)
+$finfo = finfo_open(FILEINFO_MIME_TYPE);
+$mime = finfo_file($finfo, $resolved);
+finfo_close($finfo);
+if ($mime === false || $mime === 'application/octet-stream') {
+    $ext = strtolower(pathinfo($resolved, PATHINFO_EXTENSION));
+    $mimes = [
+        'jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg',
+        'png' => 'image/png', 'webp' => 'image/webp',
+        'gif' => 'image/gif', 'svg' => 'image/svg+xml',
+        'pdf' => 'application/pdf',
+    ];
+    $mime = $mimes[$ext] ?? 'application/octet-stream';
+}
 
 // Serve file
 header('Content-Type: ' . $mime);

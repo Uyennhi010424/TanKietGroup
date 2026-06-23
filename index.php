@@ -333,6 +333,11 @@ $viewMap = [
 		'title' => 'Quản lý khách hàng',
 		'layout' => 'none',
 	],
+	'admin_industries' => [
+		'view' => __DIR__ . '/admin/industries.php',
+		'title' => 'Marketing theo ngành',
+		'layout' => 'none',
+	],
 	'admin_login' => [
 		'view' => __DIR__ . '/admin/login.php',
 		'title' => 'Đăng nhập quản trị',

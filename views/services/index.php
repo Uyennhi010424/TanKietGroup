@@ -3,11 +3,11 @@ require_once __DIR__ . '/../../includes/site.php';
 
 $site = site_settings();
 $services = site_fetch_all(
-	'SELECT s.id, s.title, s.slug, s.short_desc, s.content, s.image, i.name AS industry_name
+	'SELECT s.id, s.title, s.slug, s.short_desc, s.content, s.image, s.is_featured, i.name AS industry_name
 	 FROM services s
 	 LEFT JOIN industries i ON i.id = s.industry_id
 	 WHERE s.status = 1
-	 ORDER BY s.sort_order ASC, s.id DESC'
+	 ORDER BY s.is_featured DESC, s.sort_order ASC, s.id DESC'
 );
 $industries = site_fetch_all('SELECT id, name, slug, description FROM industries ORDER BY sort_order ASC, id ASC');
 ?>
@@ -69,7 +69,10 @@ $industries = site_fetch_all('SELECT id, name, slug, description FROM industries
 						<?php if (!$services): ?>
 							<article class="card reveal"><h3>Chưa có dịch vụ</h3><p class="muted">Thêm dịch vụ trong trang quản trị để hiển thị tại đây.</p></article>
 						<?php else: foreach ($services as $service): ?>
-							<article class="card reveal">
+							<article class="card reveal" style="position:relative;">
+								<?php if ((int)($service['is_featured'] ?? 0) === 1): ?>
+									<span style="position:absolute;top:12px;right:12px;background:rgba(255,200,0,0.9);color:#1a1a1a;font-size:0.72rem;font-weight:700;padding:4px 10px;border-radius:999px;z-index:1;">Tiêu biểu</span>
+								<?php endif; ?>
 								<img src="<?php echo htmlspecialchars(site_image_url($service['image'] ?? '', '/img/du_an.jpg'), ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($service['title'], ENT_QUOTES, 'UTF-8'); ?>" style="width:100%;height:200px;object-fit:cover;border-radius:12px;" loading="lazy">
 								<h3 style="margin-top:14px;"><?php echo htmlspecialchars($service['title'], ENT_QUOTES, 'UTF-8'); ?></h3>
 								<p class="muted"><?php echo htmlspecialchars($service['short_desc'] ?: ($service['industry_name'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></p>

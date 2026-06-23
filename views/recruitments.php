@@ -14,16 +14,16 @@ function rc_h($v) { return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8'); }
 ?>
 
 <!-- Hero -->
-<section class="rc-hero">
-	<div class="container rc-hero__inner reveal">
-		<span class="rc-hero__tag">Tuyển dụng</span>
-		<h1 class="rc-hero__title">Cơ hội nghề nghiệp</h1>
-		<p class="rc-hero__desc">Gia nhập đội ngũ TanKiet Group — nơi bạn được phát triển và tỏa sáng.</p>
+<section class="hero">
+	<div class="container reveal">
+		<span class="tag">Tuyển dụng</span>
+		<h1>Cơ hội nghề nghiệp</h1>
+		<p class="lead">Gia nhập đội ngũ TanKiet Group — nơi bạn được phát triển và tỏa sáng.</p>
 	</div>
 </section>
 
 <!-- Job List -->
-<section class="rc-body">
+<section class="section">
 	<div class="container">
 		<?php if (!$rows): ?>
 			<div class="rc-empty reveal">
@@ -35,102 +35,108 @@ function rc_h($v) { return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8'); }
 			<div class="rc-list">
 				<?php foreach ($rows as $r): ?>
 					<article class="rc-card reveal" id="job-<?php echo (int)$r['id']; ?>">
-						<!-- Header: title + tags -->
-						<div class="rc-card__header">
-							<h3 class="rc-card__title"><?php echo rc_h($r['title']); ?></h3>
-							<div class="rc-card__tags">
-								<?php if ($r['location']): ?>
-									<span class="rc-tag rc-tag--location"><?php echo rc_h($r['location']); ?></span>
-								<?php endif; ?>
-								<?php if ($r['salary']): ?>
-									<span class="rc-tag rc-tag--salary"><?php echo rc_h($r['salary']); ?></span>
-								<?php endif; ?>
-								<?php if ($r['deadline']): ?>
-									<span class="rc-tag rc-tag--deadline">Hạn: <?php echo rc_h($r['deadline']); ?></span>
-								<?php endif; ?>
+						<!-- Header: title + tags + toggle button -->
+						<div class="rc-card__header" onclick="toggleJob(<?php echo (int)$r['id']; ?>)">
+							<div class="rc-card__header-left">
+								<h3 class="rc-card__title"><?php echo rc_h($r['title']); ?></h3>
+								<div class="rc-card__tags">
+									<?php if ($r['location']): ?>
+										<span class="rc-tag rc-tag--location"><?php echo rc_h($r['location']); ?></span>
+									<?php endif; ?>
+									<?php if ($r['salary']): ?>
+										<span class="rc-tag rc-tag--salary"><?php echo rc_h($r['salary']); ?></span>
+									<?php endif; ?>
+									<?php if ($r['deadline']): ?>
+										<span class="rc-tag rc-tag--deadline">Hạn: <?php echo rc_h($r['deadline']); ?></span>
+									<?php endif; ?>
+								</div>
+							</div>
+							<div class="rc-card__toggle" id="toggle-icon-<?php echo (int)$r['id']; ?>">
+								<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
 							</div>
 						</div>
 
-						<!-- Description -->
-						<?php if ($r['description']): ?>
-							<div class="rc-card__desc">
-								<?php
-									$raw = trim($r['description']);
-									$lines = preg_split('/\r\n|\r|\n/', $raw);
-									$out = [];
-									foreach ($lines as $line) {
-										$line = trim($line);
-										if ($line === '') continue;
-										$isTitle = false;
-										// Dòng toàn chữ HOA
-										if (preg_match('/^[A-ZÀ-ẠẢÃÁÂẦẤẬẨẪĂẰẮẶẲẴÈẸẺẼÉÊỀẾỆỂỄÌÍỊỈĨÒỌỎÕÓÔỒỐỘỔỖƠỜỚỢỞỠÙỤỦŨÚỪỨỰỬỮỲỴỶỸĐ\s\.\&\(\)\-:]+$/u', $line) && mb_strlen($line) > 3) {
-											$isTitle = true;
+						<!-- Collapsible content -->
+						<div class="rc-card__body" id="job-body-<?php echo (int)$r['id']; ?>" style="display:none;">
+							<!-- Description -->
+							<?php if ($r['description']): ?>
+								<div class="rc-card__desc">
+									<?php
+										$raw = trim($r['description']);
+										$lines = preg_split('/\r\n|\r|\n/', $raw);
+										$out = [];
+										foreach ($lines as $line) {
+											$line = trim($line);
+											if ($line === '') continue;
+											$isTitle = false;
+											if (preg_match('/^[A-ZÀ-ẠẢÃÁÂẦẤẬẨẪĂẰẮẶẲẴÈẸẺẼÉÊỀẾỆỂỄÌÍỊỈĨÒỌỎÕÓÔỒỐỘỔỖƠỜỚỢỞỠÙỤỦŨÚỪỨỰỬỮỲỴỶỸĐ\s\.\&\(\)\-:]+$/u', $line) && mb_strlen($line) > 3) {
+												$isTitle = true;
+											}
+											elseif (preg_match('/^(Mô tả|Yêu cầu|Quyền lợi|Phúc lợi|Thông tin|Chế độ)/ui', $line)) {
+												$isTitle = true;
+											}
+											if ($isTitle) {
+												$out[] = '<span class="rc-cap">' . htmlspecialchars($line, ENT_QUOTES, 'UTF-8') . '</span>';
+											} else {
+												$out[] = '<span class="rc-line"><span class="rc-dot"></span>' . htmlspecialchars($line, ENT_QUOTES, 'UTF-8') . '</span>';
+											}
 										}
-										// Dòng bắt đầu bằng "Mô tả", "Yêu cầu", "Quyền lợi"
-										elseif (preg_match('/^(Mô tả|Yêu cầu|Quyền lợi|Phúc lợi|Thông tin|Chế độ)/ui', $line)) {
-											$isTitle = true;
-										}
-										if ($isTitle) {
-											$out[] = '<span class="rc-cap">' . htmlspecialchars($line, ENT_QUOTES, 'UTF-8') . '</span>';
-										} else {
-											$out[] = '<span class="rc-line"><span class="rc-dot"></span>' . htmlspecialchars($line, ENT_QUOTES, 'UTF-8') . '</span>';
-										}
-									}
-									echo implode("\n", $out);
-								?>
-							</div>
-						<?php endif; ?>
+										echo implode("\n", $out);
+									?>
+								</div>
+							<?php endif; ?>
 
-						<!-- Actions -->
-						<div class="rc-card__actions">
-							<button class="rc-btn" type="button" onclick="toggleApplyForm(<?php echo (int)$r['id']; ?>)">
-								Ứng tuyển ngay
-							</button>
+							<!-- Actions -->
+							<div class="rc-card__actions">
+								<button class="rc-btn" type="button" onclick="toggleApplyForm(<?php echo (int)$r['id']; ?>)">
+									Ứng tuyển ngay
+								</button>
+							</div>
+
+							<!-- Apply Form (hidden) -->
+							<form class="rc-form" id="apply-form-<?php echo (int)$r['id']; ?>" style="display:none;" enctype="multipart/form-data" onsubmit="submitApply(event, <?php echo (int)$r['id']; ?>)">
+								<input type="hidden" name="job_id" value="<?php echo (int)$r['id']; ?>">
+								<input type="hidden" name="csrf_token" value="<?php echo rc_h(csrf_token()); ?>">
+
+								<h4 class="rc-form__title">Đơn ứng tuyển</h4>
+
+								<div class="rc-form__grid">
+									<div class="rc-form__field">
+										<label>Họ và tên <span class="rc-required">*</span></label>
+										<input type="text" name="apply_name" placeholder="Nguyễn Văn A" required>
+									</div>
+									<div class="rc-form__field">
+										<label>Email <span class="rc-required">*</span></label>
+										<input type="email" name="apply_email" placeholder="email@example.com" required>
+									</div>
+									<div class="rc-form__field">
+										<label>Số điện thoại <span class="rc-required">*</span></label>
+										<input type="tel" name="apply_phone" placeholder="0901234567" required pattern="[0-9]{10,11}">
+									</div>
+									<div class="rc-form__field">
+										<label>Vị trí ứng tuyển</label>
+										<input type="text" name="apply_position" value="<?php echo rc_h($r['title']); ?>">
+									</div>
+								</div>
+
+								<div class="rc-form__field rc-form__field--full">
+									<label>Giới thiệu bản thân</label>
+									<textarea name="apply_message" rows="3" placeholder="Lý do bạn quan tâm đến vị trí này..."></textarea>
+								</div>
+
+								<div class="rc-form__field rc-form__field--full">
+									<label>Đính kèm CV <span class="rc-hint">(PDF, DOC, DOCX, JPG, PNG — tối đa 10MB)</span></label>
+									<input type="file" name="cv_file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+								</div>
+
+								<div class="rc-form__actions">
+									<button class="rc-btn rc-btn--submit" type="submit">Gửi đơn ứng tuyển</button>
+									<button class="rc-btn rc-btn--cancel" type="button" onclick="toggleApplyForm(<?php echo (int)$r['id']; ?>)">Hủy</button>
+								</div>
+
+								<div class="rc-form__msg" id="apply-msg-<?php echo (int)$r['id']; ?>" style="display:none;"></div>
+							</form>
 						</div>
-
-						<!-- Apply Form (hidden) -->
-						<form class="rc-form" id="apply-form-<?php echo (int)$r['id']; ?>" style="display:none;" enctype="multipart/form-data" onsubmit="submitApply(event, <?php echo (int)$r['id']; ?>)">
-							<input type="hidden" name="job_id" value="<?php echo (int)$r['id']; ?>">
-							<input type="hidden" name="csrf_token" value="<?php echo rc_h(csrf_token()); ?>">
-
-							<h4 class="rc-form__title">Đơn ứng tuyển</h4>
-
-							<div class="rc-form__grid">
-								<div class="rc-form__field">
-									<label>Họ và tên <span class="rc-required">*</span></label>
-									<input type="text" name="apply_name" placeholder="Nguyễn Văn A" required>
-								</div>
-								<div class="rc-form__field">
-									<label>Email <span class="rc-required">*</span></label>
-									<input type="email" name="apply_email" placeholder="email@example.com" required>
-								</div>
-								<div class="rc-form__field">
-									<label>Số điện thoại <span class="rc-required">*</span></label>
-									<input type="tel" name="apply_phone" placeholder="0901234567" required pattern="[0-9]{10,11}">
-								</div>
-								<div class="rc-form__field">
-									<label>Vị trí ứng tuyển</label>
-									<input type="text" name="apply_position" value="<?php echo rc_h($r['title']); ?>">
-								</div>
-							</div>
-
-							<div class="rc-form__field rc-form__field--full">
-								<label>Giới thiệu bản thân</label>
-								<textarea name="apply_message" rows="3" placeholder="Lý do bạn quan tâm đến vị trí này..."></textarea>
-							</div>
-
-							<div class="rc-form__field rc-form__field--full">
-								<label>Đính kèm CV <span class="rc-hint">(PDF, DOC, DOCX, JPG, PNG — tối đa 10MB)</span></label>
-								<input type="file" name="cv_file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
-							</div>
-
-							<div class="rc-form__actions">
-								<button class="rc-btn rc-btn--submit" type="submit">Gửi đơn ứng tuyển</button>
-								<button class="rc-btn rc-btn--cancel" type="button" onclick="toggleApplyForm(<?php echo (int)$r['id']; ?>)">Hủy</button>
-							</div>
-
-							<div class="rc-form__msg" id="apply-msg-<?php echo (int)$r['id']; ?>" style="display:none;"></div>
-						</form>
 					</article>
 				<?php endforeach; ?>
 			</div>
@@ -139,6 +145,15 @@ function rc_h($v) { return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8'); }
 </section>
 
 <script>
+function toggleJob(id) {
+    var body = document.getElementById('job-body-' + id);
+    var icon = document.getElementById('toggle-icon-' + id);
+    if (!body) return;
+    var isOpen = body.style.display !== 'none';
+    body.style.display = isOpen ? 'none' : 'block';
+    if (icon) icon.classList.toggle('rc-card__toggle--open', !isOpen);
+}
+
 function toggleApplyForm(id) {
     var form = document.getElementById('apply-form-' + id);
     if (form) {
